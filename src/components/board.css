@@ -1,0 +1,57 @@
+
+.piece{
+    width: 50px;
+    height: 50px;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    position: absolute;
+    
+
+}
+.chess-board{
+    width: 400px;
+    height: 400px;
+    background-image: url("../images/board_img.png");
+    background-repeat: no-repeat;
+    background-size: 100%;
+    margin: auto;
+    margin-top: 100px;
+}
+
+
+.bRk{
+    background-image: url("../images/bRk.png");
+}
+.bBp{
+    background-image: url("../images/bBp.png");
+}
+.bKt{
+    background-image: url("../images/bKt.png");
+}
+.bQn{
+    background-image: url("../images/bQn.png");
+}
+.bKg{
+    background-image: url("../images/bKg.png");
+}
+.bPn{
+    background-image: url("../images/bpawn.png");
+}
+.wRk{
+    background-image: url("../images/wRk.png");
+}
+.wBp{
+    background-image: url("../images/wBp.png");
+}
+.wKt{
+    background-image: url("../images/wKt.png");
+}
+.wQn{
+    background-image: url("../images/wQn.png");
+}
+.wKg{
+    background-image: url("../images/wKg.png");
+}
+.wPn{
+    background-image: url("../images/wpawn.png");
+}
