@@ -1,23 +1,23 @@
-const pieceSize: number = 50;
+const squareSize: number = 50;
 
 interface ChessBoardProps {
-  BoardLayout: string[][];
+  BoardLayout: {type:string;piece:string}[][];
 }
- const ChessBoard: React.FC<ChessBoardProps> = props => {
-  const {
-    BoardLayout
-  } = props;
-  const pieces: JSX.Element[] = [];
-  BoardLayout.forEach((row, rowIndex) => row.forEach((piece, colIndex) => {
-    const position = `${rowIndex},${colIndex}`;
-    const pieceStyle = {
-      transform: `translate(${colIndex * pieceSize}px, ${rowIndex * pieceSize}px)`
-    };
+const ChessBoard: React.FC<ChessBoardProps> = (props) => {
+  const { BoardLayout } = props;
+  const squares: JSX.Element[] = [];
+  BoardLayout.forEach((row, rowIndex) =>
+    row.forEach((square, colIndex) => {
+      const position = `${rowIndex},${colIndex}`;
+      const Style = {
+        transform: `translate(${colIndex * squareSize}px, ${rowIndex * squareSize}px)`,
+      };
 
-    if (piece !== "") {
-      pieces.push(<div key={position} className={`piece ${piece}`} id={position} style={pieceStyle}></div>);
-    }
-  }));
-  return <>{pieces}</>;
+      if (square.type !== "empty") {
+        squares.push(<div key={position} className={`piece ${square.type[0] + square.piece[0].toUpperCase() + square.piece[square.piece.length-1]}`} id={position} style={Style}></div>);
+      }
+    })
+  );
+  return <>{squares}</>;
 };
 export default ChessBoard;
