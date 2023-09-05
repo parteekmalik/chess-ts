@@ -7,7 +7,7 @@ const findMoves = (props: FindMovesProps): { row: number; col: number }[] => {
   let ans: { row: number; col: number }[] = [];
   const square: { type: string; piece: string } = BoardLayout[row][col];
 
-  if (square.type !== "empty" && turn === square.piece) {
+  if (square.type === turn && "" !== square.piece) {
     if (pieceFunctions.hasOwnProperty(square.piece)) {
       ans = [...pieceFunctions[square.piece]({ BoardLayout, turn, pieceType: square.piece, row, col })];
     }
@@ -25,6 +25,8 @@ const findValidMoves = (props: FindValidMovesProps): { row: number; col: number 
     }
     validMoves.push(validMovesrow);
   }
+
+  console.log(validMoves);
 
   return validMoves;
 };

@@ -1,54 +1,11 @@
 import ChessBoard from "./ChessBoard";
+import ChessBoardHints from "./ChessBoardHints";
 import { HtmlHTMLAttributes, useState } from "react";
 import "./board.css";
 import findValidMoves from "./findValidMoves";
+import { initialPoition } from "./types";
 
-const initialPoition: {type:string;piece:string}[][] = [
-  [
-    { type: "black", piece: "rook" },
-    { type: "black", piece: "knight" },
-    { type: "black", piece: "bishop" },
-    { type: "black", piece: "king" },
-    { type: "black", piece: "queen" },
-    { type: "black", piece: "bishop" },
-    { type: "black", piece: "knight" },
-    { type: "black", piece: "rook" },
-  ],
-  [
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-  ],
-  Array(8).fill({ type: "empty", piece: "" }),
-  Array(8).fill({ type: "empty", piece: "" }),
-  Array(8).fill({ type: "empty", piece: "" }),
-  Array(8).fill({ type: "empty", piece: "" }),
-  [
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-  ],
-  [
-    { type: "white", piece: "rook" },
-    { type: "white", piece: "knight" },
-    { type: "white", piece: "bishop" },
-    { type: "white", piece: "king" },
-    { type: "white", piece: "queen" },
-    { type: "white", piece: "bishop" },
-    { type: "white", piece: "knight" },
-    { type: "white", piece: "rook" },
-  ],
-];
+
 const pieceSize: number = 50;
 
 const checkForValidClick = (event: React.MouseEvent) => {
@@ -64,35 +21,31 @@ const checkForValidClick = (event: React.MouseEvent) => {
   return { isValid, row, col };
 };
 
-// const makeMove = () => {
+const makeMove = () => {
 
-// }
+}
 
 function Board() {
-  const [BoardLayout, setBoardLayout] = useState<{type:string;piece:string}[][]>(initialPoition);
-  const [turn, setTurn] = useState<string>("white");
-  const [Hints, setHints] = useState<{ row: number; col: number }[]>([]);
-  const [SelectedPiece, setSelectedPiece] = useState<{
-    isSelected: boolean;
-    row: number;
-    col: number;
-  }>({ isSelected: false, row: 0, col: 0 });
+  const [BoardData, setBoardData] = useState<{ BoardLayout: { type: string; piece: string }[][]; turn: string; ValidMoves: { row: number; col: number }[][][] }>
+  ({ BoardLayout: initialPoition, turn: "white", ValidMoves: findValidMoves({ BoardLayout: initialPoition, turn: "white" }) });
+  const [Hints, setHints] = useState<{ isShowHint: boolean; hints: { row: number; col: number }[] }>({ isShowHint: true, hints: [] });
+  const [SelectedPiece, setSelectedPiece] = useState<{ isSelected: boolean; row: number; col: number }>({ isSelected: false, row: 0, col: 0 });
 
-  // still working on findValidMoves
-  // let ValidMoves: { row: number; col: number }[][][] = findValidMoves({BoardLayout,turn});
-  // console.log(ValidMoves);
+  // still working on findValidMoves remaining : casling, en passent;
+  // let ValidMoves: { row: number; col: number }[][][] = findValidMoves({ BoardLayout: BoardData.BoardLayout, turn:BoardData.turn });
 
   const ClickHandle = (event: React.MouseEvent) => {
     const { isValid, row, col } = checkForValidClick(event);
     console.log(checkForValidClick(event));
 
+    // logic not correct select accourding to turn
     if (isValid) {
       if (!SelectedPiece.isSelected) {
         setSelectedPiece({ isSelected: true, row: row, col: col });
-        // setHints(ValidMoves[row][col]);
+        setHints({...Hints,hints: BoardData.ValidMoves[row][col]});
       } else {
-        if (Hints.some((hint) => hint.row === row && hint.col === col)) {
-          // makeMove();
+        if (Hints.hints.some((hint) => hint.row === row && hint.col === col)) {
+          makeMove();
         } else {
           setSelectedPiece({ ...SelectedPiece, isSelected: false });
         }
@@ -104,7 +57,8 @@ function Board() {
 
   return (
     <div className="chess-board" onClick={ClickHandle}>
-      <ChessBoard BoardLayout={BoardLayout} />
+      <ChessBoard BoardLayout={BoardData.BoardLayout} />
+      <ChessBoardHints Hints={Hints} />
     </div>
   );
 }

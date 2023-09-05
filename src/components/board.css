@@ -1,57 +1,55 @@
-
-.piece{
-    width: 50px;
-    height: 50px;
-    background-repeat: no-repeat;
-    background-size: 100%;
-    position: absolute;
-    
-
+.piece {
+  width: 50px;
+  height: 50px;
+  background-repeat: no-repeat;
+  background-size: 100%;
+  position: absolute;
 }
-.chess-board{
-    width: 400px;
-    height: 400px;
-    background-image: url("../images/board_img.png");
-    background-repeat: no-repeat;
-    background-size: 100%;
-    margin: auto;
-    margin-top: 100px;
+.chess-board {
+  width: 400px;
+  height: 400px;
+  background-image: url("../images/board_img.png");
+  background-repeat: no-repeat;
+  background-size: 100%;
+  margin: auto;
+  margin-top: 100px;
 }
-
-
-.bRk{
-    background-image: url("../images/bRk.png");
+.hint{
+  background-color: red;
 }
-.bBp{
-    background-image: url("../images/bBp.png");
+.bRk {
+  background-image: url("../images/bRk.png");
 }
-.bKt{
-    background-image: url("../images/bKt.png");
+.bBp {
+  background-image: url("../images/bBp.png");
 }
-.bQn{
-    background-image: url("../images/bQn.png");
+.bKt {
+  background-image: url("../images/bKt.png");
 }
-.bKg{
-    background-image: url("../images/bKg.png");
+.bQn {
+  background-image: url("../images/bQn.png");
 }
-.bPn{
-    background-image: url("../images/bpawn.png");
+.bKg {
+  background-image: url("../images/bKg.png");
 }
-.wRk{
-    background-image: url("../images/wRk.png");
+.bPn {
+  background-image: url("../images/bpawn.png");
 }
-.wBp{
-    background-image: url("../images/wBp.png");
+.wRk {
+  background-image: url("../images/wRk.png");
 }
-.wKt{
-    background-image: url("../images/wKt.png");
+.wBp {
+  background-image: url("../images/wBp.png");
 }
-.wQn{
-    background-image: url("../images/wQn.png");
+.wKt {
+  background-image: url("../images/wKt.png");
 }
-.wKg{
-    background-image: url("../images/wKg.png");
+.wQn {
+  background-image: url("../images/wQn.png");
 }
-.wPn{
-    background-image: url("../images/wpawn.png");
+.wKg {
+  background-image: url("../images/wKg.png");
+}
+.wPn {
+  background-image: url("../images/wpawn.png");
 }
