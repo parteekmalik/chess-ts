@@ -1,5 +1,4 @@
-import { boardType, FindValidMovesProps, FindMovesProps, PieceMovementProps, continusMovesProps } from "./types";
-
+import { FindValidMovesProps, FindMovesProps } from "../types";
 import { pieceFunctions } from "./pieceLogic";
 
 const findMoves = (props: FindMovesProps): { row: number; col: number }[] => {
@@ -26,7 +25,7 @@ const findValidMoves = (props: FindValidMovesProps): { row: number; col: number 
     validMoves.push(validMovesrow);
   }
 
-  console.log(validMoves);
+  // console.log(validMoves);
 
   return validMoves;
 };

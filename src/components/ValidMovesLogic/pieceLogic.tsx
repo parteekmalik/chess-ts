@@ -1,5 +1,5 @@
-import { boardType, FindValidMovesProps, FindMovesProps, PieceMovementProps, continusMovesProps } from "./types";
-import { pieceMovement } from "./types";
+import { FindMovesProps, PieceMovementProps } from "../types";
+import { pieceMovement } from "../types";
 
 const isValidMove = (row: number, col: number): boolean => {
   return row >= 0 && row < 8 && col >= 0 && col < 8;
@@ -54,7 +54,7 @@ const knightKing = (props: PieceMovementProps): { row: number; col: number }[] =
   return possibleMoves;
 };
 const pawn = (props: PieceMovementProps): { row: number; col: number }[] => {
-  const { BoardLayout, turn, pieceType, row, col } = props;
+  const { BoardLayout, turn, row, col } = props;
   let possibleMoves: { row: number; col: number }[] = [];
   const forward = turn === "white" ? -1 : 1;
 
@@ -74,7 +74,10 @@ const pawn = (props: PieceMovementProps): { row: number; col: number }[] => {
   }
 
   // Check diagonal captures
-  const diagonalMoves = [{ row: forward, col: -1 }, { row: forward, col: 1 }];
+  const diagonalMoves = [
+    { row: forward, col: -1 },
+    { row: forward, col: 1 },
+  ];
   for (const move of diagonalMoves) {
     newRow = row + move.row;
     newCol = col + move.col;
@@ -86,7 +89,6 @@ const pawn = (props: PieceMovementProps): { row: number; col: number }[] => {
 
   return possibleMoves;
 };
-
 
 export const pieceFunctions: { [key: string]: (props: PieceMovementProps) => { row: number; col: number }[] } = {
   rook: rookBishopQueen,

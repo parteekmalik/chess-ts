@@ -1,3 +1,13 @@
+export interface BoardDataType {
+  BoardLayout: { type: string; piece: string }[][];
+  turn: string;
+  ValidMoves: { row: number; col: number }[][][];
+}
+export interface MovesPlayedType {
+  current: number;
+  moves: { from: { row: number; col: number; piece: { type: string; piece: string } }; to: { row: number; col: number; piece: { type: string; piece: string } } }[];
+}
+
 export interface boardType {
   BoardLayout: { type: string; piece: string }[][];
 }
@@ -15,6 +25,17 @@ export interface PieceMovementProps extends FindMovesProps {
 export interface continusMovesProps extends PieceMovementProps {
   i: number;
   j: number;
+}
+export interface handleMoveProps { 
+  boardData: BoardDataType,
+  selectedPiece: { isSelected: boolean; row: number; col: number },
+  movesPlayed: MovesPlayedType,
+  row: number,
+  col: number,
+  setBoardData: React.Dispatch<React.SetStateAction<BoardDataType>>,
+  setHints: React.Dispatch<React.SetStateAction<{ isShowHint: boolean; hints: { row: number; col: number }[] }>>,
+  setSelectedPiece: React.Dispatch<React.SetStateAction<{ isSelected: boolean; row: number; col: number }>>,
+  setMovesPlayed: React.Dispatch<React.SetStateAction<MovesPlayedType>>
 }
 
 export const pieceMovement: { [key: string]: { row: number; col: number }[] } = {
@@ -61,7 +82,8 @@ export const pieceMovement: { [key: string]: { row: number; col: number }[] } = 
     { row: -1, col: 1 },
   ],
 };
-export const initialPoition: { type: string; piece: string }[][] = [
+export const emptyPiece: { type: string; piece: string } = { type: "empty", piece: "" };
+export const initialPosition: { type: string; piece: string }[][] = [
   [
     { type: "black", piece: "rook" },
     { type: "black", piece: "knight" },
@@ -107,3 +129,17 @@ export const initialPoition: { type: string; piece: string }[][] = [
     { type: "white", piece: "rook" },
   ],
 ];
+export const pieceSize: number = 50;
+
+export const checkForValidClick = (event: React.MouseEvent) => {
+  const { clientX, clientY, currentTarget } = event;
+  const { left, top, right, bottom } = currentTarget.getBoundingClientRect();
+
+  // Check if the click is within the boundaries of the target element
+  const isValid = clientX >= left && clientX <= right && clientY >= top && clientY <= bottom;
+
+  const col = isValid ? Math.floor((clientX - left) / pieceSize) : -1;
+  const row = isValid ? Math.floor((clientY - top) / pieceSize) : -1;
+
+  return { isValid, row, col };
+};
