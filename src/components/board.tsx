@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import ChessBoard from "./piece and hints/ChessBoard";
 import ChessBoardHints from "./piece and hints/ChessBoardHints";
 import "./board.css";
 import findValidMoves from "./ValidMovesLogic/findValidMoves";
 import { initialPosition, BoardDataType, checkForValidClick, MovesPlayedType } from "./types";
+import { boardSize } from "./types";
 import { handleMove } from "./ValidMovesLogic/updateGameState";
 
 const Board: React.FC = () => {
@@ -13,6 +14,9 @@ const Board: React.FC = () => {
   const [selectedPiece, setSelectedPiece] = useState<{ isSelected: boolean; row: number; col: number }>({ isSelected: false, row: 0, col: 0 });
   const [movesPlayed, setMovesPlayed] = useState<MovesPlayedType>({ current: -1, moves: [] });
 
+  useEffect(()=>{
+    console.log(boardData.BoardLayout);
+  },[boardData.BoardLayout]);
   const clickHandle = (event: React.MouseEvent) => {
     const { isValid, row, col } = checkForValidClick(event);
 
@@ -33,9 +37,9 @@ const Board: React.FC = () => {
   };
 
   return (
-    <div className="chess-board" onClick={clickHandle}>
+    <div className="chess-board" onClick={clickHandle} style={{width: boardSize + "px",height: boardSize + "px"}}>
       <ChessBoard BoardLayout={boardData.BoardLayout} />
-      <ChessBoardHints Hints={hints} />
+      <ChessBoardHints Hints={hints} BoardLayout={boardData.BoardLayout} />
     </div>
   );
 };

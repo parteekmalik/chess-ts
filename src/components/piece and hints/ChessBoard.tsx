@@ -1,4 +1,4 @@
-const squareSize: number = 50;
+import { squareSize } from "../types";
 
 interface ChessBoardProps {
   BoardLayout: { type: string; piece: string }[][];
