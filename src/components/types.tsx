@@ -15,6 +15,13 @@ export interface FindValidMovesProps extends boardType {
   turn: string;
 }
 
+export interface deleteInvalidProps extends BoardDataType {
+  row: number;
+  col: number;
+}
+export interface makemoveProps extends deleteInvalidProps {
+  to: { row: number; col: number };
+}
 export interface FindMovesProps extends FindValidMovesProps {
   row: number;
   col: number;
@@ -26,16 +33,18 @@ export interface continusMovesProps extends PieceMovementProps {
   i: number;
   j: number;
 }
-export interface handleMoveProps { 
-  boardData: BoardDataType,
-  selectedPiece: { isSelected: boolean; row: number; col: number },
-  movesPlayed: MovesPlayedType,
-  row: number,
-  col: number,
-  setBoardData: React.Dispatch<React.SetStateAction<BoardDataType>>,
-  setHints: React.Dispatch<React.SetStateAction<{ isShowHint: boolean; hints: { row: number; col: number }[] }>>,
-  setSelectedPiece: React.Dispatch<React.SetStateAction<{ isSelected: boolean; row: number; col: number }>>,
-  setMovesPlayed: React.Dispatch<React.SetStateAction<MovesPlayedType>>
+export interface handleMoveProps {
+  BoardLayout: { type: string; piece: string }[][];
+  setBoardLayout: React.Dispatch<React.SetStateAction<{ type: string; piece: string }[][]>>;
+  selectedPiece: { isSelected: boolean; row: number; col: number };
+  setSelectedPiece: React.Dispatch<React.SetStateAction<{ isSelected: boolean; row: number; col: number }>>;
+  movesPlayed: MovesPlayedType;
+  setMovesPlayed: React.Dispatch<React.SetStateAction<MovesPlayedType>>;
+  turn: string;
+  setTurn: React.Dispatch<React.SetStateAction<string>>;
+  setHints: React.Dispatch<React.SetStateAction<{ isShowHint: boolean; hints: { row: number; col: number }[] }>>;
+  row: number;
+  col: number;
 }
 
 export const pieceMovement: { [key: string]: { row: number; col: number }[] } = {
@@ -129,7 +138,6 @@ export const initialPosition: { type: string; piece: string }[][] = [
     { type: "white", piece: "rook" },
   ],
 ];
-export const pieceSize: number = 50;
 
 export const checkForValidClick = (event: React.MouseEvent) => {
   const { clientX, clientY, currentTarget } = event;
@@ -138,8 +146,10 @@ export const checkForValidClick = (event: React.MouseEvent) => {
   // Check if the click is within the boundaries of the target element
   const isValid = clientX >= left && clientX <= right && clientY >= top && clientY <= bottom;
 
-  const col = isValid ? Math.floor((clientX - left) / pieceSize) : -1;
-  const row = isValid ? Math.floor((clientY - top) / pieceSize) : -1;
+  const col = isValid ? Math.floor((clientX - left) / squareSize) : -1;
+  const row = isValid ? Math.floor((clientY - top) / squareSize) : -1;
 
   return { isValid, row, col };
 };
+export const boardSize: number = 600;
+export const squareSize: number = boardSize / 8;

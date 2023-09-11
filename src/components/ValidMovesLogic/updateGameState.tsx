@@ -1,9 +1,8 @@
 // updateGameState.tsx
-import findValidMoves from "./findValidMoves";
 import { emptyPiece, MovesPlayedType, handleMoveProps } from "../types";
 
 export const handleMove = (props: handleMoveProps) => {
-  const { boardData, selectedPiece, row, col, movesPlayed, setBoardData, setHints, setMovesPlayed, setSelectedPiece } = props;
+  const { BoardLayout, selectedPiece, movesPlayed, turn, setBoardLayout, setHints, setSelectedPiece, setMovesPlayed, setTurn, row, col } = props;
   // Increment current moves and update moves array
   const updatedMovesPlayed: MovesPlayedType = {
     current: movesPlayed.current + 1,
@@ -13,31 +12,24 @@ export const handleMove = (props: handleMoveProps) => {
         from: {
           row: selectedPiece.row,
           col: selectedPiece.col,
-          piece: boardData.BoardLayout[selectedPiece.row][selectedPiece.col],
+          piece: BoardLayout[selectedPiece.row][selectedPiece.col],
         },
-        to: { row, col, piece: boardData.BoardLayout[row][col] },
+        to: { row, col, piece: BoardLayout[row][col] },
       },
     ],
   };
 
   // Update the board
-  const updatedBoard: { type: string; piece: string }[][] = [...boardData.BoardLayout];
+  const updatedBoard: { type: string; piece: string }[][] = [...BoardLayout];
   const pieceToMove = { ...updatedBoard[selectedPiece.row][selectedPiece.col] };
   updatedBoard[row][col] = pieceToMove;
   updatedBoard[selectedPiece.row][selectedPiece.col] = { ...emptyPiece };
 
-  // Toggle the turn
-  const turn: string = boardData.turn === "white" ? "black" : "white";
+  // Toggle the turn and update
+  setTurn(turn === "white" ? "black" : "white");
 
   // Update board data with the new board layout and valid moves
-  setBoardData({
-    ...boardData,
-    BoardLayout: updatedBoard,
-    turn,
-    ValidMoves: findValidMoves({ BoardLayout: updatedBoard, turn }),
-  });
-
-  setMovesPlayed(updatedMovesPlayed);
+  setBoardLayout(updatedBoard);
 
   // Reset selected piece and hints
   setSelectedPiece({ isSelected: false, row: 0, col: 0 });

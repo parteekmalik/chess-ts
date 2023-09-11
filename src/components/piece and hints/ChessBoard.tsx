@@ -1,4 +1,5 @@
-const squareSize: number = 50;
+// ChessBoard.tsx
+import { squareSize } from "../types";
 
 interface ChessBoardProps {
   BoardLayout: { type: string; piece: string }[][];

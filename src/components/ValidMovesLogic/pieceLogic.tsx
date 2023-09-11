@@ -1,4 +1,5 @@
-import { FindMovesProps, PieceMovementProps } from "../types";
+// pieceLogic.tsx
+import { FindMovesProps, PieceMovementProps, FindValidMovesProps } from "../types";
 import { pieceMovement } from "../types";
 
 const isValidMove = (row: number, col: number): boolean => {
@@ -90,7 +91,7 @@ const pawn = (props: PieceMovementProps): { row: number; col: number }[] => {
   return possibleMoves;
 };
 
-export const pieceFunctions: { [key: string]: (props: PieceMovementProps) => { row: number; col: number }[] } = {
+const pieceFunctions: { [key: string]: (props: PieceMovementProps) => { row: number; col: number }[] } = {
   rook: rookBishopQueen,
   bishop: rookBishopQueen,
   queen: rookBishopQueen,
@@ -98,3 +99,46 @@ export const pieceFunctions: { [key: string]: (props: PieceMovementProps) => { r
   king: knightKing,
   pawn: pawn,
 };
+
+export const findMoves = (props: FindMovesProps): { row: number; col: number }[] => {
+  const { BoardLayout, turn, row, col } = props;
+  let ans: { row: number; col: number }[] = [];
+  const square: { type: string; piece: string } = BoardLayout[row][col];
+
+  if (square.type === turn && "" !== square.piece) {
+    if (pieceFunctions.hasOwnProperty(square.piece)) {
+      ans = [...pieceFunctions[square.piece]({ BoardLayout, turn, pieceType: square.piece, row, col })];
+    }
+  }
+  return ans;
+};
+
+export const allMoves = (props: FindValidMovesProps): { row: number; col: number }[][][] => {
+  const validMoves: { row: number; col: number }[][][] = [];
+
+  for (let row = 0; row < 8; row++) {
+    const validMovesrow: { row: number; col: number }[][] = [];
+    for (let col = 0; col < 8; col++) {
+      validMovesrow.push(findMoves({ ...props, row, col }));
+    }
+    validMoves.push(validMovesrow);
+  }
+  return validMoves;
+};
+
+export const kingInCheck = (props: FindValidMovesProps) => {
+  const { BoardLayout, turn } = props;
+  const opponentMoves = allMoves(props);
+  for (let row: number = 0; row < 8; row++) {
+    for (let col: number = 0; col < 8; col++) {
+      for (let i: number = 0; i < opponentMoves[row][col].length; i++) {
+        const { row: curRow, col: curCol } = opponentMoves[row][col][i];
+        if (BoardLayout[curRow][curCol].type !== turn && BoardLayout[curRow][curCol].piece === "king") {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+};
+export default findMoves;
