@@ -1,3 +1,4 @@
+// ChessBoardHints.tsx
 import { squareSize } from "../types";
 
 interface ChessBoardProps {
@@ -5,8 +6,8 @@ interface ChessBoardProps {
   BoardLayout: { type: string; piece: string }[][];
 }
 const ChessBoardHints: React.FC<ChessBoardProps> = (props) => {
-  const { Hints ,BoardLayout } = props;
-  const { hints} = Hints;
+  const { Hints, BoardLayout } = props;
+  const { hints } = Hints;
   const squares: JSX.Element[] = [];
   hints.forEach((square) => {
     const rowIndex = square.row;
@@ -15,7 +16,7 @@ const ChessBoardHints: React.FC<ChessBoardProps> = (props) => {
     const Style = {
       transform: `translate(${colIndex * squareSize}px, ${rowIndex * squareSize}px)`,
     };
-    if(BoardLayout[rowIndex][colIndex].type !== "empty") squares.push(<div key={"hint" + position} className={`hint-capture`} id={position} style={Style}></div>);
+    if (BoardLayout[rowIndex][colIndex].type !== "empty") squares.push(<div key={"hint" + position} className={`hint-capture`} id={position} style={Style}></div>);
     else squares.push(<div key={"hint" + position} className={`hint`} id={position} style={Style}></div>);
   });
 

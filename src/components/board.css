@@ -1,4 +1,7 @@
-.piece,.hint,.hint-capture {
+.piece,
+.hint,
+.hint-capture,
+.highlight {
   width: 12.5%;
   height: 12.5%;
   background-repeat: no-repeat;
@@ -10,23 +13,26 @@
   background-repeat: no-repeat;
   background-size: 100%;
   position: relative;
-  
+
   margin: auto;
   margin-top: 100px;
 }
-.hint,.hint-capture {
-  
+.hint,
+.hint-capture {
   background-clip: content-box;
   border-radius: 50%;
   box-sizing: border-box;
 }
-.hint{
+.hint {
   background-color: rgba(0, 0, 0, 0.1);
   padding: 4.2%;
 }
-.hint-capture{
-  border: 5px solid rgba(0,0,0,.1);
+.hint-capture {
+  border: 5px solid rgba(0, 0, 0, 0.1);
   border-width: 17px;
+}
+.highlight {
+  background-color: rgb(255, 255, 51, 0.5);
 }
 .bRk {
   background-image: url("../images/bRk.png");

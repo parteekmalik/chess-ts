@@ -1,3 +1,4 @@
+// ChessBoard.tsx
 import { squareSize } from "../types";
 
 interface ChessBoardProps {

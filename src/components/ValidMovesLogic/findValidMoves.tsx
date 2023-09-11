@@ -1,16 +1,15 @@
-import { FindValidMovesProps, FindMovesProps, BoardDataType, deleteInvalidProps, makemoveProps, boardType, emptyPiece } from "../types";
-import { findMoves, kingInCheck, allMoves } from "./pieceLogic";
+// findValidMoves.tsx
+import { FindValidMovesProps, BoardDataType, deleteInvalidProps, makemoveProps, emptyPiece } from "../types";
+import { kingInCheck, allMoves } from "./pieceLogic";
 import _ from "lodash";
-
-
 
 const makemove = (props: makemoveProps): FindValidMovesProps => {
   const newprop = _.cloneDeep(props);
-  let { BoardLayout,to,row,col,turn } = newprop;
+  let { BoardLayout, to, row, col, turn } = newprop;
   BoardLayout[to.row][to.col] = BoardLayout[row][col];
   BoardLayout[row][col] = emptyPiece;
   turn = turn === "white" ? "black" : "white";
-  return {BoardLayout,turn};
+  return { BoardLayout, turn };
 };
 
 const deleteInvalid = (props: deleteInvalidProps): { row: number; col: number }[] => {
@@ -31,16 +30,17 @@ const removeInvalidMoves = (props: BoardDataType): { row: number; col: number }[
   let { ValidMoves } = props;
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
-      let validMovesrow: { row: number; col: number }[] = ValidMoves[row][col];
-      validMovesrow = deleteInvalid({ ...props, row, col });
+      ValidMoves[row][col] = deleteInvalid({ ...props, row, col });
     }
   }
+
   return ValidMoves;
 };
 
 const findValidMoves = (props: FindValidMovesProps): { row: number; col: number }[][][] => {
+  console.log("moves calculated");
   let allMove: { row: number; col: number }[][][] = allMoves(props);
-  let validMoves: { row: number; col: number }[][][] = removeInvalidMoves({ ...props, ValidMoves: allMove });
+  let validMoves: { row: number; col: number }[][][] = removeInvalidMoves({ ...props, ValidMoves: _.cloneDeep(allMove) });
 
   return validMoves;
 };

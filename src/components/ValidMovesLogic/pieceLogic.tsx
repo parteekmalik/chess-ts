@@ -1,3 +1,4 @@
+// pieceLogic.tsx
 import { FindMovesProps, PieceMovementProps, FindValidMovesProps } from "../types";
 import { pieceMovement } from "../types";
 
@@ -125,18 +126,19 @@ export const allMoves = (props: FindValidMovesProps): { row: number; col: number
   return validMoves;
 };
 
-
-export const kingInCheck=(props:FindValidMovesProps) =>{
-  const {BoardLayout,turn} = props;
+export const kingInCheck = (props: FindValidMovesProps) => {
+  const { BoardLayout, turn } = props;
   const opponentMoves = allMoves(props);
-  for(let row:number=0;row<8;row++){
-    for(let col:number=0;col<8;col++){
-      for(let i:number=0;i<opponentMoves[row][col].length;i++){
+  for (let row: number = 0; row < 8; row++) {
+    for (let col: number = 0; col < 8; col++) {
+      for (let i: number = 0; i < opponentMoves[row][col].length; i++) {
         const { row: curRow, col: curCol } = opponentMoves[row][col][i];
-        if(BoardLayout[curRow][curCol].type === turn && BoardLayout[curRow][curCol].piece === "king")return true;
+        if (BoardLayout[curRow][curCol].type !== turn && BoardLayout[curRow][curCol].piece === "king") {
+          return true;
+        }
       }
     }
   }
   return false;
-}
+};
 export default findMoves;
