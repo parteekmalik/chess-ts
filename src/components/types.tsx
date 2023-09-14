@@ -1,51 +1,78 @@
-export interface BoardDataType {
-  BoardLayout: { type: string; piece: string }[][];
-  turn: string;
-  ValidMoves: { row: number; col: number }[][][];
-}
-export interface MovesPlayedType {
+export interface MovesPlayed_Type {
   current: number;
   moves: { from: { row: number; col: number; piece: { type: string; piece: string } }; to: { row: number; col: number; piece: { type: string; piece: string } } }[];
 }
+export interface HintsProps {
+  isShowHint: boolean;
+  hints: { row: number; col: number }[];
+}
+export interface selectedPieceProps {
+  isSelected: boolean;
+  row: number;
+  col: number;
+}
+export interface boardData_Type {
+  BoardLayout: { type: string; piece: string }[][];
+  turn: string;
+  movesPlayed: MovesPlayed_Type;
+}
 
-export interface boardType {
+export interface handleMoveProps {
+  boardData: boardData_Type;
+  setBoardData: React.Dispatch<React.SetStateAction<boardData_Type>>;
+  selectedPiece: selectedPieceProps;
+  setSelectedPiece: React.Dispatch<React.SetStateAction<selectedPieceProps>>;
+  setHints: React.Dispatch<React.SetStateAction<HintsProps>>;
+  row: number;
+  col: number;
+}
+
+export interface updatedMovesPlayedProps {
+  selectedPiece: selectedPieceProps;
+  BoardLayout: { type: string; piece: string }[][];
+  movesPlayed: MovesPlayed_Type;
+  row: number;
+  col: number;
+}
+
+export interface BoardLayout_Type {
   BoardLayout: { type: string; piece: string }[][];
 }
-export interface FindValidMovesProps extends boardType {
+export interface Turn_Type {
   turn: string;
 }
-
-export interface deleteInvalidProps extends BoardDataType {
+export interface movesplayed_Type {
+  movesPlayed: MovesPlayed_Type;
+}
+export interface ValidMoves_Type {
+  ValidMoves: { row: number; col: number }[][][];
+}
+export interface Row_Col_Type {
   row: number;
   col: number;
 }
-export interface makemoveProps extends deleteInvalidProps {
+export interface To_Type {
   to: { row: number; col: number };
 }
-export interface FindMovesProps extends FindValidMovesProps {
-  row: number;
-  col: number;
-}
-export interface PieceMovementProps extends FindMovesProps {
+export interface PieceType_Type {
   pieceType: string;
 }
-export interface continusMovesProps extends PieceMovementProps {
+export interface I_J_Type {
   i: number;
   j: number;
 }
-export interface handleMoveProps {
-  BoardLayout: { type: string; piece: string }[][];
-  setBoardLayout: React.Dispatch<React.SetStateAction<{ type: string; piece: string }[][]>>;
-  selectedPiece: { isSelected: boolean; row: number; col: number };
-  setSelectedPiece: React.Dispatch<React.SetStateAction<{ isSelected: boolean; row: number; col: number }>>;
-  movesPlayed: MovesPlayedType;
-  setMovesPlayed: React.Dispatch<React.SetStateAction<MovesPlayedType>>;
-  turn: string;
-  setTurn: React.Dispatch<React.SetStateAction<string>>;
-  setHints: React.Dispatch<React.SetStateAction<{ isShowHint: boolean; hints: { row: number; col: number }[] }>>;
-  row: number;
-  col: number;
-}
+
+export interface BoardLayout_Turn_Type extends BoardLayout_Type, Turn_Type {}
+export interface BoardLayout_Turn_Movesplayed_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type {}
+export interface BoardLayout_Turn_ValidMoves_Type extends BoardLayout_Type, Turn_Type, ValidMoves_Type {}
+export interface BoardLayout_Turn_ValidMoves_MovesPlayed_Type extends BoardLayout_Type, Turn_Type, ValidMoves_Type, movesplayed_Type {}
+export interface BoardLayout_Turn_Movesplayed_Row_Col_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type {}
+export interface BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, ValidMoves_Type {}
+export interface BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_To_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, To_Type {}
+export interface BoardLayout_Turn_Movesplayed_Row_Col_PieceType_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, PieceType_Type {}
+export interface BoardLayout_Turn_Movesplayed_Row_Col_PieceType_I_J_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, PieceType_Type, I_J_Type {}
+export interface BoardLayout_Turn_Row_Col_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type {}
+export interface BoardLayout_Turn_Row_Col_PieceType_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type, PieceType_Type {}
 
 export const pieceMovement: { [key: string]: { row: number; col: number }[] } = {
   rook: [

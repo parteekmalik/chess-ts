@@ -1,40 +1,29 @@
 // updateGameState.tsx
-import { emptyPiece, MovesPlayedType, handleMoveProps } from "../types";
+import { emptyPiece,selectedPieceProps,HintsProps } from "../types";
+import { handleMoveProps } from "../types";
+import {updatedMovesPlayed} from "./updateMovesPlayed"
+import _ from "lodash";
 
-export const handleMove = (props: handleMoveProps) => {
-  const { BoardLayout, selectedPiece, movesPlayed, turn, setBoardLayout, setHints, setSelectedPiece, setMovesPlayed, setTurn, row, col } = props;
-  // Increment current moves and update moves array
-  const updatedMovesPlayed: MovesPlayedType = {
-    current: movesPlayed.current + 1,
-    moves: [
-      ...movesPlayed.moves,
-      {
-        from: {
-          row: selectedPiece.row,
-          col: selectedPiece.col,
-          piece: BoardLayout[selectedPiece.row][selectedPiece.col],
-        },
-        to: { row, col, piece: BoardLayout[row][col] },
-      },
-    ],
-  };
+
+
+ const handleMove = (props: handleMoveProps) => {
+  const { boardData, selectedPiece, setBoardData, setHints, setSelectedPiece, row, col } = props;
+
+  // Update the moves 
+  boardData.movesPlayed = updatedMovesPlayed({movesPlayed: boardData.movesPlayed, selectedPiece, BoardLayout: boardData.BoardLayout, row, col});
 
   // Update the board
-  const updatedBoard: { type: string; piece: string }[][] = [...BoardLayout];
-  const pieceToMove = { ...updatedBoard[selectedPiece.row][selectedPiece.col] };
-  updatedBoard[row][col] = pieceToMove;
-  updatedBoard[selectedPiece.row][selectedPiece.col] = { ...emptyPiece };
+  boardData.BoardLayout[row][col] = { ...boardData.BoardLayout[selectedPiece.row][selectedPiece.col] };
+  boardData.BoardLayout[selectedPiece.row][selectedPiece.col] = { ...emptyPiece };
 
   // Toggle the turn and update
-  setTurn(turn === "white" ? "black" : "white");
-
-  // Update board data with the new board layout and valid moves
-  setBoardLayout(updatedBoard);
+  boardData.turn = (boardData.turn === "white") ? "black" : "white";
+  
+  setBoardData(boardData);
 
   // Reset selected piece and hints
   setSelectedPiece({ isSelected: false, row: 0, col: 0 });
   setHints({ isShowHint: true, hints: [] });
-
-  // Update the moves played state
-  setMovesPlayed(updatedMovesPlayed);
 };
+
+export default handleMove;
