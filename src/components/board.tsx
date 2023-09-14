@@ -8,7 +8,7 @@ import findValidMoves from "./ValidMovesLogic/findValidMoves";
 import HandleMove from "./ValidMovesLogic/updateGameState";
 import Highlight from "./highlight/highlight";
 
-let ValidMoves: { row: number; col: number }[][][];
+let ValidMoves: { type: string; row: number; col: number }[][][];
 
 const Board: React.FC = () => {
   const [boardData, setBoardData] = useState<boardData_Type>({ BoardLayout: initialPosition, turn: "white", movesPlayed: { current: -1, moves: [] } });

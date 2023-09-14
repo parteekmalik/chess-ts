@@ -26,10 +26,10 @@ const makeMove = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_To_Type
 };
 
 // Helper function to delete invalid moves
-const deleteInvalid = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type): { row: number; col: number }[] => {
+const deleteInvalid = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type): { type: string; row: number; col: number }[] => {
   const { ValidMoves, row, col } = props;
   const movesRow = ValidMoves[row][col];
-  const newMovesRow: { row: number; col: number }[] = [];
+  const newMovesRow: { type: string; row: number; col: number }[] = [];
 
   for (let i = 0; i < movesRow.length; i++) {
     let boardData = makeMove({ ...props, to: { row: movesRow[i].row, col: movesRow[i].col } });
@@ -44,7 +44,7 @@ const deleteInvalid = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Ty
 };
 
 // Helper function to remove invalid moves from the ValidMoves array
-const removeInvalidMoves = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Type): { row: number; col: number }[][][] => {
+const removeInvalidMoves = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Type): { type: string; row: number; col: number }[][][] => {
   let { ValidMoves } = props;
 
   for (let row = 0; row < 8; row++) {
@@ -57,14 +57,14 @@ const removeInvalidMoves = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Type)
 };
 
 // Main function to find valid moves
-const findValidMoves = (props: BoardLayout_Turn_Movesplayed_Type): { row: number; col: number }[][][] => {
+const findValidMoves = (props: BoardLayout_Turn_Movesplayed_Type): { type: string; row: number; col: number }[][][] => {
   console.log("Calculating moves...");
 
   // Generate all possible moves
-  let allMove: { row: number; col: number }[][][] = allMoves(props);
+  let allMove: { type: string; row: number; col: number }[][][] = allMoves(props);
 
   // Remove invalid moves
-  let validMoves: { row: number; col: number }[][][] = removeInvalidMoves({ ...props, ValidMoves: _.cloneDeep(allMove) });
+  let validMoves: { type: string; row: number; col: number }[][][] = removeInvalidMoves({ ...props, ValidMoves: _.cloneDeep(allMove) });
 
   return validMoves;
 };

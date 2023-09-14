@@ -45,7 +45,7 @@ export interface movesplayed_Type {
   movesPlayed: MovesPlayed_Type;
 }
 export interface ValidMoves_Type {
-  ValidMoves: { row: number; col: number }[][][];
+  ValidMoves: { type: string; row: number; col: number }[][][];
 }
 export interface Row_Col_Type {
   row: number;
