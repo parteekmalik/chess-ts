@@ -71,11 +71,8 @@ export interface BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type extends Bo
 export interface BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_To_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, To_Type {}
 export interface BoardLayout_Turn_Movesplayed_Row_Col_PieceType_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, PieceType_Type {}
 export interface BoardLayout_Turn_Movesplayed_Row_Col_PieceType_I_J_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, PieceType_Type, I_J_Type {}
-export interface BoardLayout_Turn_Row_Col_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type{}
-export interface BoardLayout_Turn_Row_Col_PieceType_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type, PieceType_Type{}
-
-
-
+export interface BoardLayout_Turn_Row_Col_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type {}
+export interface BoardLayout_Turn_Row_Col_PieceType_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type, PieceType_Type {}
 
 export const pieceMovement: { [key: string]: { row: number; col: number }[] } = {
   rook: [

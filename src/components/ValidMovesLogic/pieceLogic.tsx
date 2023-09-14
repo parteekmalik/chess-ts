@@ -1,5 +1,10 @@
 // pieceLogic.tsx
-import { BoardLayout_Turn_Movesplayed_Type, BoardLayout_Turn_Movesplayed_Row_Col_Type ,BoardLayout_Turn_Row_Col_Type, BoardLayout_Turn_Row_Col_PieceType_Type} from "../types";
+import {
+  BoardLayout_Turn_Movesplayed_Type,
+  BoardLayout_Turn_Movesplayed_Row_Col_Type,
+  BoardLayout_Turn_Row_Col_Type,
+  BoardLayout_Turn_Row_Col_PieceType_Type,
+} from "../types";
 import { pieceMovement } from "../types";
 
 const isValidMove = (row: number, col: number): boolean => {

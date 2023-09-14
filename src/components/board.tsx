@@ -1,18 +1,17 @@
 // board.tsx
 import "./board.css";
-import React, { useState, useEffect } from "react";HandleMove
+import React, { useState, useEffect } from "react";
 import { boardSize, initialPosition, checkForValidClick, boardData_Type, HintsProps, selectedPieceProps } from "./types";
 import ChessBoard from "./piece and hints/ChessBoard";
 import ChessBoardHints from "./piece and hints/ChessBoardHints";
 import findValidMoves from "./ValidMovesLogic/findValidMoves";
-import HandleMove  from "./ValidMovesLogic/updateGameState";
+import HandleMove from "./ValidMovesLogic/updateGameState";
 import Highlight from "./highlight/highlight";
 
 let ValidMoves: { row: number; col: number }[][][];
 
-
 const Board: React.FC = () => {
-  const [boardData, setBoardData] = useState<boardData_Type>({BoardLayout: initialPosition, turn: "white", movesPlayed: {current: -1,moves: []}});
+  const [boardData, setBoardData] = useState<boardData_Type>({ BoardLayout: initialPosition, turn: "white", movesPlayed: { current: -1, moves: [] } });
   const [hints, setHints] = useState<HintsProps>({ isShowHint: true, hints: [] });
   const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, row: 0, col: 0 });
 
