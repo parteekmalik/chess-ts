@@ -1,5 +1,5 @@
-import { MovesPlayedType } from "../types";
-import { squareSize } from "../types";
+import { squareSize, MovesPlayedType } from "../types";
+
 export interface highlightProps {
   selectedPiece: { isSelected: boolean; row: number; col: number };
   movesPlayed: MovesPlayedType;
@@ -7,6 +7,7 @@ export interface highlightProps {
 
 const Highlight: React.FC<highlightProps> = (props) => {
   const { selectedPiece, movesPlayed } = props;
+
   return (
     <>
       {selectedPiece.isSelected && <div className="highlight" style={{ transform: `translate(${selectedPiece.col * squareSize}px, ${selectedPiece.row * squareSize}px)` }}></div>}

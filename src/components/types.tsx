@@ -1,26 +1,42 @@
-export interface BoardDataType {
-  BoardLayout: { type: string; piece: string }[][];
-  turn: string;
-  ValidMoves: { row: number; col: number }[][][];
-}
 export interface MovesPlayedType {
   current: number;
   moves: { from: { row: number; col: number; piece: { type: string; piece: string } }; to: { row: number; col: number; piece: { type: string; piece: string } } }[];
 }
+export interface HintsProps {
+  isShowHint: boolean;
+  hints: { row: number; col: number }[];
+}
+export interface selectedPieceProps {
+  isSelected: boolean;
+  row: number;
+  col: number;
+}
+
 
 export interface boardType {
   BoardLayout: { type: string; piece: string }[][];
 }
 export interface FindValidMovesProps extends boardType {
   turn: string;
+  movesPlayed: MovesPlayedType;
+}
+export interface BoardDataType extends boardType {
+  turn: string;
+  ValidMoves: { row: number; col: number }[][][];
+}
+export interface removeInvalidMovesProps extends BoardDataType{
+  movesPlayed: MovesPlayedType;
+  
 }
 
 export interface deleteInvalidProps extends BoardDataType {
   row: number;
   col: number;
+  movesPlayed: MovesPlayedType;
 }
 export interface makemoveProps extends deleteInvalidProps {
   to: { row: number; col: number };
+  movesPlayed: MovesPlayedType;
 }
 export interface FindMovesProps extends FindValidMovesProps {
   row: number;
@@ -33,16 +49,23 @@ export interface continusMovesProps extends PieceMovementProps {
   i: number;
   j: number;
 }
+export interface updatedMovesPlayedProps{
+  selectedPiece: selectedPieceProps;
+  BoardLayout: { type: string; piece: string }[][];
+  movesPlayed: MovesPlayedType;
+  row: number;
+  col: number;
+}
 export interface handleMoveProps {
   BoardLayout: { type: string; piece: string }[][];
   setBoardLayout: React.Dispatch<React.SetStateAction<{ type: string; piece: string }[][]>>;
-  selectedPiece: { isSelected: boolean; row: number; col: number };
-  setSelectedPiece: React.Dispatch<React.SetStateAction<{ isSelected: boolean; row: number; col: number }>>;
+  selectedPiece: selectedPieceProps;
+  setSelectedPiece: React.Dispatch<React.SetStateAction<selectedPieceProps>>;
   movesPlayed: MovesPlayedType;
   setMovesPlayed: React.Dispatch<React.SetStateAction<MovesPlayedType>>;
   turn: string;
   setTurn: React.Dispatch<React.SetStateAction<string>>;
-  setHints: React.Dispatch<React.SetStateAction<{ isShowHint: boolean; hints: { row: number; col: number }[] }>>;
+  setHints: React.Dispatch<React.SetStateAction<HintsProps>>;
   row: number;
   col: number;
 }

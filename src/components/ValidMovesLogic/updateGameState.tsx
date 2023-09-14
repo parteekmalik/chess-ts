@@ -1,23 +1,9 @@
 // updateGameState.tsx
 import { emptyPiece, MovesPlayedType, handleMoveProps } from "../types";
+import {updatedMovesPlayed} from "./updateMovesPlayed"
 
-export const handleMove = (props: handleMoveProps) => {
-  const { BoardLayout, selectedPiece, movesPlayed, turn, setBoardLayout, setHints, setSelectedPiece, setMovesPlayed, setTurn, row, col } = props;
-  // Increment current moves and update moves array
-  const updatedMovesPlayed: MovesPlayedType = {
-    current: movesPlayed.current + 1,
-    moves: [
-      ...movesPlayed.moves,
-      {
-        from: {
-          row: selectedPiece.row,
-          col: selectedPiece.col,
-          piece: BoardLayout[selectedPiece.row][selectedPiece.col],
-        },
-        to: { row, col, piece: BoardLayout[row][col] },
-      },
-    ],
-  };
+ const handleMove = (props: handleMoveProps) => {
+  const { BoardLayout, selectedPiece, movesPlayed, turn, setBoardLayout, setMovesPlayed, setHints, setSelectedPiece, setTurn, row, col } = props;
 
   // Update the board
   const updatedBoard: { type: string; piece: string }[][] = [...BoardLayout];
@@ -36,5 +22,6 @@ export const handleMove = (props: handleMoveProps) => {
   setHints({ isShowHint: true, hints: [] });
 
   // Update the moves played state
-  setMovesPlayed(updatedMovesPlayed);
+  setMovesPlayed(updatedMovesPlayed({movesPlayed, selectedPiece, BoardLayout, row, col}));
 };
+export default handleMove;
