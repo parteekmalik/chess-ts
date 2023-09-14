@@ -1,7 +1,7 @@
-import { updatedMovesPlayedProps, MovesPlayedType } from "../types";
+import { updatedMovesPlayedProps, MovesPlayed_Type } from "../types";
 
 // Increment current moves and update moves array
-export const updatedMovesPlayed = (props: updatedMovesPlayedProps): MovesPlayedType => {
+export const updatedMovesPlayed = (props: updatedMovesPlayedProps): MovesPlayed_Type => {
   let { movesPlayed, selectedPiece, BoardLayout, row, col } = props;
   return {
     current: movesPlayed.current + 1,

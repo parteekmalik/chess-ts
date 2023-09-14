@@ -1,10 +1,16 @@
-import { FindValidMovesProps, BoardDataType, deleteInvalidProps, makemoveProps, emptyPiece, removeInvalidMovesProps } from "../types";
+import {
+  emptyPiece,
+  BoardLayout_Turn_Movesplayed_Type,
+  BoardLayout_Turn_ValidMoves_MovesPlayed_Type,
+  BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type,
+  BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_To_Type,
+} from "../types";
 import { kingInCheck, allMoves } from "./pieceLogic";
 import { updatedMovesPlayed } from "./updateMovesPlayed";
 import _ from "lodash";
 
 // Helper function to make a move
-const makeMove = (props: makemoveProps): FindValidMovesProps => {
+const makeMove = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_To_Type): BoardLayout_Turn_Movesplayed_Type => {
   const newProps = _.cloneDeep(props);
   let { BoardLayout, to, row, col, turn, movesPlayed } = newProps;
 
@@ -20,7 +26,7 @@ const makeMove = (props: makemoveProps): FindValidMovesProps => {
 };
 
 // Helper function to delete invalid moves
-const deleteInvalid = (props: deleteInvalidProps): { row: number; col: number }[] => {
+const deleteInvalid = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type): { row: number; col: number }[] => {
   const { ValidMoves, row, col } = props;
   const movesRow = ValidMoves[row][col];
   const newMovesRow: { row: number; col: number }[] = [];
@@ -38,7 +44,7 @@ const deleteInvalid = (props: deleteInvalidProps): { row: number; col: number }[
 };
 
 // Helper function to remove invalid moves from the ValidMoves array
-const removeInvalidMoves = (props: removeInvalidMovesProps): { row: number; col: number }[][][] => {
+const removeInvalidMoves = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Type): { row: number; col: number }[][][] => {
   let { ValidMoves } = props;
 
   for (let row = 0; row < 8; row++) {
@@ -51,7 +57,7 @@ const removeInvalidMoves = (props: removeInvalidMovesProps): { row: number; col:
 };
 
 // Main function to find valid moves
-const findValidMoves = (props: FindValidMovesProps): { row: number; col: number }[][][] => {
+const findValidMoves = (props: BoardLayout_Turn_Movesplayed_Type): { row: number; col: number }[][][] => {
   console.log("Calculating moves...");
 
   // Generate all possible moves

@@ -1,12 +1,11 @@
 // pieceLogic.tsx
-import { FindMovesProps, PieceMovementProps, FindValidMovesProps } from "../types";
+import { BoardLayout_Turn_Movesplayed_Type, BoardLayout_Turn_Movesplayed_Row_Col_Type ,BoardLayout_Turn_Row_Col_Type, BoardLayout_Turn_Row_Col_PieceType_Type} from "../types";
 import { pieceMovement } from "../types";
 
 const isValidMove = (row: number, col: number): boolean => {
   return row >= 0 && row < 8 && col >= 0 && col < 8;
 };
-
-const pieceOnLoc = (props: FindMovesProps): string => {
+const pieceOnLoc = (props: BoardLayout_Turn_Row_Col_Type): string => {
   const { BoardLayout, turn, row, col } = props;
   if (!isValidMove(row, col)) return "invalid Pos";
   const square = BoardLayout[row][col].type;
@@ -14,7 +13,7 @@ const pieceOnLoc = (props: FindMovesProps): string => {
   return square === turn ? "friendly piece" : "opponent piece";
 };
 
-const rookBishopQueen = (props: PieceMovementProps): { row: number; col: number }[] => {
+const rookBishopQueen = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { row: number; col: number }[] => {
   const { BoardLayout, turn, row, col, pieceType } = props;
   const possibleMoves: { row: number; col: number }[] = [];
   const moves: { row: number; col: number }[] = pieceMovement[pieceType];
@@ -40,7 +39,7 @@ const rookBishopQueen = (props: PieceMovementProps): { row: number; col: number 
   return possibleMoves;
 };
 
-const knightKing = (props: PieceMovementProps): { row: number; col: number }[] => {
+const knightKing = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { row: number; col: number }[] => {
   const { BoardLayout, turn, pieceType, row, col } = props;
   let possibleMoves: { row: number; col: number }[] = [];
   const moves: { row: number; col: number }[] = pieceMovement[pieceType];
@@ -54,7 +53,7 @@ const knightKing = (props: PieceMovementProps): { row: number; col: number }[] =
 
   return possibleMoves;
 };
-const pawn = (props: PieceMovementProps): { row: number; col: number }[] => {
+const pawn = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { row: number; col: number }[] => {
   const { BoardLayout, turn, row, col } = props;
   let possibleMoves: { row: number; col: number }[] = [];
   const forward = turn === "white" ? -1 : 1;
@@ -91,7 +90,7 @@ const pawn = (props: PieceMovementProps): { row: number; col: number }[] => {
   return possibleMoves;
 };
 
-const pieceFunctions: { [key: string]: (props: PieceMovementProps) => { row: number; col: number }[] } = {
+const pieceFunctions: { [key: string]: (props: BoardLayout_Turn_Row_Col_PieceType_Type) => { row: number; col: number }[] } = {
   rook: rookBishopQueen,
   bishop: rookBishopQueen,
   queen: rookBishopQueen,
@@ -100,7 +99,7 @@ const pieceFunctions: { [key: string]: (props: PieceMovementProps) => { row: num
   pawn: pawn,
 };
 
-export const findMoves = (props: FindMovesProps): { row: number; col: number }[] => {
+const findMoves = (props: BoardLayout_Turn_Movesplayed_Row_Col_Type): { row: number; col: number }[] => {
   const { BoardLayout, turn, row, col } = props;
   let ans: { row: number; col: number }[] = [];
   const square: { type: string; piece: string } = BoardLayout[row][col];
@@ -113,7 +112,7 @@ export const findMoves = (props: FindMovesProps): { row: number; col: number }[]
   return ans;
 };
 
-export const allMoves = (props: FindValidMovesProps): { row: number; col: number }[][][] => {
+export const allMoves = (props: BoardLayout_Turn_Movesplayed_Type): { row: number; col: number }[][][] => {
   const validMoves: { row: number; col: number }[][][] = [];
 
   for (let row = 0; row < 8; row++) {
@@ -126,7 +125,7 @@ export const allMoves = (props: FindValidMovesProps): { row: number; col: number
   return validMoves;
 };
 
-export const kingInCheck = (props: FindValidMovesProps) => {
+export const kingInCheck = (props: BoardLayout_Turn_Movesplayed_Type) => {
   const { BoardLayout, turn } = props;
   const opponentMoves = allMoves(props);
   for (let row: number = 0; row < 8; row++) {
@@ -141,4 +140,3 @@ export const kingInCheck = (props: FindValidMovesProps) => {
   }
   return false;
 };
-export default findMoves;

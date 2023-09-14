@@ -1,8 +1,8 @@
-import { squareSize, MovesPlayedType } from "../types";
+import { squareSize, MovesPlayed_Type } from "../types";
 
 export interface highlightProps {
   selectedPiece: { isSelected: boolean; row: number; col: number };
-  movesPlayed: MovesPlayedType;
+  movesPlayed: MovesPlayed_Type;
 }
 
 const Highlight: React.FC<highlightProps> = (props) => {
