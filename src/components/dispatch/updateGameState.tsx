@@ -2,7 +2,6 @@
 import { emptyPiece } from "../types";
 import { handleMoveProps } from "../types";
 import { updatedMovesPlayed } from "./updateMovesPlayed";
-// import _ from "lodash";
 
 const handleMove = (props: handleMoveProps) => {
   const { boardData, selectedPiece, setBoardData, setHints, setSelectedPiece, row, col } = props;
