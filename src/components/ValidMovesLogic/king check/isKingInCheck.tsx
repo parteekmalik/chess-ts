@@ -21,6 +21,7 @@ export const iskingInCheck = (props: BoardLayout_Turn_Movesplayed_Type): boolean
   console.log("knight moves to check in king", moves);
   for (let i = 0; i < moves.length; i++) if (BoardLayout[moves[i].row][moves[i].col].piece === "knight") return true;
 
+  // refacto code using pieceonloc function
   if (turn === "white") {
     const leftpawn = BoardLayout[kingPos.row - 1][kingPos.col - 1];
     const rightpawn = BoardLayout[kingPos.row - 1][kingPos.col + 1];

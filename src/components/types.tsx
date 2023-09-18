@@ -61,6 +61,9 @@ export interface I_J_Type {
   i: number;
   j: number;
 }
+export interface moves_Type{
+  type: string; row: number; col: number; toBeMoved: { row: number; col: number }[]
+}
 
 export interface BoardLayout_Turn_Type extends BoardLayout_Type, Turn_Type {}
 export interface BoardLayout_Turn_Movesplayed_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type {}
@@ -73,6 +76,7 @@ export interface BoardLayout_Turn_Movesplayed_Row_Col_PieceType_Type extends Boa
 export interface BoardLayout_Turn_Movesplayed_Row_Col_PieceType_I_J_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, PieceType_Type, I_J_Type {}
 export interface BoardLayout_Turn_Row_Col_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type {}
 export interface BoardLayout_Turn_Row_Col_PieceType_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type, PieceType_Type {}
+export interface BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type, PieceType_Type,movesplayed_Type {}
 
 export const pieceMovement: { [key: string]: { row: number; col: number }[] } = {
   rook: [

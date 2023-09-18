@@ -17,6 +17,7 @@ const Board: React.FC = () => {
 
   useEffect(() => {
     ValidMoves = findValidMoves({ BoardLayout: boardData.BoardLayout, turn: boardData.turn, movesPlayed: boardData.movesPlayed });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardData.turn]);
 
   const clickHandle = (event: React.MouseEvent) => {
