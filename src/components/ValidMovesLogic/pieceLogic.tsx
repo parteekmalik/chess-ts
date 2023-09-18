@@ -5,7 +5,7 @@ import {
   BoardLayout_Turn_Row_Col_Type,
   BoardLayout_Turn_Row_Col_PieceType_Type,
   BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type,
-  moves_Type
+  moves_Type,
 } from "../types";
 import { pieceMovement } from "../types";
 
@@ -20,9 +20,7 @@ export const pieceOnLoc = (props: BoardLayout_Turn_Row_Col_Type): string => {
   return square === turn ? "friendly piece" : "opponent piece";
 };
 
-export const rookBishopQueen = (
-  props: BoardLayout_Turn_Row_Col_PieceType_Type
-): moves_Type[] => {
+export const rookBishopQueen = (props: BoardLayout_Turn_Row_Col_PieceType_Type): moves_Type[] => {
   const { BoardLayout, turn, row, col, pieceType } = props;
   const possibleMoves: moves_Type[] = [];
   const moves: { row: number; col: number }[] = pieceMovement[pieceType];
@@ -62,9 +60,7 @@ export const knightKing = (props: BoardLayout_Turn_Row_Col_PieceType_Type): move
 
   return possibleMoves;
 };
-const knightKingcastle = (
-  props: BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type
-): moves_Type[] => {
+const knightKingcastle = (props: BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type): moves_Type[] => {
   const { BoardLayout, turn, row, col, pieceType } = props;
   let possibleMoves: moves_Type[] = knightKing({ BoardLayout, turn, row, col, pieceType });
 
