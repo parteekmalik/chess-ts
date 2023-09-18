@@ -5,7 +5,7 @@ import { boardSize, initialPosition, checkForValidClick, boardData_Type, HintsPr
 import ChessBoard from "./piece and hints/ChessBoard";
 import ChessBoardHints from "./piece and hints/ChessBoardHints";
 import findValidMoves from "./ValidMovesLogic/findValidMoves";
-import HandleMove from "./ValidMovesLogic/updateGameState";
+import HandleMove from "./dispatch/updateGameState";
 import Highlight from "./highlight/highlight";
 
 let ValidMoves: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[][][];
@@ -17,7 +17,7 @@ const Board: React.FC = () => {
 
   useEffect(() => {
     ValidMoves = findValidMoves({ BoardLayout: boardData.BoardLayout, turn: boardData.turn, movesPlayed: boardData.movesPlayed });
-  }, [boardData.BoardLayout, boardData.turn]);
+  }, [boardData.turn]);
 
   const clickHandle = (event: React.MouseEvent) => {
     const { isValid, row, col } = checkForValidClick(event);

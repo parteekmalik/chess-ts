@@ -31,7 +31,7 @@ const rookBishopQueen = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type
       const res = pieceOnLoc({ BoardLayout, turn, row: currentRow, col: currentCol });
 
       if (res === "empty square" || res === "opponent piece") {
-        possibleMoves.push({ type: "normal", row: currentRow, col: currentCol , toBeMoved:[{row: currentRow,col: currentCol}] });
+        possibleMoves.push({ type: "normal", row: currentRow, col: currentCol, toBeMoved: [{ row: currentRow, col: currentCol }] });
       }
 
       if (res !== "empty square") break;
@@ -53,7 +53,7 @@ const knightKing = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: str
     const newRow: number = row + moves[i].row;
     const newCol: number = col + moves[i].col;
     const res = pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol });
-    if (res === "empty square" || res === "opponent piece") possibleMoves.push({ type: "normal", row: newRow, col: newCol , toBeMoved:[{row: newRow,col: newCol}] });
+    if (res === "empty square" || res === "opponent piece") possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
   }
 
   return possibleMoves;
@@ -67,13 +67,13 @@ const pawn = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: string; r
   let newRow = row + forward;
   let newCol = col;
   if (pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol }) === "empty square") {
-    possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved:[{row: newRow,col: newCol}]  });
+    possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
 
     // Check two squares forward if on starting position
     newRow = row + 2 * forward;
     if ((turn === "white" && row === 6) || (turn === "black" && row === 1)) {
       if (pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol }) === "empty square") {
-        possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved:[{row: newRow,col: newCol}]  });
+        possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
       }
     }
   }
@@ -88,14 +88,16 @@ const pawn = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: string; r
     newCol = col + move.col;
     const res = pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol });
     if (res === "opponent piece") {
-      possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved:[{row: newRow,col: newCol}] });
+      possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
     }
   }
 
   return possibleMoves;
 };
 
-const pieceFunctions: { [key: string]: (props: BoardLayout_Turn_Row_Col_PieceType_Type) => { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] } = {
+const pieceFunctions: {
+  [key: string]: (props: BoardLayout_Turn_Row_Col_PieceType_Type) => { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[];
+} = {
   rook: rookBishopQueen,
   bishop: rookBishopQueen,
   queen: rookBishopQueen,
@@ -128,20 +130,4 @@ export const allMoves = (props: BoardLayout_Turn_Movesplayed_Type): { type: stri
     validMoves.push(validMovesrow);
   }
   return validMoves;
-};
-
-export const kingInCheck = (props: BoardLayout_Turn_Movesplayed_Type) => {
-  const { BoardLayout, turn } = props;
-  const opponentMoves = allMoves(props);
-  for (let row: number = 0; row < 8; row++) {
-    for (let col: number = 0; col < 8; col++) {
-      for (let i: number = 0; i < opponentMoves[row][col].length; i++) {
-        const { row: curRow, col: curCol } = opponentMoves[row][col][i];
-        if (BoardLayout[curRow][curCol].type !== turn && BoardLayout[curRow][curCol].piece === "king") {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
 };
