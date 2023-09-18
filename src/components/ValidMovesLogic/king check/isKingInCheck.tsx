@@ -7,18 +7,15 @@ export const iskingInCheck = (props: BoardLayout_Turn_Movesplayed_Type): boolean
   const kingPos: { row: number; col: number } = findKingPos({ BoardLayout, turn });
 
   let moves = rookBishopQueen({ BoardLayout, turn, row: kingPos.row, col: kingPos.col, pieceType: "rook" });
-  console.log("rook moves to check in king", moves);
   for (let i = 0; i < moves.length; i++)
     if (BoardLayout[moves[i].row][moves[i].col].piece === "queen" || BoardLayout[moves[i].row][moves[i].col].piece === "rook") return true;
 
   moves = rookBishopQueen({ BoardLayout, turn, row: kingPos.row, col: kingPos.col, pieceType: "bishop" });
-  console.log("bishop moves to check in king", moves);
 
   for (let i = 0; i < moves.length; i++)
     if (BoardLayout[moves[i].row][moves[i].col].piece === "queen" || BoardLayout[moves[i].row][moves[i].col].piece === "bishop") return true;
 
   moves = knightKing({ BoardLayout, turn, row: kingPos.row, col: kingPos.col, pieceType: "knight" });
-  console.log("knight moves to check in king", moves);
   for (let i = 0; i < moves.length; i++) if (BoardLayout[moves[i].row][moves[i].col].piece === "knight") return true;
 
   // refacto code using pieceonloc function
