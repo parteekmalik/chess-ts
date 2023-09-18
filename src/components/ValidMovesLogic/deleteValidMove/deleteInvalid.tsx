@@ -35,8 +35,8 @@ const deleteInvalid = (
     let boardData = makeMove({ ...props, to: { row: movesRow[i].row, col: movesRow[i].col } });
 
     // Check if the king is in check after the move
-    console.log("movesPlayed",movesRow[i],boardData);
-    console.log("result isKingIncheck" , iskingInCheck(boardData));
+    console.log("movesPlayed", movesRow[i], boardData);
+    console.log("result isKingIncheck", iskingInCheck(boardData));
     if (!iskingInCheck(boardData)) {
       newMovesRow.push(movesRow[i]);
     }

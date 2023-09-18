@@ -7,10 +7,10 @@ import {
 } from "../types";
 import { pieceMovement } from "../types";
 
-const isValidMove = (row: number, col: number): boolean => {
+export const isValidMove = (row: number, col: number): boolean => {
   return row >= 0 && row < 8 && col >= 0 && col < 8;
 };
-const pieceOnLoc = (props: BoardLayout_Turn_Row_Col_Type): string => {
+export const pieceOnLoc = (props: BoardLayout_Turn_Row_Col_Type): string => {
   const { BoardLayout, turn, row, col } = props;
   if (!isValidMove(row, col)) return "invalid Pos";
   const square = BoardLayout[row][col].type;
@@ -18,7 +18,9 @@ const pieceOnLoc = (props: BoardLayout_Turn_Row_Col_Type): string => {
   return square === turn ? "friendly piece" : "opponent piece";
 };
 
-const rookBishopQueen = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
+export const rookBishopQueen = (
+  props: BoardLayout_Turn_Row_Col_PieceType_Type
+): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
   const { BoardLayout, turn, row, col, pieceType } = props;
   const possibleMoves: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] = [];
   const moves: { row: number; col: number }[] = pieceMovement[pieceType];
@@ -44,7 +46,7 @@ const rookBishopQueen = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type
   return possibleMoves;
 };
 
-const knightKing = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
+export const knightKing = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
   const { BoardLayout, turn, pieceType, row, col } = props;
   let possibleMoves: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] = [];
   const moves: { row: number; col: number }[] = pieceMovement[pieceType];
