@@ -1,6 +1,6 @@
 import { updatedMovesPlayedProps, MovesPlayed_Type } from "../types";
 
-// to be edited to a new type which holds which hold prev data and after data someting like that
+// to_be_edited to a new type which holds which hold prev data and after data someting like that
 // Increment current moves and update moves array
 export const updatedMovesPlayed = (props: updatedMovesPlayedProps): MovesPlayed_Type => {
   let { movesPlayed, selectedPiece, BoardLayout, row, col } = props;

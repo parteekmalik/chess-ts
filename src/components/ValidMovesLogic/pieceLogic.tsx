@@ -64,7 +64,7 @@ const knightKingcastle = (props: BoardLayout_Turn_Row_Col_PieceType_Movesplayed_
   const { BoardLayout, turn, row, col, pieceType } = props;
   let possibleMoves: moves_Type[] = knightKing({ BoardLayout, turn, row, col, pieceType });
 
-  // write logic for en passet move(make a special move type)
+  // to_be_edited write logic for en passet move(make a special move type)
 
   return possibleMoves;
 };
@@ -103,23 +103,19 @@ const pawn = (props: BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type): moves
     }
   }
 
-  // write logic for en passet move(make a special move type)
+  // to_be_edited write logic for en passet move(make a special move type)
 
   return possibleMoves;
 };
 
-const normalpieceFunctions: {
-  [key: string]: (props: BoardLayout_Turn_Row_Col_PieceType_Type) => moves_Type[];
-} = {
+const normalpieceFunctions: { [key: string]: (props: BoardLayout_Turn_Row_Col_PieceType_Type) => moves_Type[] } = {
   rook: rookBishopQueen,
   bishop: rookBishopQueen,
   queen: rookBishopQueen,
   knight: knightKing,
 };
 
-const specialpieceFunctions: {
-  [key: string]: (props: BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type) => moves_Type[];
-} = {
+const specialpieceFunctions: { [key: string]: (props: BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type) => moves_Type[] } = {
   king: knightKingcastle,
   pawn: pawn,
 };

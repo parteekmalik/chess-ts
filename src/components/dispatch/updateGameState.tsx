@@ -9,7 +9,7 @@ const handleMove = (props: handleMoveProps) => {
   // Update the moves
   boardData.movesPlayed = updatedMovesPlayed({ movesPlayed: boardData.movesPlayed, selectedPiece, BoardLayout: boardData.BoardLayout, row, col });
 
-  // to be edited to for loop and update changes;
+  // to_be_edited to for loop and update changes;
   // Update the board
   boardData.BoardLayout[row][col] = { ...boardData.BoardLayout[selectedPiece.row][selectedPiece.col] };
   boardData.BoardLayout[selectedPiece.row][selectedPiece.col] = { ...emptyPiece };
