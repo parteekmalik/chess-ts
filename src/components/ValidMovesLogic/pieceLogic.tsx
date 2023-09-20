@@ -1,4 +1,7 @@
 // pieceLogic.tsx
+import { MovesPlayed_Type } from "../types";
+import { movesplayed_Type } from "../types";
+import { Turn_Type } from "../types";
 import {
   BoardLayout_Turn_Movesplayed_Type,
   BoardLayout_Turn_Movesplayed_Row_Col_Type,
@@ -8,6 +11,7 @@ import {
   moves_Type,
 } from "../types";
 import { pieceMovement } from "../types";
+import { pawn, knightKingcastle } from "./specialmovelogic";
 
 export const isValidMove = (row: number, col: number): boolean => {
   return row >= 0 && row < 8 && col >= 0 && col < 8;
@@ -33,7 +37,11 @@ export const rookBishopQueen = (props: BoardLayout_Turn_Row_Col_PieceType_Type):
       const res = pieceOnLoc({ BoardLayout, turn, row: currentRow, col: currentCol });
 
       if (res === "empty square" || res === "opponent piece") {
-        possibleMoves.push({ type: "normal", row: currentRow, col: currentCol, toBeMoved: [{ row: currentRow, col: currentCol }] });
+        possibleMoves.push({
+          type: pieceType + res === "empty square" ? " normal" : " capture",
+          hint: { row: currentRow, col: currentCol },
+          toBeMoved: [{ row: currentRow, col: currentCol }],
+        });
       }
 
       if (res !== "empty square") break;
@@ -55,55 +63,13 @@ export const knightKing = (props: BoardLayout_Turn_Row_Col_PieceType_Type): move
     const newRow: number = row + moves[i].row;
     const newCol: number = col + moves[i].col;
     const res = pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol });
-    if (res === "empty square" || res === "opponent piece") possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
+    if (res === "empty square" || res === "opponent piece")
+      possibleMoves.push({
+        type: pieceType + res === "empty square" ? "normal" : "capture",
+        hint: { row: newRow, col: newCol },
+        toBeMoved: [{ row: newRow, col: newCol }],
+      });
   }
-
-  return possibleMoves;
-};
-const knightKingcastle = (props: BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type): moves_Type[] => {
-  const { BoardLayout, turn, row, col, pieceType } = props;
-  let possibleMoves: moves_Type[] = knightKing({ BoardLayout, turn, row, col, pieceType });
-
-  // to_be_edited write logic for en passet move(make a special move type)
-
-  return possibleMoves;
-};
-
-const pawn = (props: BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type): moves_Type[] => {
-  const { BoardLayout, turn, row, col } = props;
-  let possibleMoves: moves_Type[] = [];
-  const forward = turn === "white" ? -1 : 1;
-
-  // Check one square forward
-  let newRow = row + forward;
-  let newCol = col;
-  if (pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol }) === "empty square") {
-    possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
-
-    // Check two squares forward if on starting position
-    newRow = row + 2 * forward;
-    if ((turn === "white" && row === 6) || (turn === "black" && row === 1)) {
-      if (pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol }) === "empty square") {
-        possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
-      }
-    }
-  }
-
-  // Check diagonal captures
-  const diagonalMoves = [
-    { row: forward, col: -1 },
-    { row: forward, col: 1 },
-  ];
-  for (const move of diagonalMoves) {
-    newRow = row + move.row;
-    newCol = col + move.col;
-    const res = pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol });
-    if (res === "opponent piece") {
-      possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
-    }
-  }
-
-  // to_be_edited write logic for en passet move(make a special move type)
 
   return possibleMoves;
 };

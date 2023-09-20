@@ -1,10 +1,15 @@
 export interface MovesPlayed_Type {
   current: number;
-  moves: { from: { row: number; col: number; piece: { type: string; piece: string } }; to: { row: number; col: number; piece: { type: string; piece: string } } }[];
+  moves: {
+    type: string;
+    from: { row: number; col: number; piece: { type: string; piece: string } };
+    to: { row: number; col: number; piece: { type: string; piece: string } };
+    toBeMoved: { row: number; col: number }[];
+  }[];
 }
 export interface HintsProps {
   isShowHint: boolean;
-  hints: { row: number; col: number }[];
+  availableMoves: moves_Type[];
 }
 export interface selectedPieceProps {
   isSelected: boolean;
@@ -15,6 +20,8 @@ export interface boardData_Type {
   BoardLayout: { type: string; piece: string }[][];
   turn: string;
   movesPlayed: MovesPlayed_Type;
+  isblackcastle: boolean[];
+  iswhitecastle: boolean[];
 }
 
 export interface handleMoveProps {
@@ -22,9 +29,10 @@ export interface handleMoveProps {
   setBoardData: React.Dispatch<React.SetStateAction<boardData_Type>>;
   selectedPiece: selectedPieceProps;
   setSelectedPiece: React.Dispatch<React.SetStateAction<selectedPieceProps>>;
-  setHints: React.Dispatch<React.SetStateAction<HintsProps>>;
+  setSelectedMoves: React.Dispatch<React.SetStateAction<HintsProps>>;
   row: number;
   col: number;
+  Move: moves_Type;
 }
 
 export interface updatedMovesPlayedProps {
@@ -33,6 +41,7 @@ export interface updatedMovesPlayedProps {
   movesPlayed: MovesPlayed_Type;
   row: number;
   col: number;
+  Move: moves_Type;
 }
 
 export interface BoardLayout_Type {
@@ -63,8 +72,7 @@ export interface I_J_Type {
 }
 export interface moves_Type {
   type: string;
-  row: number;
-  col: number;
+  hint: { row: number; col: number };
   toBeMoved: { row: number; col: number }[];
 }
 

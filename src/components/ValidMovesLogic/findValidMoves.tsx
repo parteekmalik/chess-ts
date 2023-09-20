@@ -1,8 +1,8 @@
 import { BoardLayout_Turn_Movesplayed_Type, moves_Type } from "../types";
 import { allMoves } from "./pieceLogic";
-import _ from "lodash";
+// import _ from "lodash";
 
-import { removeInvalidMoves } from "./deleteValidMove/deleteInvalid";
+// import { removeInvalidMoves } from "./deleteValidMove/deleteInvalid";
 
 // Main function to find valid moves
 const findValidMoves = (props: BoardLayout_Turn_Movesplayed_Type): moves_Type[][][] => {
@@ -10,9 +10,9 @@ const findValidMoves = (props: BoardLayout_Turn_Movesplayed_Type): moves_Type[][
   let allMove: moves_Type[][][] = allMoves(props);
 
   // Remove invalid moves
-  let validMoves: moves_Type[][][] = removeInvalidMoves({ ...props, ValidMoves: _.cloneDeep(allMove) });
+  // let validMoves: moves_Type[][][] = removeInvalidMoves({ ...props, ValidMoves: _.cloneDeep(allMove) });
 
-  return validMoves;
+  return allMove;
 };
 
 export default findValidMoves;

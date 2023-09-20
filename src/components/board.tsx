@@ -8,15 +8,24 @@ import findValidMoves from "./ValidMovesLogic/findValidMoves";
 import HandleMove from "./dispatch/updateGameState";
 import Highlight from "./highlight/highlight";
 
-let ValidMoves: moves_Type[][][];
-
 const Board: React.FC = () => {
-  const [boardData, setBoardData] = useState<boardData_Type>({ BoardLayout: initialPosition, turn: "white", movesPlayed: { current: -1, moves: [] } });
-  const [hints, setHints] = useState<HintsProps>({ isShowHint: true, hints: [] });
+  const [boardData, setBoardData] = useState<boardData_Type>({
+    BoardLayout: initialPosition,
+    turn: "white",
+    movesPlayed: { current: -1, moves: [] },
+    isblackcastle: [true, true],
+    iswhitecastle: [true, true],
+  });
+  const [SelectedMoves, setSelectedMoves] = useState<HintsProps>({ isShowHint: true, availableMoves: [] });
   const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, row: 0, col: 0 });
+  const [ValidMoves, setValidMoves] = useState<moves_Type[][][]>(
+    findValidMoves({ BoardLayout: boardData.BoardLayout, turn: boardData.turn, movesPlayed: boardData.movesPlayed })
+  );
 
   useEffect(() => {
-    ValidMoves = findValidMoves({ BoardLayout: boardData.BoardLayout, turn: boardData.turn, movesPlayed: boardData.movesPlayed });
+    setValidMoves(findValidMoves({ BoardLayout: boardData.BoardLayout, turn: boardData.turn, movesPlayed: boardData.movesPlayed }));
+    console.log(ValidMoves);
+    console.log(boardData.movesPlayed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardData.turn]);
 
@@ -28,22 +37,25 @@ const Board: React.FC = () => {
       return;
     }
 
-    if (hints.hints.some((hint) => hint.row === row && hint.col === col)) {
-      HandleMove({ boardData, selectedPiece, setBoardData, setHints, setSelectedPiece, row, col });
+    if (SelectedMoves.availableMoves.some((hint) => hint.hint.row === row && hint.hint.col === col)) {
+      SelectedMoves.availableMoves.forEach((moves) => {
+        if (moves.hint.row === row && moves.hint.col === col)
+          HandleMove({ boardData, selectedPiece, setBoardData, setSelectedMoves, setSelectedPiece, row, col, Move: moves });
+      });
     } else if (boardData.BoardLayout[row][col].type !== "empty") {
       setSelectedPiece({ isSelected: true, row, col });
-      setHints({ ...hints, hints: ValidMoves[row][col] });
+      setSelectedMoves({ ...SelectedMoves, availableMoves: ValidMoves[row][col] });
     } else {
       setSelectedPiece({ isSelected: false, row: 0, col: 0 });
-      setHints({ isShowHint: true, hints: [] });
+      setSelectedMoves({ ...SelectedMoves, availableMoves: [] });
     }
   };
 
   return (
     <div className="chess-board" onClick={clickHandle} style={{ width: boardSize + "px", height: boardSize + "px" }}>
-      <Highlight selectedPiece={selectedPiece} movesPlayed={boardData.movesPlayed} />
+      {/* <Highlight selectedPiece={selectedPiece} movesPlayed={boardData.movesPlayed} /> */}
       <ChessBoard BoardLayout={boardData.BoardLayout} />
-      <ChessBoardHints Hints={hints} BoardLayout={boardData.BoardLayout} />
+      <ChessBoardHints Hints={SelectedMoves.availableMoves} BoardLayout={boardData.BoardLayout} />
     </div>
   );
 };
