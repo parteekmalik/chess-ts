@@ -1,5 +1,5 @@
 // ChessBoardHints.tsx
-import { squareSize, HintsProps, moves_Type } from "../types";
+import { squareSize, moves_Type } from "../types";
 
 interface ChessBoardProps {
   Hints: moves_Type[];

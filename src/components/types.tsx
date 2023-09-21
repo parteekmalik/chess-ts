@@ -20,8 +20,7 @@ export interface boardData_Type {
   BoardLayout: { type: string; piece: string }[][];
   turn: string;
   movesPlayed: MovesPlayed_Type;
-  isblackcastle: boolean[];
-  iswhitecastle: boolean[];
+  iscastle: { [key: string]: { [key: string]: boolean } };
 }
 
 export interface handleMoveProps {
@@ -88,6 +87,8 @@ export interface BoardLayout_Turn_Movesplayed_Row_Col_PieceType_I_J_Type extends
 export interface BoardLayout_Turn_Row_Col_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type {}
 export interface BoardLayout_Turn_Row_Col_PieceType_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type, PieceType_Type {}
 export interface BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type, PieceType_Type, movesplayed_Type {}
+export interface boardData_Row_Col_Type extends boardData_Type,Row_Col_Type {}
+export interface Row_Col_PieceType_Type extends Row_Col_Type,PieceType_Type{}
 
 export const pieceMovement: { [key: string]: { row: number; col: number }[] } = {
   rook: [

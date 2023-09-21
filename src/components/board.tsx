@@ -13,19 +13,16 @@ const Board: React.FC = () => {
     BoardLayout: initialPosition,
     turn: "white",
     movesPlayed: { current: -1, moves: [] },
-    isblackcastle: [true, true],
-    iswhitecastle: [true, true],
+    iscastle: { black: { king: true, rightrook: true, leftrook: true }, white: { king: true, rightrook: true, leftrook: true } },
   });
   const [SelectedMoves, setSelectedMoves] = useState<HintsProps>({ isShowHint: true, availableMoves: [] });
   const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, row: 0, col: 0 });
-  const [ValidMoves, setValidMoves] = useState<moves_Type[][][]>(
-    findValidMoves({ BoardLayout: boardData.BoardLayout, turn: boardData.turn, movesPlayed: boardData.movesPlayed })
-  );
+  const [ValidMoves, setValidMoves] = useState<moves_Type[][][]>([])
 
   useEffect(() => {
-    setValidMoves(findValidMoves({ BoardLayout: boardData.BoardLayout, turn: boardData.turn, movesPlayed: boardData.movesPlayed }));
-    console.log(ValidMoves);
-    console.log(boardData.movesPlayed);
+    setValidMoves(findValidMoves(boardData));
+    // console.log(ValidMoves);
+    // console.log(boardData.movesPlayed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardData.turn]);
 
@@ -53,7 +50,7 @@ const Board: React.FC = () => {
 
   return (
     <div className="chess-board" onClick={clickHandle} style={{ width: boardSize + "px", height: boardSize + "px" }}>
-      {/* <Highlight selectedPiece={selectedPiece} movesPlayed={boardData.movesPlayed} /> */}
+      <Highlight selectedPiece={selectedPiece} movesPlayed={boardData.movesPlayed} />
       <ChessBoard BoardLayout={boardData.BoardLayout} />
       <ChessBoardHints Hints={SelectedMoves.availableMoves} BoardLayout={boardData.BoardLayout} />
     </div>

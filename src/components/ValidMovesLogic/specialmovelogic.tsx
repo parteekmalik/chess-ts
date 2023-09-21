@@ -1,4 +1,4 @@
-import { moves_Type, BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type } from "../types";
+import { moves_Type, boardData_Type, Row_Col_PieceType_Type } from "../types";
 import { knightKing, pieceOnLoc } from "./pieceLogic";
 
 // export interface iskingandrookmovedProps extends movesplayed_Type, Turn_Type {}
@@ -10,32 +10,32 @@ import { knightKing, pieceOnLoc } from "./pieceLogic";
 //   return true;
 // };
 
-export const knightKingcastle = (props: BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type): moves_Type[] => {
-  const { BoardLayout, turn, row, col, pieceType, movesPlayed } = props;
-  let possibleMoves: moves_Type[] = knightKing({ BoardLayout, turn, row, col, pieceType });
+export const knightKingcastle = (boardData: boardData_Type, props: Row_Col_PieceType_Type): moves_Type[] => {
+  let possibleMoves: moves_Type[] = knightKing(boardData, props);
 
-  // to_be_edited write logic for en passet move(make a special move type)
-  if (turn === "white" && ) {
-  }
+  // to_be_edited write logic for castle move(make a special move type)
+  // if (BoardLayout) {
+  // }
 
   return possibleMoves;
 };
 
-export const pawn = (props: BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type): moves_Type[] => {
-  const { BoardLayout, turn, row, col, movesPlayed } = props;
+export const pawn = (boardData: boardData_Type, props: Row_Col_PieceType_Type): moves_Type[] => {
+  const { row, col } = props;
+  const { movesPlayed, turn } = boardData;
   let possibleMoves: moves_Type[] = [];
   const forward = turn === "white" ? -1 : 1;
 
   // Check one square forward
   let newRow = row + forward;
   let newCol = col;
-  if (pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol }) === "empty square") {
+  if (pieceOnLoc(boardData, { row: newRow, col: newCol }) === "empty square") {
     possibleMoves.push({ type: "pawn normal", hint: { row: newRow, col: newCol }, toBeMoved: [{ row: newRow, col: newCol }] });
 
     // Check two squares forward if on starting position
     newRow = row + 2 * forward;
     if ((turn === "white" && row === 6) || (turn === "black" && row === 1)) {
-      if (pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol }) === "empty square") {
+      if (pieceOnLoc(boardData, { row: newRow, col: newCol }) === "empty square") {
         possibleMoves.push({ type: "pawn double forward", hint: { row: newRow, col: newCol }, toBeMoved: [{ row: newRow, col: newCol }] });
       }
     }
@@ -49,7 +49,7 @@ export const pawn = (props: BoardLayout_Turn_Row_Col_PieceType_Movesplayed_Type)
   for (const move of diagonalMoves) {
     newRow = row + move.row;
     newCol = col + move.col;
-    const res = pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol });
+    const res = pieceOnLoc(boardData, { row: newRow, col: newCol });
     if (res === "opponent piece") {
       possibleMoves.push({ type: "pawn capture", hint: { row: newRow, col: newCol }, toBeMoved: [{ row: newRow, col: newCol }] });
     }
