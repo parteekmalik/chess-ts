@@ -1,7 +1,7 @@
 // updateGameState.tsx
-import { emptyPiece } from "../types";
 import { handleMoveProps } from "../types";
 import { updatedMovesPlayed } from "./updateMovesPlayed";
+import { movePiece } from "./movePiece";
 
 const handleMove = (props: handleMoveProps) => {
   const { boardData, selectedPiece, setBoardData, setSelectedMoves, setSelectedPiece, row, col, Move } = props;
@@ -20,11 +20,7 @@ const handleMove = (props: handleMoveProps) => {
   // to_be_edited to for loop and update changes;
   // Update the board
   let prev: { row: number; col: number } = { row: selectedPiece.row, col: selectedPiece.col };
-  Move.toBeMoved.forEach((current) => {
-    boardData.BoardLayout[current.row][current.col] = { ...boardData.BoardLayout[prev.row][prev.col] };
-    boardData.BoardLayout[prev.row][prev.col] = { ...emptyPiece };
-    prev = current;
-  });
+  movePiece(boardData, Move, prev);
 
   // Toggle the turn and update
   boardData.turn = boardData.turn === "white" ? "black" : "white";

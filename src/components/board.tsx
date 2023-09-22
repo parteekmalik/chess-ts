@@ -21,7 +21,7 @@ const Board: React.FC = () => {
 
   useEffect(() => {
     setValidMoves(findValidMoves(boardData));
-    // console.log(ValidMoves);
+    console.log(boardData.iscastle);
     // console.log(boardData.movesPlayed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardData.turn]);

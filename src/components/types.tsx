@@ -52,9 +52,7 @@ export interface Turn_Type {
 export interface movesplayed_Type {
   movesPlayed: MovesPlayed_Type;
 }
-export interface ValidMoves_Type {
-  ValidMoves: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[][][];
-}
+
 export interface Row_Col_Type {
   row: number;
   col: number;
@@ -77,10 +75,7 @@ export interface moves_Type {
 
 export interface BoardLayout_Turn_Type extends BoardLayout_Type, Turn_Type {}
 export interface BoardLayout_Turn_Movesplayed_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type {}
-export interface BoardLayout_Turn_ValidMoves_Type extends BoardLayout_Type, Turn_Type, ValidMoves_Type {}
-export interface BoardLayout_Turn_ValidMoves_MovesPlayed_Type extends BoardLayout_Type, Turn_Type, ValidMoves_Type, movesplayed_Type {}
 export interface BoardLayout_Turn_Movesplayed_Row_Col_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type {}
-export interface BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, ValidMoves_Type {}
 export interface BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_To_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, To_Type {}
 export interface BoardLayout_Turn_Movesplayed_Row_Col_PieceType_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, PieceType_Type {}
 export interface BoardLayout_Turn_Movesplayed_Row_Col_PieceType_I_J_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, PieceType_Type, I_J_Type {}
@@ -161,7 +156,7 @@ export const initialPosition: { type: string; piece: string }[][] = [
   Array(8).fill({ type: "empty", piece: "" }),
   Array(8).fill({ type: "empty", piece: "" }),
   [
-    { type: "white", piece: "rook" },
+    { type: "white", piece: "pawn" },
     { type: "white", piece: "pawn" },
     { type: "white", piece: "pawn" },
     { type: "white", piece: "pawn" },

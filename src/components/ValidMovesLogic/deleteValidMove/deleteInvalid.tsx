@@ -1,63 +1,37 @@
-// import {
-//   emptyPiece,
-//   BoardLayout_Turn_Movesplayed_Type,
-//   BoardLayout_Turn_ValidMoves_MovesPlayed_Type,
-//   BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type,
-//   BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_To_Type,
-// } from "../../types";
-// import { updatedMovesPlayed } from "../../dispatch/updateMovesPlayed";
-// import _ from "lodash";
+import {
+  boardData_Type,
+  moves_Type,
+} from "../../types";
+import _ from "lodash";
+import { movePiece } from "../../dispatch/movePiece";
+import { iskingInCheck } from "../king check/isKingInCheck";
 
-// import { iskingInCheck } from "../king check/isKingInCheck";
 
-// // Helper function to make a move
-// const makeMove = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_To_Type): BoardLayout_Turn_Movesplayed_Type => {
-//   const newProps = _.cloneDeep(props);
-//   let { BoardLayout, to, row, col, turn, movesPlayed } = newProps;
+// Helper function to delete invalid moves
+export const deleteInvalid = (boardData:boardData_Type,movesRow: moves_Type[],prev:{row:number,col:number}): moves_Type[] => {
+  const newMovesRow: moves_Type[] = [];
 
-//   movesPlayed = { ...updatedMovesPlayed({ movesPlayed, selectedPiece: { isSelected: true, row: to.row, col: to.col }, BoardLayout, row, col }) };
-//   // Perform the move
-//   BoardLayout[to.row][to.col] = BoardLayout[row][col];
-//   BoardLayout[row][col] = emptyPiece;
+  for (let i = 0; i < movesRow.length; i++) {
+    let newboardData = movePiece(_.cloneDeep(boardData),movesRow[i],prev);
 
-//   return { BoardLayout, turn, movesPlayed };
-// };
+    // Check if the king is in check after the move
+    if (!iskingInCheck(newboardData)) {
+      newMovesRow.push(movesRow[i]);
+    }
+  }
 
-// // Helper function to delete invalid moves
-// const deleteInvalid = (
-//   props: BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type
-// ): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
-//   const { ValidMoves, row, col } = props;
-//   const movesRow = ValidMoves[row][col];
-//   const newMovesRow: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] = [];
+  return newMovesRow;
+};
 
-//   for (let i = 0; i < movesRow.length; i++) {
-//     let boardData = makeMove({ ...props, to: { row: movesRow[i].row, col: movesRow[i].col } });
+// Helper function to remove invalid moves from the ValidMoves array
+export const removeInvalidMoves = (boardData:boardData_Type , ValidMoves:moves_Type[][][]): moves_Type[][][] => {
 
-//     // Check if the king is in check after the move
-//     if (!iskingInCheck(boardData)) {
-//       newMovesRow.push(movesRow[i]);
-//     }
-//   }
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      ValidMoves[row][col] = deleteInvalid(boardData, ValidMoves[row][col], {row,col});
+    }
+  }
 
-//   return newMovesRow;
-// };
-
-// // Helper function to remove invalid moves from the ValidMoves array
-// const removeInvalidMoves = (
-//   props: BoardLayout_Turn_ValidMoves_MovesPlayed_Type
-// ): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[][][] => {
-//   let { ValidMoves } = props;
-
-//   for (let row = 0; row < 8; row++) {
-//     for (let col = 0; col < 8; col++) {
-//       ValidMoves[row][col] = deleteInvalid({ ...props, row, col });
-//     }
-//   }
-
-//   return ValidMoves;
-// };
-// export { removeInvalidMoves };
-// export default removeInvalidMoves;
-
-export{};
+  return ValidMoves;
+};
+export default removeInvalidMoves;
