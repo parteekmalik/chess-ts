@@ -1,26 +1,23 @@
 // pieceLogic.tsx
-import {
-  BoardLayout_Turn_Movesplayed_Type,
-  BoardLayout_Turn_Movesplayed_Row_Col_Type,
-  BoardLayout_Turn_Row_Col_Type,
-  BoardLayout_Turn_Row_Col_PieceType_Type,
-} from "../types";
+import { moves_Type, boardData_Type, Row_Col_PieceType_Type, Row_Col_Type } from "../types";
 import { pieceMovement } from "../types";
+import { pawnenpassent, Kingcastle } from "./specialmovelogic";
 
-const isValidMove = (row: number, col: number): boolean => {
+export const isValidMove = (row: number, col: number): boolean => {
   return row >= 0 && row < 8 && col >= 0 && col < 8;
 };
-const pieceOnLoc = (props: BoardLayout_Turn_Row_Col_Type): string => {
-  const { BoardLayout, turn, row, col } = props;
+export const pieceOnLoc = (boardData: boardData_Type, props: Row_Col_Type): string => {
+  const { row, col } = props;
+  const { BoardLayout, turn } = boardData;
   if (!isValidMove(row, col)) return "invalid Pos";
   const square = BoardLayout[row][col].type;
   if (square === "empty") return "empty square";
   return square === turn ? "friendly piece" : "opponent piece";
 };
 
-const rookBishopQueen = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
-  const { BoardLayout, turn, row, col, pieceType } = props;
-  const possibleMoves: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] = [];
+export const rookBishopQueen = (boardData: boardData_Type, props: Row_Col_PieceType_Type): moves_Type[] => {
+  const { row, col, pieceType } = props;
+  const possibleMoves: moves_Type[] = [];
   const moves: { row: number; col: number }[] = pieceMovement[pieceType];
 
   for (const { row: moveI, col: moveJ } of moves) {
@@ -28,10 +25,14 @@ const rookBishopQueen = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type
     let currentCol = col + moveJ;
 
     while (true) {
-      const res = pieceOnLoc({ BoardLayout, turn, row: currentRow, col: currentCol });
+      const res = pieceOnLoc(boardData, { row: currentRow, col: currentCol });
 
       if (res === "empty square" || res === "opponent piece") {
-        possibleMoves.push({ type: "normal", row: currentRow, col: currentCol, toBeMoved: [{ row: currentRow, col: currentCol }] });
+        possibleMoves.push({
+          type: pieceType + res === "empty square" ? "normal" : "capture",
+          row: currentRow,
+          col: currentCol,
+        });
       }
 
       if (res !== "empty square") break;
@@ -44,36 +45,43 @@ const rookBishopQueen = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type
   return possibleMoves;
 };
 
-const knightKing = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
-  const { BoardLayout, turn, pieceType, row, col } = props;
-  let possibleMoves: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] = [];
+export const knightKing = (boardData: boardData_Type, props: Row_Col_PieceType_Type): moves_Type[] => {
+  const { pieceType, row, col } = props;
+  let possibleMoves: moves_Type[] = [];
   const moves: { row: number; col: number }[] = pieceMovement[pieceType];
 
   for (let i = 0; i < moves.length; i++) {
     const newRow: number = row + moves[i].row;
     const newCol: number = col + moves[i].col;
-    const res = pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol });
-    if (res === "empty square" || res === "opponent piece") possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
+    const res = pieceOnLoc(boardData, { row: newRow, col: newCol });
+    if (res === "empty square" || res === "opponent piece")
+      possibleMoves.push({
+        type: pieceType + res === "empty square" ? "normal" : "capture",
+        row: newRow,
+        col: newCol,
+      });
   }
 
   return possibleMoves;
 };
-const pawn = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
-  const { BoardLayout, turn, row, col } = props;
-  let possibleMoves: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] = [];
+
+export const pawn = (boardData: boardData_Type, props: Row_Col_PieceType_Type): moves_Type[] => {
+  const { row, col } = props;
+  const { turn } = boardData;
+  let possibleMoves: moves_Type[] = [];
   const forward = turn === "white" ? -1 : 1;
 
   // Check one square forward
   let newRow = row + forward;
   let newCol = col;
-  if (pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol }) === "empty square") {
-    possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
+  if (pieceOnLoc(boardData, { row: newRow, col: newCol }) === "empty square") {
+    possibleMoves.push({ type: "pawn normal", row: newRow, col: newCol });
 
     // Check two squares forward if on starting position
     newRow = row + 2 * forward;
     if ((turn === "white" && row === 6) || (turn === "black" && row === 1)) {
-      if (pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol }) === "empty square") {
-        possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
+      if (pieceOnLoc(boardData, { row: newRow, col: newCol }) === "empty square") {
+        possibleMoves.push({ type: "pawn double forward", row: newRow, col: newCol });
       }
     }
   }
@@ -86,46 +94,44 @@ const pawn = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: string; r
   for (const move of diagonalMoves) {
     newRow = row + move.row;
     newCol = col + move.col;
-    const res = pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol });
+    const res = pieceOnLoc(boardData, { row: newRow, col: newCol });
     if (res === "opponent piece") {
-      possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
+      possibleMoves.push({ type: "pawn capture", row: newRow, col: newCol });
     }
   }
 
   return possibleMoves;
 };
 
-const pieceFunctions: {
-  [key: string]: (props: BoardLayout_Turn_Row_Col_PieceType_Type) => { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[];
-} = {
+const pieceFunctions: { [key: string]: (boardData: boardData_Type, props: Row_Col_PieceType_Type) => moves_Type[] } = {
   rook: rookBishopQueen,
   bishop: rookBishopQueen,
   queen: rookBishopQueen,
   knight: knightKing,
-  king: knightKing,
-  pawn: pawn,
+  king: Kingcastle,
+  pawn: pawnenpassent,
 };
 
-const findMoves = (props: BoardLayout_Turn_Movesplayed_Row_Col_Type): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
-  const { BoardLayout, turn, row, col } = props;
-  let ans: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] = [];
+const findMoves = (boardData: boardData_Type, props: Row_Col_Type): moves_Type[] => {
+  const { BoardLayout, turn } = boardData;
+  const { row, col } = props;
+  let ans: moves_Type[] = [];
   const square: { type: string; piece: string } = BoardLayout[row][col];
 
   if (square.type === turn && "" !== square.piece) {
-    if (pieceFunctions.hasOwnProperty(square.piece)) {
-      ans = [...pieceFunctions[square.piece]({ BoardLayout, turn, pieceType: square.piece, row, col })];
-    }
+    if (square.piece === "king" || square.piece === "pawn") ans = [...pieceFunctions[square.piece](boardData, { ...props, pieceType: square.piece })];
+    else ans = [...pieceFunctions[square.piece](boardData, { ...props, pieceType: square.piece })];
   }
   return ans;
 };
 
-export const allMoves = (props: BoardLayout_Turn_Movesplayed_Type): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[][][] => {
-  const validMoves: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[][][] = [];
+export const allMoves = (boardData: boardData_Type): moves_Type[][][] => {
+  const validMoves: moves_Type[][][] = [];
 
   for (let row = 0; row < 8; row++) {
-    const validMovesrow: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[][] = [];
+    const validMovesrow: moves_Type[][] = [];
     for (let col = 0; col < 8; col++) {
-      validMovesrow.push(findMoves({ ...props, row, col }));
+      validMovesrow.push(findMoves(boardData, { row, col }));
     }
     validMoves.push(validMovesrow);
   }

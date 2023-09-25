@@ -1,19 +1,28 @@
 // updateGameState.tsx
-import { emptyPiece } from "../types";
 import { handleMoveProps } from "../types";
 import { updatedMovesPlayed } from "./updateMovesPlayed";
-// import _ from "lodash";
+import { movePiece } from "./movePiece";
 
 const handleMove = (props: handleMoveProps) => {
-  const { boardData, selectedPiece, setBoardData, setHints, setSelectedPiece, row, col } = props;
+  const { boardData, selectedPiece, setBoardData, setSelectedMoves, setSelectedPiece, Move } = props;
+
+  // updating castling logic
+  const movedpiece = boardData.BoardLayout[selectedPiece.row][selectedPiece.col];
+  if (movedpiece.piece === "king") {
+    boardData.iscastle[boardData.turn]["king"] = false;
+  } else if (movedpiece.piece === "rook") {
+    boardData.iscastle[boardData.turn][selectedPiece.col === 0 ? "leftrook" : selectedPiece.col === 7 ? "rightrook" : "leftrook"] = false;
+  }
 
   // Update the moves
-  boardData.movesPlayed = updatedMovesPlayed({ movesPlayed: boardData.movesPlayed, selectedPiece, BoardLayout: boardData.BoardLayout, row, col });
+  boardData.movesPlayed.current += 1;
+  boardData.movesPlayed.moves = [
+    ...boardData.movesPlayed.moves,
+    updatedMovesPlayed({ movesPlayed: boardData.movesPlayed, selectedPiece, BoardLayout: boardData.BoardLayout, Move }),
+  ];
 
-  // to be edited to for loop and update changes;
   // Update the board
-  boardData.BoardLayout[row][col] = { ...boardData.BoardLayout[selectedPiece.row][selectedPiece.col] };
-  boardData.BoardLayout[selectedPiece.row][selectedPiece.col] = { ...emptyPiece };
+  movePiece(boardData);
 
   // Toggle the turn and update
   boardData.turn = boardData.turn === "white" ? "black" : "white";
@@ -22,7 +31,7 @@ const handleMove = (props: handleMoveProps) => {
 
   // Reset selected piece and hints
   setSelectedPiece({ isSelected: false, row: 0, col: 0 });
-  setHints({ isShowHint: true, hints: [] });
+  setSelectedMoves({ isShowHint: true, availableMoves: [] });
 };
 
 export default handleMove;
