@@ -24,7 +24,8 @@ export const iskingInCheck = (boardData: boardData_Type): boolean => {
     const leftpawn = isValidMove(kingPos.row - 1, kingPos.col - 1) ? BoardLayout[kingPos.row - 1][kingPos.col - 1] : { type: "", piece: "" };
     const rightpawn = isValidMove(kingPos.row - 1, kingPos.col + 1) ? BoardLayout[kingPos.row - 1][kingPos.col + 1] : { type: "", piece: "" };
     if ((leftpawn.piece === "pawn" && leftpawn.type !== turn) || (rightpawn.piece === "pawn" && rightpawn.type !== turn)) return true;
-  } else {
+  } else { 
+    
     const leftpawn = isValidMove(kingPos.row + 1, kingPos.col - 1) ? BoardLayout[kingPos.row + 1][kingPos.col - 1] : { type: "", piece: "" };
     const rightpawn = isValidMove(kingPos.row + 1, kingPos.col + 1) ? BoardLayout[kingPos.row + 1][kingPos.col + 1] : { type: "", piece: "" };
     if ((leftpawn.piece === "pawn" && leftpawn.type !== turn) || (rightpawn.piece === "pawn" && rightpawn.type !== turn)) return true;
