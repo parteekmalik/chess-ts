@@ -1,14 +1,15 @@
 // ChessBoardHints.tsx
-import { squareSize, moves_Type } from "../types";
+import { squareSize } from "../types";
 
 interface ChessBoardProps {
-  Hints: moves_Type[];
+  Hints: { isShowHint: boolean; hints: { row: number; col: number }[] };
   BoardLayout: { type: string; piece: string }[][];
 }
 const ChessBoardHints: React.FC<ChessBoardProps> = (props) => {
   const { Hints, BoardLayout } = props;
+  const { hints } = Hints;
   const squares: JSX.Element[] = [];
-  Hints.forEach((square) => {
+  hints.forEach((square) => {
     const rowIndex = square.row;
     const colIndex = square.col;
     const position = `${rowIndex},${colIndex}`;
