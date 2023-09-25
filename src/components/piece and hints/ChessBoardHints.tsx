@@ -9,8 +9,8 @@ const ChessBoardHints: React.FC<ChessBoardProps> = (props) => {
   const { Hints, BoardLayout } = props;
   const squares: JSX.Element[] = [];
   Hints.forEach((square) => {
-    const rowIndex = square.hint.row;
-    const colIndex = square.hint.col;
+    const rowIndex = square.row;
+    const colIndex = square.col;
     const position = `${rowIndex},${colIndex}`;
     const Style = {
       transform: `translate(${colIndex * squareSize}px, ${rowIndex * squareSize}px)`,

@@ -17,11 +17,11 @@ const Board: React.FC = () => {
   });
   const [SelectedMoves, setSelectedMoves] = useState<HintsProps>({ isShowHint: true, availableMoves: [] });
   const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, row: 0, col: 0 });
-  const [ValidMoves, setValidMoves] = useState<moves_Type[][][]>([])
+  const [ValidMoves, setValidMoves] = useState<moves_Type[][][]>([]);
 
   useEffect(() => {
     setValidMoves(findValidMoves(boardData));
-    console.log(boardData.iscastle);
+    console.log(boardData.movesPlayed.moves);
     // console.log(boardData.movesPlayed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardData.turn]);
@@ -34,10 +34,9 @@ const Board: React.FC = () => {
       return;
     }
 
-    if (SelectedMoves.availableMoves.some((hint) => hint.hint.row === row && hint.hint.col === col)) {
+    if (SelectedMoves.availableMoves.some((hint) => hint.row === row && hint.col === col)) {
       SelectedMoves.availableMoves.forEach((moves) => {
-        if (moves.hint.row === row && moves.hint.col === col)
-          HandleMove({ boardData, selectedPiece, setBoardData, setSelectedMoves, setSelectedPiece, row, col, Move: moves });
+        if (moves.row === row && moves.col === col) HandleMove({ boardData, selectedPiece, setBoardData, setSelectedMoves, setSelectedPiece, Move: moves });
       });
     } else if (boardData.BoardLayout[row][col].type !== "empty") {
       setSelectedPiece({ isSelected: true, row, col });

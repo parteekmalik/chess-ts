@@ -4,7 +4,7 @@ import { updatedMovesPlayed } from "./updateMovesPlayed";
 import { movePiece } from "./movePiece";
 
 const handleMove = (props: handleMoveProps) => {
-  const { boardData, selectedPiece, setBoardData, setSelectedMoves, setSelectedPiece, row, col, Move } = props;
+  const { boardData, selectedPiece, setBoardData, setSelectedMoves, setSelectedPiece, Move } = props;
 
   // updating castling logic
   const movedpiece = boardData.BoardLayout[selectedPiece.row][selectedPiece.col];
@@ -15,12 +15,14 @@ const handleMove = (props: handleMoveProps) => {
   }
 
   // Update the moves
-  boardData.movesPlayed = updatedMovesPlayed({ movesPlayed: boardData.movesPlayed, selectedPiece, BoardLayout: boardData.BoardLayout, row, col, Move });
+  boardData.movesPlayed.current += 1;
+  boardData.movesPlayed.moves = [
+    ...boardData.movesPlayed.moves,
+    updatedMovesPlayed({ movesPlayed: boardData.movesPlayed, selectedPiece, BoardLayout: boardData.BoardLayout, Move }),
+  ];
 
-  // to_be_edited to for loop and update changes;
   // Update the board
-  let prev: { row: number; col: number } = { row: selectedPiece.row, col: selectedPiece.col };
-  movePiece(boardData, Move, prev);
+  movePiece(boardData);
 
   // Toggle the turn and update
   boardData.turn = boardData.turn === "white" ? "black" : "white";

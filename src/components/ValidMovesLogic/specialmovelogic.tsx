@@ -1,48 +1,58 @@
 import { moves_Type, boardData_Type, Row_Col_PieceType_Type } from "../types";
-import removeInvalidMoves, { deleteInvalid } from "./deleteValidMove/deleteInvalid";
-import { knightKing, pawn } from "./pieceLogic";
+import { deleteInvalid } from "./deleteValidMove/deleteInvalid";
+import { iskingInCheck } from "./king check/isKingInCheck";
+import { knightKing, pawn, pieceOnLoc } from "./pieceLogic";
 
-export const iscastlepossible = (boardData: boardData_Type, props: Row_Col_PieceType_Type): boolean => {
-  // if()
+const chackForBlank = (boardData: boardData_Type, moves: moves_Type[]): boolean => {
+  for (let i = 1; i < moves.length; i++) {
+    let res = pieceOnLoc(boardData, { row: moves[i].row, col: moves[i].col });
+    if (res !== "empty square") return false;
+  }
   return true;
-}
-
+};
 
 export const Kingcastle = (boardData: boardData_Type, props: Row_Col_PieceType_Type): moves_Type[] => {
   let possibleMoves: moves_Type[] = knightKing(boardData, props);
-  const {BoardLayout,movesPlayed,turn} = boardData;
-  const {row,col} = props;
-  // to_be_edited write logic for castle move(make a special move type)
+  const { turn } = boardData;
+  const { row, col } = props;
+
   const iscastle = boardData.iscastle[turn];
   const rowRank = turn === "white" ? 7 : 0;
-  if (iscastle["king"]) {
-    if(iscastle["leftrook"]){
-      const moves = 
-      [{type : "",hint:{row:rowRank,col:0},toBeMoved:[{row:rowRank,col:0}]},
-      {type : "",hint:{row:rowRank,col:1},toBeMoved:[{row:rowRank,col:1}]},
-      {type : "",hint:{row:rowRank,col:2},toBeMoved:[{row:rowRank,col:2}]},
-      {type : "",hint:{row:rowRank,col:3},toBeMoved:[{row:rowRank,col:3}]},
-      {type : "",hint:{row:rowRank,col:4},toBeMoved:[{row:rowRank,col:4}]},]
-      if(deleteInvalid(boardData,moves,{row,col}).length === 5){
-        possibleMoves.push({type:"o-o-o",hint:{row:rowRank,col:2},toBeMoved:[{row:rowRank,col:2}]})
-      }
-    }else if(iscastle["rightrook"]){
+  if (iscastle["king"] && !iskingInCheck(boardData)) {
+    const caslemoves = [
+      [
+        { type: "", row: rowRank, col: 0 },
+        { type: "", row: rowRank, col: 1 },
+        { type: "", row: rowRank, col: 2 },
+        { type: "", row: rowRank, col: 3 },
+      ],
+      [
+        { type: "", row: rowRank, col: 7 },
+        { type: "", row: rowRank, col: 6 },
+        { type: "", row: rowRank, col: 5 },
+      ],
+    ];
 
+    if (iscastle["leftrook"] && chackForBlank(boardData, caslemoves[0])) {
+      if (deleteInvalid(boardData, caslemoves[0], { row, col }).length === 4) {
+        possibleMoves.push({ type: "o-o-o", row: rowRank, col: 2 });
+      }
+    }
+    if (iscastle["rightrook"] && chackForBlank(boardData, caslemoves[1])) {
+      if (deleteInvalid(boardData, caslemoves[1], { row, col }).length === 3) {
+        possibleMoves.push({ type: "o-o", row: rowRank, col: 6 });
+      }
     }
   }
 
   return possibleMoves;
 };
 
-
 export const pawnenpassent = (boardData: boardData_Type, props: Row_Col_PieceType_Type): moves_Type[] => {
   const { movesPlayed, turn } = boardData;
   const { row, col } = props;
-  let possibleMoves: moves_Type[] = pawn(boardData,props);
+  let possibleMoves: moves_Type[] = pawn(boardData, props);
 
-
-  // to_be_edited write logic for en passet move(make a special move type)
-  // console.log(movesPlayed,movesPlayed.moves[movesPlayed.moves.length-1])
   if (
     movesPlayed.moves.length > 0 &&
     movesPlayed.moves[movesPlayed.moves.length - 1].type === "pawn double forward" &&
@@ -53,11 +63,8 @@ export const pawnenpassent = (boardData: boardData_Type, props: Row_Col_PieceTyp
     let newCol = movesPlayed.moves[movesPlayed.moves.length - 1].to.col;
     possibleMoves.push({
       type: "pawn en passent",
-      hint: { row: newRow, col: newCol },
-      toBeMoved: [
-        { row: row, col: newCol },
-        { row: newRow, col: newCol },
-      ],
+      row: newRow,
+      col: newCol,
     });
   }
 
