@@ -15,14 +15,7 @@ const ChessBoard: React.FC<ChessBoardProps> = (props) => {
       };
 
       if (square.type !== "empty") {
-        squares.push(
-          <div
-            key={position}
-            className={`piece ${square.type[0] + square.piece[0].toUpperCase() + square.piece[square.piece.length - 1]}`}
-            id={position}
-            style={Style}
-          ></div>
-        );
+        squares.push(<div key={position} className={`piece ${square.type[0] + square.piece[0].toUpperCase() + square.piece[square.piece.length - 1]}`} id={position} style={Style}></div>);
       }
     })
   );
