@@ -1,10 +1,20 @@
+export interface movesPlayedMove_type {
+  type: string;
+
+  from: { row: number; col: number; piece: { type: string; piece: string } };
+  to: { row: number; col: number; piece: { type: string; piece: string } };
+  castle?: {
+    from: { row: number; col: number; piece: { type: string; piece: string } };
+    to: { row: number; col: number; piece: { type: string; piece: string } };
+  };
+}
 export interface MovesPlayed_Type {
   current: number;
-  moves: { from: { row: number; col: number; piece: { type: string; piece: string } }; to: { row: number; col: number; piece: { type: string; piece: string } } }[];
+  moves: movesPlayedMove_type[];
 }
 export interface HintsProps {
   isShowHint: boolean;
-  hints: { row: number; col: number }[];
+  availableMoves: moves_Type[];
 }
 export interface selectedPieceProps {
   isSelected: boolean;
@@ -15,6 +25,7 @@ export interface boardData_Type {
   BoardLayout: { type: string; piece: string }[][];
   turn: string;
   movesPlayed: MovesPlayed_Type;
+  iscastle: { [key: string]: { [key: string]: boolean } };
 }
 
 export interface handleMoveProps {
@@ -22,57 +33,33 @@ export interface handleMoveProps {
   setBoardData: React.Dispatch<React.SetStateAction<boardData_Type>>;
   selectedPiece: selectedPieceProps;
   setSelectedPiece: React.Dispatch<React.SetStateAction<selectedPieceProps>>;
-  setHints: React.Dispatch<React.SetStateAction<HintsProps>>;
-  row: number;
-  col: number;
+  setSelectedMoves: React.Dispatch<React.SetStateAction<HintsProps>>;
+  Move: moves_Type;
 }
 
 export interface updatedMovesPlayedProps {
   selectedPiece: selectedPieceProps;
   BoardLayout: { type: string; piece: string }[][];
   movesPlayed: MovesPlayed_Type;
-  row: number;
-  col: number;
+  Move: moves_Type;
 }
 
-export interface BoardLayout_Type {
-  BoardLayout: { type: string; piece: string }[][];
-}
-export interface Turn_Type {
-  turn: string;
-}
-export interface movesplayed_Type {
-  movesPlayed: MovesPlayed_Type;
-}
-export interface ValidMoves_Type {
-  ValidMoves: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[][][];
-}
 export interface Row_Col_Type {
   row: number;
   col: number;
 }
-export interface To_Type {
-  to: { row: number; col: number };
-}
+
 export interface PieceType_Type {
   pieceType: string;
 }
-export interface I_J_Type {
-  i: number;
-  j: number;
+
+export interface moves_Type {
+  type: string;
+  row: number;
+  col: number;
 }
 
-export interface BoardLayout_Turn_Type extends BoardLayout_Type, Turn_Type {}
-export interface BoardLayout_Turn_Movesplayed_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type {}
-export interface BoardLayout_Turn_ValidMoves_Type extends BoardLayout_Type, Turn_Type, ValidMoves_Type {}
-export interface BoardLayout_Turn_ValidMoves_MovesPlayed_Type extends BoardLayout_Type, Turn_Type, ValidMoves_Type, movesplayed_Type {}
-export interface BoardLayout_Turn_Movesplayed_Row_Col_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type {}
-export interface BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, ValidMoves_Type {}
-export interface BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_To_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, To_Type {}
-export interface BoardLayout_Turn_Movesplayed_Row_Col_PieceType_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, PieceType_Type {}
-export interface BoardLayout_Turn_Movesplayed_Row_Col_PieceType_I_J_Type extends BoardLayout_Type, Turn_Type, movesplayed_Type, Row_Col_Type, PieceType_Type, I_J_Type {}
-export interface BoardLayout_Turn_Row_Col_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type {}
-export interface BoardLayout_Turn_Row_Col_PieceType_Type extends BoardLayout_Type, Turn_Type, Row_Col_Type, PieceType_Type {}
+export interface Row_Col_PieceType_Type extends Row_Col_Type, PieceType_Type {}
 
 export const pieceMovement: { [key: string]: { row: number; col: number }[] } = {
   rook: [
@@ -118,14 +105,13 @@ export const pieceMovement: { [key: string]: { row: number; col: number }[] } = 
     { row: -1, col: 1 },
   ],
 };
-export const emptyPiece: { type: string; piece: string } = { type: "empty", piece: "" };
 export const initialPosition: { type: string; piece: string }[][] = [
   [
     { type: "black", piece: "rook" },
     { type: "black", piece: "knight" },
     { type: "black", piece: "bishop" },
-    { type: "black", piece: "king" },
     { type: "black", piece: "queen" },
+    { type: "black", piece: "king" },
     { type: "black", piece: "bishop" },
     { type: "black", piece: "knight" },
     { type: "black", piece: "rook" },
@@ -145,7 +131,7 @@ export const initialPosition: { type: string; piece: string }[][] = [
   Array(8).fill({ type: "empty", piece: "" }),
   Array(8).fill({ type: "empty", piece: "" }),
   [
-    { type: "white", piece: "rook" },
+    { type: "white", piece: "pawn" },
     { type: "white", piece: "pawn" },
     { type: "white", piece: "pawn" },
     { type: "white", piece: "pawn" },
@@ -158,14 +144,13 @@ export const initialPosition: { type: string; piece: string }[][] = [
     { type: "white", piece: "rook" },
     { type: "white", piece: "knight" },
     { type: "white", piece: "bishop" },
-    { type: "white", piece: "king" },
     { type: "white", piece: "queen" },
+    { type: "white", piece: "king" },
     { type: "white", piece: "bishop" },
     { type: "white", piece: "knight" },
     { type: "white", piece: "rook" },
   ],
 ];
-
 export const checkForValidClick = (event: React.MouseEvent) => {
   const { clientX, clientY, currentTarget } = event;
   const { left, top, right, bottom } = currentTarget.getBoundingClientRect();
@@ -178,5 +163,6 @@ export const checkForValidClick = (event: React.MouseEvent) => {
 
   return { isValid, row, col };
 };
+export const emptyPiece: { type: string; piece: string } = { type: "empty", piece: "" };
 export const boardSize: number = 600;
 export const squareSize: number = boardSize / 8;

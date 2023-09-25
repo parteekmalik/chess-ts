@@ -1,43 +1,24 @@
-import {
-  emptyPiece,
-  BoardLayout_Turn_Movesplayed_Type,
-  BoardLayout_Turn_ValidMoves_MovesPlayed_Type,
-  BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type,
-  BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_To_Type,
-} from "../../types";
-import { updatedMovesPlayed } from "../../dispatch/updateMovesPlayed";
+import { boardData_Type, moves_Type } from "../../types";
 import _ from "lodash";
-
+import { movePiece } from "../../dispatch/movePiece";
 import { iskingInCheck } from "../king check/isKingInCheck";
-
-// Helper function to make a move
-const makeMove = (props: BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_To_Type): BoardLayout_Turn_Movesplayed_Type => {
-  const newProps = _.cloneDeep(props);
-  let { BoardLayout, to, row, col, turn, movesPlayed } = newProps;
-
-  movesPlayed = { ...updatedMovesPlayed({ movesPlayed, selectedPiece: { isSelected: true, row: to.row, col: to.col }, BoardLayout, row, col }) };
-  // Perform the move
-  BoardLayout[to.row][to.col] = BoardLayout[row][col];
-  BoardLayout[row][col] = emptyPiece;
-
-  return { BoardLayout, turn, movesPlayed };
-};
+import { updatedMovesPlayed } from "../../dispatch/updateMovesPlayed";
 
 // Helper function to delete invalid moves
-const deleteInvalid = (
-  props: BoardLayout_Turn_ValidMoves_MovesPlayed_Row_Col_Type
-): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
-  const { ValidMoves, row, col } = props;
-  const movesRow = ValidMoves[row][col];
-  const newMovesRow: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] = [];
+export const deleteInvalid = (boardData: boardData_Type, movesRow: moves_Type[], prev: { row: number; col: number }): moves_Type[] => {
+  const newMovesRow: moves_Type[] = [];
 
   for (let i = 0; i < movesRow.length; i++) {
-    let boardData = makeMove({ ...props, to: { row: movesRow[i].row, col: movesRow[i].col } });
+    let newboardData = _.cloneDeep(boardData);
+    newboardData.movesPlayed.moves = [
+      ...newboardData.movesPlayed.moves,
+      updatedMovesPlayed({ movesPlayed: boardData.movesPlayed, selectedPiece: { ...prev, isSelected: true }, BoardLayout: newboardData.BoardLayout, Move: movesRow[i] }),
+    ];
+
+    movePiece(newboardData);
 
     // Check if the king is in check after the move
-    console.log("movesPlayed",movesRow[i],boardData);
-    console.log("result isKingIncheck" , iskingInCheck(boardData));
-    if (!iskingInCheck(boardData)) {
+    if (!iskingInCheck(newboardData)) {
       newMovesRow.push(movesRow[i]);
     }
   }
@@ -46,18 +27,13 @@ const deleteInvalid = (
 };
 
 // Helper function to remove invalid moves from the ValidMoves array
-const removeInvalidMoves = (
-  props: BoardLayout_Turn_ValidMoves_MovesPlayed_Type
-): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[][][] => {
-  let { ValidMoves } = props;
-
+export const removeInvalidMoves = (boardData: boardData_Type, ValidMoves: moves_Type[][][]): moves_Type[][][] => {
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
-      ValidMoves[row][col] = deleteInvalid({ ...props, row, col });
+      ValidMoves[row][col] = deleteInvalid(boardData, ValidMoves[row][col], { row, col });
     }
   }
 
   return ValidMoves;
 };
-export { removeInvalidMoves };
 export default removeInvalidMoves;

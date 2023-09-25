@@ -1,88 +1,33 @@
-import { useEffect } from "react";
-import { BoardLayout_Turn_Movesplayed_Type,BoardLayout_Turn_Row_Col_Type, BoardLayout_Turn_Row_Col_PieceType_Type } from "../../types";
-import { allMoves } from "../pieceLogic";
+import { boardData_Type } from "../../types";
+import { isValidMove, rookBishopQueen, knightKing } from "../pieceLogic";
 import findKingPos from "./findKingPos";
 
-import { pieceMovement } from "../../types";
+export const iskingInCheck = (boardData: boardData_Type): boolean => {
+  const { BoardLayout, turn } = boardData;
+  const kingPos: { row: number; col: number } = findKingPos(boardData);
+  // console.log("kingPos -> ",kingPos);
 
-const isValidMove = (row: number, col: number): boolean => {
-  return row >= 0 && row < 8 && col >= 0 && col < 8;
-};
-const pieceOnLoc = (props: BoardLayout_Turn_Row_Col_Type): string => {
-  const { BoardLayout, turn, row, col } = props;
-  if (!isValidMove(row, col)) return "invalid Pos";
-  const square = BoardLayout[row][col].type;
-  if (square === "empty") return "empty square";
-  return square === turn ? "friendly piece" : "opponent piece";
-};
+  let moves = rookBishopQueen(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "rook" });
+  for (let i = 0; i < moves.length; i++)
+    if (BoardLayout[moves[i].row][moves[i].col].piece === "queen" || BoardLayout[moves[i].row][moves[i].col].piece === "rook") return true;
 
-const rookBishopQueen = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
-  const { BoardLayout, turn, row, col, pieceType } = props;
-  const possibleMoves: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] = [];
-  const moves: { row: number; col: number }[] = pieceMovement[pieceType];
+  moves = rookBishopQueen(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "bishop" });
 
-  for (const { row: moveI, col: moveJ } of moves) {
-    let currentRow = row + moveI;
-    let currentCol = col + moveJ;
+  for (let i = 0; i < moves.length; i++)
+    if (BoardLayout[moves[i].row][moves[i].col].piece === "queen" || BoardLayout[moves[i].row][moves[i].col].piece === "bishop") return true;
 
-    while (true) {
-      const res = pieceOnLoc({ BoardLayout, turn, row: currentRow, col: currentCol });
+  moves = knightKing(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "knight" });
+  for (let i = 0; i < moves.length; i++) if (BoardLayout[moves[i].row][moves[i].col].piece === "knight") return true;
 
-      if (res === "empty square" || res === "opponent piece") {
-        possibleMoves.push({ type: "normal", row: currentRow, col: currentCol, toBeMoved: [{ row: currentRow, col: currentCol }] });
-      }
-
-      if (res !== "empty square") break;
-
-      currentRow += moveI;
-      currentCol += moveJ;
-    }
+  // refacto code using pieceonloc function
+  if (turn === "white") {
+    const leftpawn = isValidMove(kingPos.row - 1, kingPos.col - 1) ? BoardLayout[kingPos.row - 1][kingPos.col - 1] : { type: "", piece: "" };
+    const rightpawn = isValidMove(kingPos.row - 1, kingPos.col + 1) ? BoardLayout[kingPos.row - 1][kingPos.col + 1] : { type: "", piece: "" };
+    if ((leftpawn.piece === "pawn" && leftpawn.type !== turn) || (rightpawn.piece === "pawn" && rightpawn.type !== turn)) return true;
+  } else {
+    const leftpawn = isValidMove(kingPos.row + 1, kingPos.col - 1) ? BoardLayout[kingPos.row + 1][kingPos.col - 1] : { type: "", piece: "" };
+    const rightpawn = isValidMove(kingPos.row + 1, kingPos.col + 1) ? BoardLayout[kingPos.row + 1][kingPos.col + 1] : { type: "", piece: "" };
+    if ((leftpawn.piece === "pawn" && leftpawn.type !== turn) || (rightpawn.piece === "pawn" && rightpawn.type !== turn)) return true;
   }
-
-  return possibleMoves;
-};
-const knightKing = (props: BoardLayout_Turn_Row_Col_PieceType_Type): { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] => {
-  const { BoardLayout, turn, pieceType, row, col } = props;
-  let possibleMoves: { type: string; row: number; col: number; toBeMoved: { row: number; col: number }[] }[] = [];
-  const moves: { row: number; col: number }[] = pieceMovement[pieceType];
-
-  for (let i = 0; i < moves.length; i++) {
-    const newRow: number = row + moves[i].row;
-    const newCol: number = col + moves[i].col;
-    const res = pieceOnLoc({ BoardLayout, turn, row: newRow, col: newCol });
-    if (res === "empty square" || res === "opponent piece") possibleMoves.push({ type: "normal", row: newRow, col: newCol, toBeMoved: [{ row: newRow, col: newCol }] });
-  }
-
-  return possibleMoves;
-};
-
-export const iskingInCheck = (props: BoardLayout_Turn_Movesplayed_Type): boolean => {
-  const { BoardLayout, turn } = props;
-  const kingPos: {row:number,col:number} = findKingPos({BoardLayout,turn});
-  // console.log(kingPos,turn,BoardLayout);
-
-  let moves = rookBishopQueen({BoardLayout, turn, row: kingPos.row, col: kingPos.col, pieceType: "rook"})
-  console.log("rook moves to check in king",moves);
-  for(let i=0;i<moves.length;i++)if(BoardLayout[moves[i].row][moves[i].col].piece === "queen" ||BoardLayout[moves[i].row][moves[i].col].piece === "rook")return true;
-
-  moves = rookBishopQueen({BoardLayout, turn, row: kingPos.row, col: kingPos.col, pieceType: "bishop"})
-  console.log("bishop moves to check in king",moves);
-
-  for(let i=0;i<moves.length;i++)if(BoardLayout[moves[i].row][moves[i].col].piece === "queen" ||BoardLayout[moves[i].row][moves[i].col].piece === "bishop")return true;
-
-  moves = knightKing({BoardLayout, turn, row: kingPos.row, col: kingPos.col, pieceType: "knight"})
-  console.log("knight moves to check in king",moves);
-  for(let i=0;i<moves.length;i++)if(BoardLayout[moves[i].row][moves[i].col].piece === "knight")return true;
-
-  if(turn ==="white") {
-    const leftpawn = BoardLayout[kingPos.row-1][kingPos.col-1];
-    const rightpawn = BoardLayout[kingPos.row-1][kingPos.col+1];
-    if(isValidMove(kingPos.row-1,kingPos.col-1) && leftpawn.piece === "pawn" && leftpawn.type !== turn ||isValidMove(kingPos.row-1,kingPos.col+1) && rightpawn.piece === "pawn" && rightpawn.type !== turn)return true;
-  }
-  else {
-    const leftpawn = BoardLayout[kingPos.row+1][kingPos.col-1];
-    const rightpawn = BoardLayout[kingPos.row+1][kingPos.col+1];
-    if(isValidMove(kingPos.row+1,kingPos.col-1) && leftpawn.piece === "pawn" && leftpawn.type !== turn || isValidMove(kingPos.row+1,kingPos.col+1) && rightpawn.piece === "pawn" && rightpawn.type !== turn)return true;
-  }               
   return false;
 };
