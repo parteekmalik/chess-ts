@@ -44,13 +44,6 @@ export interface updatedMovesPlayedProps {
   Move: moves_Type;
 }
 
-export interface BoardLayout_Type {
-  BoardLayout: { type: string; piece: string }[][];
-}
-export interface Turn_Type {
-  turn: string;
-}
-
 export interface Row_Col_Type {
   row: number;
   col: number;
@@ -66,7 +59,6 @@ export interface moves_Type {
   col: number;
 }
 
-export interface boardData_Row_Col_Type extends boardData_Type, Row_Col_Type {}
 export interface Row_Col_PieceType_Type extends Row_Col_Type, PieceType_Type {}
 
 export const pieceMovement: { [key: string]: { row: number; col: number }[] } = {
@@ -113,7 +105,6 @@ export const pieceMovement: { [key: string]: { row: number; col: number }[] } = 
     { row: -1, col: 1 },
   ],
 };
-export const emptyPiece: { type: string; piece: string } = { type: "empty", piece: "" };
 export const initialPosition: { type: string; piece: string }[][] = [
   [
     { type: "black", piece: "rook" },
@@ -160,7 +151,6 @@ export const initialPosition: { type: string; piece: string }[][] = [
     { type: "white", piece: "rook" },
   ],
 ];
-
 export const checkForValidClick = (event: React.MouseEvent) => {
   const { clientX, clientY, currentTarget } = event;
   const { left, top, right, bottom } = currentTarget.getBoundingClientRect();
@@ -173,5 +163,6 @@ export const checkForValidClick = (event: React.MouseEvent) => {
 
   return { isValid, row, col };
 };
+export const emptyPiece: { type: string; piece: string } = { type: "empty", piece: "" };
 export const boardSize: number = 600;
 export const squareSize: number = boardSize / 8;
