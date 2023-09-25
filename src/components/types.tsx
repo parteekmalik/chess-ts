@@ -62,19 +62,19 @@ export interface moves_Type {
 export interface Row_Col_PieceType_Type extends Row_Col_Type, PieceType_Type {}
 
 export const pieceMovement: { [key: string]: { row: number; col: number }[] } = {
-  rook: [
+  Rook: [
     { row: 1, col: 0 },
     { row: -1, col: 0 },
     { row: 0, col: 1 },
     { row: 0, col: -1 },
   ],
-  bishop: [
+  Bishop: [
     { row: 1, col: 1 },
     { row: -1, col: -1 },
     { row: 1, col: -1 },
     { row: -1, col: 1 },
   ],
-  knight: [
+  Night: [
     { row: 2, col: 1 },
     { row: 2, col: -1 },
     { row: -2, col: 1 },
@@ -84,7 +84,7 @@ export const pieceMovement: { [key: string]: { row: number; col: number }[] } = 
     { row: 1, col: -2 },
     { row: -1, col: -2 },
   ],
-  king: [
+  King: [
     { row: 1, col: 1 },
     { row: 0, col: 1 },
     { row: -1, col: 1 },
@@ -94,7 +94,7 @@ export const pieceMovement: { [key: string]: { row: number; col: number }[] } = 
     { row: 1, col: -1 },
     { row: 1, col: 0 },
   ],
-  queen: [
+  Queen: [
     { row: 1, col: 0 },
     { row: -1, col: 0 },
     { row: 0, col: 1 },
@@ -107,48 +107,48 @@ export const pieceMovement: { [key: string]: { row: number; col: number }[] } = 
 };
 export const initialPosition: { type: string; piece: string }[][] = [
   [
-    { type: "black", piece: "rook" },
-    { type: "black", piece: "knight" },
-    { type: "black", piece: "bishop" },
-    { type: "black", piece: "queen" },
-    { type: "black", piece: "king" },
-    { type: "black", piece: "bishop" },
-    { type: "black", piece: "knight" },
-    { type: "black", piece: "rook" },
+    { type: "black", piece: "Rook" },
+    { type: "black", piece: "Night" },
+    { type: "black", piece: "Bishop" },
+    { type: "black", piece: "Queen" },
+    { type: "black", piece: "King" },
+    { type: "black", piece: "Bishop" },
+    { type: "black", piece: "Night" },
+    { type: "black", piece: "Rook" },
   ],
   [
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
-    { type: "black", piece: "pawn" },
+    { type: "black", piece: "Pawn" },
+    { type: "black", piece: "Pawn" },
+    { type: "black", piece: "Pawn" },
+    { type: "black", piece: "Pawn" },
+    { type: "black", piece: "Pawn" },
+    { type: "black", piece: "Pawn" },
+    { type: "black", piece: "Pawn" },
+    { type: "black", piece: "Pawn" },
   ],
   Array(8).fill({ type: "empty", piece: "" }),
   Array(8).fill({ type: "empty", piece: "" }),
   Array(8).fill({ type: "empty", piece: "" }),
   Array(8).fill({ type: "empty", piece: "" }),
   [
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
-    { type: "white", piece: "pawn" },
+    { type: "white", piece: "Pawn" },
+    { type: "white", piece: "Pawn" },
+    { type: "white", piece: "Pawn" },
+    { type: "white", piece: "Pawn" },
+    { type: "white", piece: "Pawn" },
+    { type: "white", piece: "Pawn" },
+    { type: "white", piece: "Pawn" },
+    { type: "white", piece: "Pawn" },
   ],
   [
-    { type: "white", piece: "rook" },
-    { type: "white", piece: "knight" },
-    { type: "white", piece: "bishop" },
-    { type: "white", piece: "queen" },
-    { type: "white", piece: "king" },
-    { type: "white", piece: "bishop" },
-    { type: "white", piece: "knight" },
-    { type: "white", piece: "rook" },
+    { type: "white", piece: "Rook" },
+    { type: "white", piece: "Night" },
+    { type: "white", piece: "Bishop" },
+    { type: "white", piece: "Queen" },
+    { type: "white", piece: "King" },
+    { type: "white", piece: "Bishop" },
+    { type: "white", piece: "Night" },
+    { type: "white", piece: "Rook" },
   ],
 ];
 export const checkForValidClick = (event: React.MouseEvent) => {

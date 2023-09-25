@@ -6,7 +6,7 @@ import { knightKing, pawn, pieceOnLoc } from "./pieceLogic";
 const chackForBlank = (boardData: boardData_Type, moves: moves_Type[]): boolean => {
   for (let i = 1; i < moves.length; i++) {
     let res = pieceOnLoc(boardData, { row: moves[i].row, col: moves[i].col });
-    if (res !== "empty square") return false;
+    if (res[0] !== "E") return false;
   }
   return true;
 };
@@ -61,11 +61,7 @@ export const pawnenpassent = (boardData: boardData_Type, props: Row_Col_PieceTyp
   ) {
     let newRow = row + (turn === "white" ? -1 : +1);
     let newCol = movesPlayed.moves[movesPlayed.moves.length - 1].to.col;
-    possibleMoves.push({
-      type: "pawn en passent",
-      row: newRow,
-      col: newCol,
-    });
+    possibleMoves.push({ type: "pawn en passent", row: newRow, col: newCol });
   }
 
   return possibleMoves;
