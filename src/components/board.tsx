@@ -13,7 +13,7 @@ const Board: React.FC = () => {
     BoardLayout: initialPosition,
     turn: "white",
     movesPlayed: { current: -1, moves: [] },
-    iscastle: { black: { king: true, rightrook: true, leftrook: true }, white: { king: true, rightrook: true, leftrook: true } },
+    iscastle: { black: { King: true, rightRook: true, leftRook: true }, white: { King: true, rightRook: true, leftRook: true } },
   });
   const [SelectedMoves, setSelectedMoves] = useState<HintsProps>({ isShowHint: true, availableMoves: [] });
   const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, row: 0, col: 0 });
@@ -21,8 +21,8 @@ const Board: React.FC = () => {
 
   useEffect(() => {
     setValidMoves(findValidMoves(boardData));
-    console.log(boardData.movesPlayed.moves);
-    // console.log(boardData.movesPlayed);
+    // console.log(boardData.movesPlayed.moves);
+    // console.log(boardData.iscastle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardData.turn]);
 

@@ -6,7 +6,7 @@ import { knightKing, pawn, pieceOnLoc } from "./pieceLogic";
 const chackForBlank = (boardData: boardData_Type, moves: moves_Type[]): boolean => {
   for (let i = 1; i < moves.length; i++) {
     let res = pieceOnLoc(boardData, { row: moves[i].row, col: moves[i].col });
-    if (res !== "empty square") return false;
+    if (res !== "E") return false;
   }
   return true;
 };
@@ -18,7 +18,7 @@ export const Kingcastle = (boardData: boardData_Type, props: Row_Col_PieceType_T
 
   const iscastle = boardData.iscastle[turn];
   const rowRank = turn === "white" ? 7 : 0;
-  if (iscastle["king"] && !iskingInCheck(boardData)) {
+  if (iscastle["King"] && !iskingInCheck(boardData)) {
     const caslemoves = [
       [
         { type: "", row: rowRank, col: 0 },
@@ -33,16 +33,11 @@ export const Kingcastle = (boardData: boardData_Type, props: Row_Col_PieceType_T
       ],
     ];
 
-    if (iscastle["leftrook"] && chackForBlank(boardData, caslemoves[0])) {
-      if (deleteInvalid(boardData, caslemoves[0], { row, col }).length === 4) {
-        possibleMoves.push({ type: "o-o-o", row: rowRank, col: 2 });
-      }
-    }
-    if (iscastle["rightrook"] && chackForBlank(boardData, caslemoves[1])) {
-      if (deleteInvalid(boardData, caslemoves[1], { row, col }).length === 3) {
-        possibleMoves.push({ type: "o-o", row: rowRank, col: 6 });
-      }
-    }
+    if (iscastle["leftRook"] && chackForBlank(boardData, caslemoves[0]) && deleteInvalid(boardData, caslemoves[0], { row, col }).length === 4)
+      possibleMoves.push({ type: "o-o-o", row: rowRank, col: 2 });
+
+    if (iscastle["rightRook"] && chackForBlank(boardData, caslemoves[1]) && deleteInvalid(boardData, caslemoves[1], { row, col }).length === 3)
+      possibleMoves.push({ type: "o-o", row: rowRank, col: 6 });
   }
 
   return possibleMoves;
@@ -61,11 +56,7 @@ export const pawnenpassent = (boardData: boardData_Type, props: Row_Col_PieceTyp
   ) {
     let newRow = row + (turn === "white" ? -1 : +1);
     let newCol = movesPlayed.moves[movesPlayed.moves.length - 1].to.col;
-    possibleMoves.push({
-      type: "pawn en passent",
-      row: newRow,
-      col: newCol,
-    });
+    possibleMoves.push({ type: "pawn en passent", row: newRow, col: newCol });
   }
 
   return possibleMoves;

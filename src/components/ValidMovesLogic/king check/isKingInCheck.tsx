@@ -1,33 +1,34 @@
 import { boardData_Type } from "../../types";
-import { isValidMove, rookBishopQueen, knightKing } from "../pieceLogic";
+import { rookBishopQueen, knightKing, pieceOnLoc } from "../pieceLogic";
 import findKingPos from "./findKingPos";
 
 export const iskingInCheck = (boardData: boardData_Type): boolean => {
-  const { BoardLayout, turn } = boardData;
+  const { turn } = boardData;
   const kingPos: { row: number; col: number } = findKingPos(boardData);
-  // console.log("kingPos -> ",kingPos);
 
-  let moves = rookBishopQueen(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "rook" });
-  for (let i = 0; i < moves.length; i++)
-    if (BoardLayout[moves[i].row][moves[i].col].piece === "queen" || BoardLayout[moves[i].row][moves[i].col].piece === "rook") return true;
-
-  moves = rookBishopQueen(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "bishop" });
-
-  for (let i = 0; i < moves.length; i++)
-    if (BoardLayout[moves[i].row][moves[i].col].piece === "queen" || BoardLayout[moves[i].row][moves[i].col].piece === "bishop") return true;
-
-  moves = knightKing(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "knight" });
-  for (let i = 0; i < moves.length; i++) if (BoardLayout[moves[i].row][moves[i].col].piece === "knight") return true;
-
-  // refacto code using pieceonloc function
-  if (turn === "white") {
-    const leftpawn = isValidMove(kingPos.row - 1, kingPos.col - 1) ? BoardLayout[kingPos.row - 1][kingPos.col - 1] : { type: "", piece: "" };
-    const rightpawn = isValidMove(kingPos.row - 1, kingPos.col + 1) ? BoardLayout[kingPos.row - 1][kingPos.col + 1] : { type: "", piece: "" };
-    if ((leftpawn.piece === "pawn" && leftpawn.type !== turn) || (rightpawn.piece === "pawn" && rightpawn.type !== turn)) return true;
-  } else {
-    const leftpawn = isValidMove(kingPos.row + 1, kingPos.col - 1) ? BoardLayout[kingPos.row + 1][kingPos.col - 1] : { type: "", piece: "" };
-    const rightpawn = isValidMove(kingPos.row + 1, kingPos.col + 1) ? BoardLayout[kingPos.row + 1][kingPos.col + 1] : { type: "", piece: "" };
-    if ((leftpawn.piece === "pawn" && leftpawn.type !== turn) || (rightpawn.piece === "pawn" && rightpawn.type !== turn)) return true;
+  let moves = rookBishopQueen(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "Rook" });
+  for (let i = 0; i < moves.length; i++) {
+    const res = pieceOnLoc(boardData, { row: moves[i].row, col: moves[i].col });
+    if (["OQ", "OR"].includes(res)) return true;
   }
+
+  moves = rookBishopQueen(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "Bishop" });
+  for (let i = 0; i < moves.length; i++) {
+    const res = pieceOnLoc(boardData, { row: moves[i].row, col: moves[i].col });
+    if (["OQ", "OB"].includes(res)) return true;
+  }
+
+  moves = knightKing(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "Night" });
+  for (let i = 0; i < moves.length; i++) {
+    const res = pieceOnLoc(boardData, { row: moves[i].row, col: moves[i].col });
+    if (["ON"].includes(res)) return true;
+  }
+
+  const pawnRow = (turn === "white" ? -1 : 1) + kingPos.row;
+  const leftpawn = pieceOnLoc(boardData, { row: pawnRow, col: kingPos.col - 1 });
+  const rightpawn = pieceOnLoc(boardData, { row: pawnRow, col: kingPos.col + 1 });
+
+  if (leftpawn === "OP" || rightpawn === "OP") return true;
+
   return false;
 };
