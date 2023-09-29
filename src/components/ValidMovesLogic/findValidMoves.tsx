@@ -11,9 +11,9 @@ const findValidMoves = (boardData: boardData_Type): moves_Type[][][] => {
   let allMove: moves_Type[][][] = allMoves(boardData);
 
   // Remove invalid moves
-  let validMoves: moves_Type[][][] = removeInvalidMoves(boardData, allMove);
+  // let validMoves: moves_Type[][][] = removeInvalidMoves(boardData, allMove);
   console.log("calculation finished!!");
-  return validMoves;
+  return allMove;
 };
 
 export default findValidMoves;
