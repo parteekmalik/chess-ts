@@ -105,6 +105,16 @@ export const pieceMovement: { [key: string]: { row: number; col: number }[] } = 
     { row: -1, col: 1 },
   ],
 };
+// export const initialPosition: string[][] = [
+//   ["bRook", "bNight", "bBishop", "bQueen", "bKing", "bBishop", "bNight", "bRook"],
+//   ["bPawn", "bPawn", "bPawn", "bPawn", "bPawn", "bPawn", "bPawn", "bPawn"],
+//   Array(8).fill(""),
+//   Array(8).fill(""),
+//   Array(8).fill(""),
+//   Array(8).fill(""),
+//   ["wPawn", "wPawn", "wPawn", "wPawn", "wPawn", "wPawn", "wPawn", "wPawn"],
+//   ["wRook", "wNight", "wBishop", "wQueen", "wKing", "wBishop", "wNight", "wRook"],
+// ];
 export const initialPosition: { type: string; piece: string }[][] = [
   [
     { type: "black", piece: "Rook" },
