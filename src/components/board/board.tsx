@@ -6,7 +6,7 @@ import ChessBoard from "../piece and hints/ChessBoard";
 import ChessBoardHints from "../piece and hints/ChessBoardHints";
 import findValidMoves from "../ValidMovesLogic/findValidMoves";
 import HandleMove from "../dispatch/updateGameState";
-import Highlight from "../highlight/highlight";
+import Highlight from "../piece and hints/highlight";
 import Coordinates from "../coordinates/coordinates";
 
 const Board: React.FC = () => {
@@ -21,7 +21,8 @@ const Board: React.FC = () => {
   const [ValidMoves, setValidMoves] = useState<moves_Type[][][]>([]);
 
   useEffect(() => {
-    setValidMoves(findValidMoves(boardData));
+    if(boardData.BoardLayout.length)
+      setValidMoves(findValidMoves(boardData));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardData.turn]);
 

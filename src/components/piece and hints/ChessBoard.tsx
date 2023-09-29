@@ -1,5 +1,6 @@
 // ChessBoard.tsx
 import { squareSize } from "../types";
+import "./piecesHints.css"
 
 interface ChessBoardProps {
   BoardLayout: string[][];
