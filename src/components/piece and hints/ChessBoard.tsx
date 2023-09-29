@@ -2,7 +2,7 @@
 import { squareSize } from "../types";
 
 interface ChessBoardProps {
-  BoardLayout: { type: string; piece: string }[][];
+  BoardLayout: string[][];
 }
 const ChessBoard: React.FC<ChessBoardProps> = (props) => {
   const { BoardLayout } = props;
@@ -14,11 +14,11 @@ const ChessBoard: React.FC<ChessBoardProps> = (props) => {
         transform: `translate(${colIndex * squareSize}px, ${rowIndex * squareSize}px)`,
       };
 
-      if (square.type !== "empty") {
+      if (square !== "") {
         squares.push(
           <div
             key={position}
-            className={`piece ${square.type[0] + square.piece[0].toUpperCase() + square.piece[square.piece.length - 1]}`}
+            className={`piece ${square}`}
             id={position}
             style={Style}
           ></div>

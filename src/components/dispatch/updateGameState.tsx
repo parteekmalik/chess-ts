@@ -8,9 +8,9 @@ const handleMove = (props: handleMoveProps) => {
 
   // updating castling logic
   const movedpiece = boardData.BoardLayout[selectedPiece.row][selectedPiece.col];
-  if (movedpiece.piece === "King") {
+  if (movedpiece[1] === "K") {
     boardData.iscastle[boardData.turn]["King"] = false;
-  } else if (movedpiece.piece === "Rook") {
+  } else if (movedpiece[1] === "R") {
     boardData.iscastle[boardData.turn][selectedPiece.col === 0 ? "leftRook" : selectedPiece.col === 7 ? "rightRook" : "leftRook"] = false;
   }
 

@@ -3,7 +3,7 @@ import { squareSize, moves_Type } from "../types";
 
 interface ChessBoardProps {
   Hints: moves_Type[];
-  BoardLayout: { type: string; piece: string }[][];
+  BoardLayout: string[][];
 }
 const ChessBoardHints: React.FC<ChessBoardProps> = (props) => {
   const { Hints, BoardLayout } = props;
@@ -15,7 +15,7 @@ const ChessBoardHints: React.FC<ChessBoardProps> = (props) => {
     const Style = {
       transform: `translate(${colIndex * squareSize}px, ${rowIndex * squareSize}px)`,
     };
-    if (BoardLayout[rowIndex][colIndex].type !== "empty") squares.push(<div key={"hint" + position} className={`hint-capture`} id={position} style={Style}></div>);
+    if (BoardLayout[rowIndex][colIndex] !== "") squares.push(<div key={"hint" + position} className={`hint-capture`} id={position} style={Style}></div>);
     else squares.push(<div key={"hint" + position} className={`hint`} id={position} style={Style}></div>);
   });
 

@@ -9,8 +9,8 @@ export interface HighlightProps {
 const PrevHighlight: React.FC<MovesPlayed_Type> = ({ current, moves }) => {
   if (current > -1) {
     const move = moves[current];
-    let from: { row: number; col: number; piece: { type: string; piece: string } } = move.from;
-    let to: { row: number; col: number; piece: { type: string; piece: string } } = move.to;
+    let from: { row: number; col: number; piece: string } = move.from;
+    let to: { row: number; col: number; piece: string } = move.to;
 
     return (
       <>

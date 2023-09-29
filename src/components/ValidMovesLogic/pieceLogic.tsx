@@ -10,9 +10,9 @@ export const pieceOnLoc = (boardData: boardData_Type, props: Row_Col_Type): stri
   const { row, col } = props;
   const { BoardLayout, turn } = boardData;
   if (!isValidMove(row, col)) return "I";
-  const square = BoardLayout[row][col].type;
-  if (square === "empty") return "E";
-  return (square === turn ? "F" : "O") + BoardLayout[row][col].piece[0];
+  const square = BoardLayout[row][col];
+  if (square === "") return "E";
+  return (square[0] === turn[0] ? "F" : "O") + BoardLayout[row][col][1];
 };
 
 export const rookBishopQueen = (boardData: boardData_Type, props: Row_Col_PieceType_Type): moves_Type[] => {
@@ -27,7 +27,7 @@ export const rookBishopQueen = (boardData: boardData_Type, props: Row_Col_PieceT
     while (true) {
       const res = pieceOnLoc(boardData, { row: currentRow, col: currentCol });
 
-      if (res[0] === "E" || res[0] === "O") possibleMoves.push({ type: pieceType + ((res[0] === "E") ? "normal" : "capture"), row: currentRow, col: currentCol });
+      if (res[0] === "E" || res[0] === "O") possibleMoves.push({ type: pieceType + (res[0] === "E" ? "normal" : "capture"), row: currentRow, col: currentCol });
       if (res[0] !== "E") break;
 
       currentRow += moveI;
@@ -47,7 +47,7 @@ export const knightKing = (boardData: boardData_Type, props: Row_Col_PieceType_T
     const newRow: number = row + moves[i].row;
     const newCol: number = col + moves[i].col;
     const res = pieceOnLoc(boardData, { row: newRow, col: newCol });
-    if (res[0] === "E" || res[0] === "O") possibleMoves.push({ type: pieceType +( (res[0] === "E") ? "normal" : "capture"), row: newRow, col: newCol });
+    if (res[0] === "E" || res[0] === "O") possibleMoves.push({ type: pieceType + (res[0] === "E" ? "normal" : "capture"), row: newRow, col: newCol });
   }
 
   return possibleMoves;
@@ -92,23 +92,23 @@ export const pawn = (boardData: boardData_Type, props: Row_Col_PieceType_Type): 
 };
 
 const pieceFunctions: { [key: string]: (boardData: boardData_Type, props: Row_Col_PieceType_Type) => moves_Type[] } = {
-  Rook: rookBishopQueen,
-  Bishop: rookBishopQueen,
-  Queen: rookBishopQueen,
-  Night: knightKing,
-  King: Kingcastle,
-  Pawn: pawnenpassent,
+  R: rookBishopQueen,
+  B: rookBishopQueen,
+  Q: rookBishopQueen,
+  N: knightKing,
+  K: Kingcastle,
+  P: pawnenpassent,
 };
 
 const findMoves = (boardData: boardData_Type, props: Row_Col_Type): moves_Type[] => {
   const { BoardLayout, turn } = boardData;
   const { row, col } = props;
   let ans: moves_Type[] = [];
-  const square: { type: string; piece: string } = BoardLayout[row][col];
+  const square: string = BoardLayout[row][col];
 
-  if (square.type === turn && "" !== square.piece) {
-    if (square.piece === "King" || square.piece === "Pawn") ans = [...pieceFunctions[square.piece](boardData, { ...props, pieceType: square.piece })];
-    else ans = [...pieceFunctions[square.piece](boardData, { ...props, pieceType: square.piece })];
+  if ("" !== square && square[0] === turn[0] ) {
+    if (square[1] === "K" || square[1] === "P") ans = [...pieceFunctions[square[1]](boardData, { ...props, pieceType: square[1] })];
+    else ans = [...pieceFunctions[square[1]](boardData, { ...props, pieceType: square[1] })];
   }
   return ans;
 };

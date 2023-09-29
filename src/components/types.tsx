@@ -1,11 +1,11 @@
 export interface movesPlayedMove_type {
   type: string;
 
-  from: { row: number; col: number; piece: { type: string; piece: string } };
-  to: { row: number; col: number; piece: { type: string; piece: string } };
+  from: { row: number; col: number; piece: string };
+  to: { row: number; col: number; piece: string };
   castle?: {
-    from: { row: number; col: number; piece: { type: string; piece: string } };
-    to: { row: number; col: number; piece: { type: string; piece: string } };
+    from: { row: number; col: number; piece: string };
+    to: { row: number; col: number; piece: string };
   };
 }
 export interface MovesPlayed_Type {
@@ -22,7 +22,7 @@ export interface selectedPieceProps {
   col: number;
 }
 export interface boardData_Type {
-  BoardLayout: { type: string; piece: string }[][];
+  BoardLayout: string[][];
   turn: string;
   movesPlayed: MovesPlayed_Type;
   iscastle: { [key: string]: { [key: string]: boolean } };
@@ -39,7 +39,7 @@ export interface handleMoveProps {
 
 export interface updatedMovesPlayedProps {
   selectedPiece: selectedPieceProps;
-  BoardLayout: { type: string; piece: string }[][];
+  BoardLayout: string[][];
   movesPlayed: MovesPlayed_Type;
   Move: moves_Type;
 }
@@ -62,19 +62,19 @@ export interface moves_Type {
 export interface Row_Col_PieceType_Type extends Row_Col_Type, PieceType_Type {}
 
 export const pieceMovement: { [key: string]: { row: number; col: number }[] } = {
-  Rook: [
+  R: [
     { row: 1, col: 0 },
     { row: -1, col: 0 },
     { row: 0, col: 1 },
     { row: 0, col: -1 },
   ],
-  Bishop: [
+  B: [
     { row: 1, col: 1 },
     { row: -1, col: -1 },
     { row: 1, col: -1 },
     { row: -1, col: 1 },
   ],
-  Night: [
+  N: [
     { row: 2, col: 1 },
     { row: 2, col: -1 },
     { row: -2, col: 1 },
@@ -84,7 +84,7 @@ export const pieceMovement: { [key: string]: { row: number; col: number }[] } = 
     { row: 1, col: -2 },
     { row: -1, col: -2 },
   ],
-  King: [
+  K: [
     { row: 1, col: 1 },
     { row: 0, col: 1 },
     { row: -1, col: 1 },
@@ -94,7 +94,7 @@ export const pieceMovement: { [key: string]: { row: number; col: number }[] } = 
     { row: 1, col: -1 },
     { row: 1, col: 0 },
   ],
-  Queen: [
+  Q: [
     { row: 1, col: 0 },
     { row: -1, col: 0 },
     { row: 0, col: 1 },
@@ -105,62 +105,17 @@ export const pieceMovement: { [key: string]: { row: number; col: number }[] } = 
     { row: -1, col: 1 },
   ],
 };
-// export const initialPosition: string[][] = [
-//   ["bRook", "bNight", "bBishop", "bQueen", "bKing", "bBishop", "bNight", "bRook"],
-//   ["bPawn", "bPawn", "bPawn", "bPawn", "bPawn", "bPawn", "bPawn", "bPawn"],
-//   Array(8).fill(""),
-//   Array(8).fill(""),
-//   Array(8).fill(""),
-//   Array(8).fill(""),
-//   ["wPawn", "wPawn", "wPawn", "wPawn", "wPawn", "wPawn", "wPawn", "wPawn"],
-//   ["wRook", "wNight", "wBishop", "wQueen", "wKing", "wBishop", "wNight", "wRook"],
-// ];
-export const initialPosition: { type: string; piece: string }[][] = [
-  [
-    { type: "black", piece: "Rook" },
-    { type: "black", piece: "Night" },
-    { type: "black", piece: "Bishop" },
-    { type: "black", piece: "Queen" },
-    { type: "black", piece: "King" },
-    { type: "black", piece: "Bishop" },
-    { type: "black", piece: "Night" },
-    { type: "black", piece: "Rook" },
-  ],
-  [
-    { type: "black", piece: "Pawn" },
-    { type: "black", piece: "Pawn" },
-    { type: "black", piece: "Pawn" },
-    { type: "black", piece: "Pawn" },
-    { type: "black", piece: "Pawn" },
-    { type: "black", piece: "Pawn" },
-    { type: "black", piece: "Pawn" },
-    { type: "black", piece: "Pawn" },
-  ],
-  Array(8).fill({ type: "empty", piece: "" }),
-  Array(8).fill({ type: "empty", piece: "" }),
-  Array(8).fill({ type: "empty", piece: "" }),
-  Array(8).fill({ type: "empty", piece: "" }),
-  [
-    { type: "white", piece: "Pawn" },
-    { type: "white", piece: "Pawn" },
-    { type: "white", piece: "Pawn" },
-    { type: "white", piece: "Pawn" },
-    { type: "white", piece: "Pawn" },
-    { type: "white", piece: "Pawn" },
-    { type: "white", piece: "Pawn" },
-    { type: "white", piece: "Pawn" },
-  ],
-  [
-    { type: "white", piece: "Rook" },
-    { type: "white", piece: "Night" },
-    { type: "white", piece: "Bishop" },
-    { type: "white", piece: "Queen" },
-    { type: "white", piece: "King" },
-    { type: "white", piece: "Bishop" },
-    { type: "white", piece: "Night" },
-    { type: "white", piece: "Rook" },
-  ],
+export const initialPosition: string[][] = [
+  ["bR", "bN", "bBi", "bQ", "bK", "bB", "bN", "bR"],
+  ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
+  Array(8).fill(""),
+  Array(8).fill(""),
+  Array(8).fill(""),
+  Array(8).fill(""),
+  ["wP", "wP", "wP", "wP", "wP", "wP", "wP", "wP"],
+  ["wR", "wN", "wB", "wQ", "wK", "wB", "wN", "wR"],
 ];
+
 export const checkForValidClick = (event: React.MouseEvent) => {
   const { clientX, clientY, currentTarget } = event;
   const { left, top, right, bottom } = currentTarget.getBoundingClientRect();
@@ -173,6 +128,6 @@ export const checkForValidClick = (event: React.MouseEvent) => {
 
   return { isValid, row, col };
 };
-export const emptyPiece: { type: string; piece: string } = { type: "empty", piece: "" };
+export const emptyPiece: string = "";
 export const boardSize: number = 600;
 export const squareSize: number = boardSize / 8;

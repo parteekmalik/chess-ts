@@ -37,7 +37,7 @@ const Board: React.FC = () => {
       SelectedMoves.availableMoves.forEach((moves) => {
         if (moves.row === row && moves.col === col) HandleMove({ boardData, selectedPiece, setBoardData, setSelectedMoves, setSelectedPiece, Move: moves });
       });
-    } else if (boardData.BoardLayout[row][col].type !== "empty") {
+    } else if (boardData.BoardLayout[row][col] !== "") {
       setSelectedPiece({ isSelected: true, row, col });
       setSelectedMoves({ ...SelectedMoves, availableMoves: ValidMoves[row][col] });
     } else {

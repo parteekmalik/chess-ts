@@ -6,19 +6,19 @@ export const iskingInCheck = (boardData: boardData_Type): boolean => {
   const { turn } = boardData;
   const kingPos: { row: number; col: number } = findKingPos(boardData);
 
-  let moves = rookBishopQueen(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "Rook" });
+  let moves = rookBishopQueen(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "R" });
   for (let i = 0; i < moves.length; i++) {
     const res = pieceOnLoc(boardData, { row: moves[i].row, col: moves[i].col });
     if (["OQ", "OR"].includes(res)) return true;
   }
 
-  moves = rookBishopQueen(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "Bishop" });
+  moves = rookBishopQueen(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "B" });
   for (let i = 0; i < moves.length; i++) {
     const res = pieceOnLoc(boardData, { row: moves[i].row, col: moves[i].col });
     if (["OQ", "OB"].includes(res)) return true;
   }
 
-  moves = knightKing(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "Night" });
+  moves = knightKing(boardData, { row: kingPos.row, col: kingPos.col, pieceType: "N" });
   for (let i = 0; i < moves.length; i++) {
     const res = pieceOnLoc(boardData, { row: moves[i].row, col: moves[i].col });
     if (["ON"].includes(res)) return true;
