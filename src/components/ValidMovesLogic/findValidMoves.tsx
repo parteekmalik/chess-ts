@@ -1,6 +1,6 @@
 import { boardData_Type, moves_Type } from "../types";
 import { allMoves } from "./pieceLogic";
-// import _ from "lodash";
+import _ from "lodash";
 
 import { removeInvalidMoves } from "./deleteValidMove/deleteInvalid";
 
@@ -11,9 +11,9 @@ const findValidMoves = (boardData: boardData_Type): moves_Type[][][] => {
   let allMove: moves_Type[][][] = allMoves(boardData);
 
   // Remove invalid moves
-  // let validMoves: moves_Type[][][] = removeInvalidMoves(boardData, allMove);
+  let validMoves: moves_Type[][][] = removeInvalidMoves(boardData, _.cloneDeep(allMove));
   console.log("calculation finished!!");
-  return allMove;
+  return validMoves;
 };
 
 export default findValidMoves;

@@ -6,7 +6,7 @@ import { knightKing, pawn, pieceOnLoc } from "./pieceLogic";
 const chackForBlank = (boardData: boardData_Type, moves: moves_Type[]): boolean => {
   for (let i = 1; i < moves.length; i++) {
     let res = pieceOnLoc(boardData, { row: moves[i].row, col: moves[i].col });
-    if (res !== "E") return false;
+    if (res[0] !== "E") return false;
   }
   return true;
 };
