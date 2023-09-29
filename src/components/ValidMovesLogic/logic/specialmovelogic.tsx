@@ -1,6 +1,6 @@
-import { moves_Type, boardData_Type, Row_Col_PieceType_Type } from "../types";
-import { deleteInvalid } from "./deleteValidMove/deleteInvalid";
-import { iskingInCheck } from "./king check/isKingInCheck";
+import { moves_Type, boardData_Type, Row_Col_PieceType_Type } from "../../types";
+import { deleteInvalid } from "../deleteValidMove/deleteInvalid";
+import { iskingInCheck } from "../king check/isKingInCheck";
 import { knightKing, pawn, pieceOnLoc } from "./pieceLogic";
 
 const chackForBlank = (boardData: boardData_Type, moves: moves_Type[]): boolean => {

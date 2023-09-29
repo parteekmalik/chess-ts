@@ -1,5 +1,5 @@
 import { boardData_Type, moves_Type } from "../types";
-import { allMoves } from "./pieceLogic";
+import { allMoves } from "./logic/pieceLogic";
 import _ from "lodash";
 
 import { removeInvalidMoves } from "./deleteValidMove/deleteInvalid";

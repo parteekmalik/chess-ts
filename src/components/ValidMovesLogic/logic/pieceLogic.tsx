@@ -1,6 +1,6 @@
 // pieceLogic.tsx
-import { moves_Type, boardData_Type, Row_Col_PieceType_Type, Row_Col_Type } from "../types";
-import { pieceMovement } from "../types";
+import { moves_Type, boardData_Type, Row_Col_PieceType_Type, Row_Col_Type } from "../../types";
+import { pieceMovement } from "../../types";
 import { pawnenpassent, Kingcastle } from "./specialmovelogic";
 
 export const isValidMove = (row: number, col: number): boolean => {
@@ -106,7 +106,7 @@ const findMoves = (boardData: boardData_Type, props: Row_Col_Type): moves_Type[]
   let ans: moves_Type[] = [];
   const square: string = BoardLayout[row][col];
 
-  if ("" !== square && square[0] === turn ) {
+  if ("" !== square && square[0] === turn) {
     if (square[1] === "K" || square[1] === "P") ans = [...pieceFunctions[square[1]](boardData, { ...props, pieceType: square[1] })];
     else ans = [...pieceFunctions[square[1]](boardData, { ...props, pieceType: square[1] })];
   }

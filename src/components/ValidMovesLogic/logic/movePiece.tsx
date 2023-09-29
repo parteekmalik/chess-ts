@@ -1,4 +1,4 @@
-import { emptyPiece, boardData_Type } from "../types";
+import { emptyPiece, boardData_Type } from "../../types";
 
 export const movePiece = (boardData: boardData_Type): boardData_Type => {
   const move = boardData.movesPlayed.moves[boardData.movesPlayed.moves.length - 1];

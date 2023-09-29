@@ -1,10 +1,12 @@
 // updateGameState.tsx
 import { handleMoveProps } from "../types";
 import { updatedMovesPlayed } from "./updateMovesPlayed";
-import { movePiece } from "./movePiece";
+import { movePiece } from "../ValidMovesLogic/logic/movePiece";
+import _ from "lodash";
 
 const handleMove = (props: handleMoveProps) => {
-  const { boardData, selectedPiece, setBoardData, setSelectedMoves, setSelectedPiece, Move } = props;
+  const { selectedPiece, setBoardData, setSelectedMoves, setSelectedPiece, Move } = props;
+  let boardData = props.boardData;
 
   // updating castling logic
   const movedpiece = boardData.BoardLayout[selectedPiece.row][selectedPiece.col];
@@ -22,7 +24,7 @@ const handleMove = (props: handleMoveProps) => {
   ];
 
   // Update the board
-  movePiece(boardData);
+  boardData = movePiece(_.cloneDeep(boardData));
 
   // Toggle the turn and update
   boardData.turn = boardData.turn === "w" ? "b" : "w";

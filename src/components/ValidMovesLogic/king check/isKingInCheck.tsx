@@ -1,5 +1,5 @@
 import { boardData_Type } from "../../types";
-import { rookBishopQueen, knightKing, pieceOnLoc } from "../pieceLogic";
+import { rookBishopQueen, knightKing, pieceOnLoc } from "../logic/pieceLogic";
 import findKingPos from "./findKingPos";
 
 export const iskingInCheck = (boardData: boardData_Type): boolean => {

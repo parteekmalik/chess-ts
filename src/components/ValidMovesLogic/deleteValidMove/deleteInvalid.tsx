@@ -1,6 +1,6 @@
 import { boardData_Type, moves_Type } from "../../types";
 import _ from "lodash";
-import { movePiece } from "../../dispatch/movePiece";
+import { movePiece } from "../logic/movePiece";
 import { iskingInCheck } from "../king check/isKingInCheck";
 import { updatedMovesPlayed } from "../../dispatch/updateMovesPlayed";
 
@@ -15,7 +15,7 @@ export const deleteInvalid = (boardData: boardData_Type, movesRow: moves_Type[],
       updatedMovesPlayed({ movesPlayed: boardData.movesPlayed, selectedPiece: { ...prev, isSelected: true }, BoardLayout: newboardData.BoardLayout, Move: movesRow[i] }),
     ];
 
-    movePiece(newboardData);
+    newboardData = movePiece(_.cloneDeep(newboardData));
 
     // Check if the king is in check after the move
     if (!iskingInCheck(newboardData)) {
