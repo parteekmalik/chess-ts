@@ -27,8 +27,8 @@ export const rookBishopQueen = (boardData: boardData_Type, props: Row_Col_PieceT
     while (true) {
       const res = pieceOnLoc(boardData, { row: currentRow, col: currentCol });
 
-      if (res === "E" || res === "O") possibleMoves.push({ type: pieceType + res === "E" ? "normal" : "capture", row: currentRow, col: currentCol });
-      if (res !== "E") break;
+      if (res[0] === "E" || res[0] === "O") possibleMoves.push({ type: pieceType + ((res[0] === "E") ? "normal" : "capture"), row: currentRow, col: currentCol });
+      if (res[0] !== "E") break;
 
       currentRow += moveI;
       currentCol += moveJ;
@@ -47,7 +47,7 @@ export const knightKing = (boardData: boardData_Type, props: Row_Col_PieceType_T
     const newRow: number = row + moves[i].row;
     const newCol: number = col + moves[i].col;
     const res = pieceOnLoc(boardData, { row: newRow, col: newCol });
-    if (res === "E" || res === "O") possibleMoves.push({ type: pieceType + res === "E" ? "normal" : "capture", row: newRow, col: newCol });
+    if (res[0] === "E" || res[0] === "O") possibleMoves.push({ type: pieceType +( (res[0] === "E") ? "normal" : "capture"), row: newRow, col: newCol });
   }
 
   return possibleMoves;
@@ -83,7 +83,7 @@ export const pawn = (boardData: boardData_Type, props: Row_Col_PieceType_Type): 
     newRow = row + move.row;
     newCol = col + move.col;
     const res = pieceOnLoc(boardData, { row: newRow, col: newCol });
-    if (res === "O") {
+    if (res[0] === "O") {
       possibleMoves.push({ type: "pawn capture", row: newRow, col: newCol });
     }
   }

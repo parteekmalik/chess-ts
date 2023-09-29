@@ -6,8 +6,8 @@ import ChessBoard from "./piece and hints/ChessBoard";
 import ChessBoardHints from "./piece and hints/ChessBoardHints";
 import findValidMoves from "./ValidMovesLogic/findValidMoves";
 import HandleMove from "./dispatch/updateGameState";
-import Highlight from "./highlight/highlight";
-import Coordinates from "./coordinates/coordinates";
+// import Highlight from "./highlight/highlight";
+// import Coordinates from "./coordinates/coordinates";
 
 const Board: React.FC = () => {
   const [boardData, setBoardData] = useState<boardData_Type>({
@@ -48,8 +48,8 @@ const Board: React.FC = () => {
 
   return (
     <div className="chess-board" onClick={clickHandle} style={{ width: boardSize + "px", height: boardSize + "px" }}>
-      <Coordinates />
-      <Highlight selectedPiece={selectedPiece} movesPlayed={boardData.movesPlayed} />
+      {/* <Coordinates /> */}
+      {/* <Highlight selectedPiece={selectedPiece} movesPlayed={boardData.movesPlayed} /> */}
       <ChessBoard BoardLayout={boardData.BoardLayout} />
       <ChessBoardHints Hints={SelectedMoves.availableMoves} BoardLayout={boardData.BoardLayout} />
     </div>
