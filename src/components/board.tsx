@@ -6,15 +6,15 @@ import ChessBoard from "./piece and hints/ChessBoard";
 import ChessBoardHints from "./piece and hints/ChessBoardHints";
 import findValidMoves from "./ValidMovesLogic/findValidMoves";
 import HandleMove from "./dispatch/updateGameState";
-// import Highlight from "./highlight/highlight";
-// import Coordinates from "./coordinates/coordinates";
+import Highlight from "./highlight/highlight";
+import Coordinates from "./coordinates/coordinates";
 
 const Board: React.FC = () => {
   const [boardData, setBoardData] = useState<boardData_Type>({
     BoardLayout: initialPosition,
-    turn: "white",
+    turn: "w",
     movesPlayed: { current: -1, moves: [] },
-    iscastle: { black: { King: true, rightRook: true, leftRook: true }, white: { King: true, rightRook: true, leftRook: true } },
+    iscastle: { b: { King: true, rightRook: true, leftRook: true }, w: { King: true, rightRook: true, leftRook: true } },
   });
   const [SelectedMoves, setSelectedMoves] = useState<HintsProps>({ isShowHint: true, availableMoves: [] });
   const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, row: 0, col: 0 });
@@ -48,8 +48,8 @@ const Board: React.FC = () => {
 
   return (
     <div className="chess-board" onClick={clickHandle} style={{ width: boardSize + "px", height: boardSize + "px" }}>
-      {/* <Coordinates /> */}
-      {/* <Highlight selectedPiece={selectedPiece} movesPlayed={boardData.movesPlayed} /> */}
+      <Coordinates />
+      <Highlight selectedPiece={selectedPiece} movesPlayed={boardData.movesPlayed} />
       <ChessBoard BoardLayout={boardData.BoardLayout} />
       <ChessBoardHints Hints={SelectedMoves.availableMoves} BoardLayout={boardData.BoardLayout} />
     </div>

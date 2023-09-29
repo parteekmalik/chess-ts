@@ -25,7 +25,7 @@ const handleMove = (props: handleMoveProps) => {
   movePiece(boardData);
 
   // Toggle the turn and update
-  boardData.turn = boardData.turn === "white" ? "black" : "white";
+  boardData.turn = boardData.turn === "w" ? "b" : "w";
 
   setBoardData(boardData);
 

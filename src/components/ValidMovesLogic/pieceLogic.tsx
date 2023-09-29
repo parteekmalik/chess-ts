@@ -12,7 +12,7 @@ export const pieceOnLoc = (boardData: boardData_Type, props: Row_Col_Type): stri
   if (!isValidMove(row, col)) return "I";
   const square = BoardLayout[row][col];
   if (square === "") return "E";
-  return (square[0] === turn[0] ? "F" : "O") + BoardLayout[row][col][1];
+  return (square[0] === turn ? "F" : "O") + BoardLayout[row][col][1];
 };
 
 export const rookBishopQueen = (boardData: boardData_Type, props: Row_Col_PieceType_Type): moves_Type[] => {
@@ -57,7 +57,7 @@ export const pawn = (boardData: boardData_Type, props: Row_Col_PieceType_Type): 
   const { row, col } = props;
   const { turn } = boardData;
   let possibleMoves: moves_Type[] = [];
-  const forward = turn === "white" ? -1 : 1;
+  const forward = turn === "w" ? -1 : 1;
 
   // Check one square forward
   let newRow = row + forward;
@@ -67,7 +67,7 @@ export const pawn = (boardData: boardData_Type, props: Row_Col_PieceType_Type): 
 
     // Check two squares forward if on starting position
     newRow = row + 2 * forward;
-    if ((turn === "white" && row === 6) || (turn === "black" && row === 1)) {
+    if ((turn === "w" && row === 6) || (turn === "b" && row === 1)) {
       if (pieceOnLoc(boardData, { row: newRow, col: newCol }) === "E") {
         possibleMoves.push({ type: "pawn double forward", row: newRow, col: newCol });
       }
@@ -106,7 +106,7 @@ const findMoves = (boardData: boardData_Type, props: Row_Col_Type): moves_Type[]
   let ans: moves_Type[] = [];
   const square: string = BoardLayout[row][col];
 
-  if ("" !== square && square[0] === turn[0] ) {
+  if ("" !== square && square[0] === turn ) {
     if (square[1] === "K" || square[1] === "P") ans = [...pieceFunctions[square[1]](boardData, { ...props, pieceType: square[1] })];
     else ans = [...pieceFunctions[square[1]](boardData, { ...props, pieceType: square[1] })];
   }

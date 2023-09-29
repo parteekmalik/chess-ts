@@ -17,7 +17,7 @@ export const Kingcastle = (boardData: boardData_Type, props: Row_Col_PieceType_T
   const { row, col } = props;
 
   const iscastle = boardData.iscastle[turn];
-  const rowRank = turn === "white" ? 7 : 0;
+  const rowRank = turn === "w" ? 7 : 0;
   if (iscastle["King"] && !iskingInCheck(boardData)) {
     const caslemoves = [
       [
@@ -54,7 +54,7 @@ export const pawnenpassent = (boardData: boardData_Type, props: Row_Col_PieceTyp
     movesPlayed.moves[movesPlayed.moves.length - 1].to.row === row &&
     Math.abs(movesPlayed.moves[movesPlayed.moves.length - 1].to.col - col) === 1
   ) {
-    let newRow = row + (turn === "white" ? -1 : +1);
+    let newRow = row + (turn === "w" ? -1 : +1);
     let newCol = movesPlayed.moves[movesPlayed.moves.length - 1].to.col;
     possibleMoves.push({ type: "pawn en passent", row: newRow, col: newCol });
   }

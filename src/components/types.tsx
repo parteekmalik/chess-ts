@@ -106,7 +106,7 @@ export const pieceMovement: { [key: string]: { row: number; col: number }[] } = 
   ],
 };
 export const initialPosition: string[][] = [
-  ["bR", "bN", "bBi", "bQ", "bK", "bB", "bN", "bR"],
+  ["bR", "bN", "bB", "bQ", "bK", "bB", "bN", "bR"],
   ["bP", "bP", "bP", "bP", "bP", "bP", "bP", "bP"],
   Array(8).fill(""),
   Array(8).fill(""),

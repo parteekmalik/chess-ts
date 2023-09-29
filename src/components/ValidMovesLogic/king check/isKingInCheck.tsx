@@ -24,7 +24,7 @@ export const iskingInCheck = (boardData: boardData_Type): boolean => {
     if (["ON"].includes(res)) return true;
   }
 
-  const pawnRow = (turn === "white" ? -1 : 1) + kingPos.row;
+  const pawnRow = (turn === "w" ? -1 : 1) + kingPos.row;
   const leftpawn = pieceOnLoc(boardData, { row: pawnRow, col: kingPos.col - 1 });
   const rightpawn = pieceOnLoc(boardData, { row: pawnRow, col: kingPos.col + 1 });
 

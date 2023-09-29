@@ -5,8 +5,7 @@ const findKingPos = (boardData: boardData_Type): { row: number; col: number } =>
 
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
-      if (BoardLayout[row][col][0] === turn[0] && BoardLayout[row][col][1] === "K") return { row, col };
-      
+      if (BoardLayout[row][col] === turn + "K") return { row, col };
     }
   }
 
