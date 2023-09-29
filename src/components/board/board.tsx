@@ -1,13 +1,13 @@
 // board.tsx
 import "./board.css";
 import React, { useState, useEffect } from "react";
-import { boardSize, initialPosition, checkForValidClick, boardData_Type, HintsProps, selectedPieceProps, moves_Type } from "./types";
-import ChessBoard from "./piece and hints/ChessBoard";
-import ChessBoardHints from "./piece and hints/ChessBoardHints";
-import findValidMoves from "./ValidMovesLogic/findValidMoves";
-import HandleMove from "./dispatch/updateGameState";
-import Highlight from "./highlight/highlight";
-import Coordinates from "./coordinates/coordinates";
+import { boardSize, initialPosition, checkForValidClick, boardData_Type, HintsProps, selectedPieceProps, moves_Type } from "../types";
+import ChessBoard from "../piece and hints/ChessBoard";
+import ChessBoardHints from "../piece and hints/ChessBoardHints";
+import findValidMoves from "../ValidMovesLogic/findValidMoves";
+import HandleMove from "../dispatch/updateGameState";
+import Highlight from "../highlight/highlight";
+import Coordinates from "../coordinates/coordinates";
 
 const Board: React.FC = () => {
   const [boardData, setBoardData] = useState<boardData_Type>({
