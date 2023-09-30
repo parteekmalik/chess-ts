@@ -8,6 +8,7 @@ import findValidMoves from "../ValidMovesLogic/findValidMoves";
 import HandleMove from "../dispatch/updateGameState";
 import Highlight from "../piece and hints/highlight";
 import Coordinates from "../coordinates/coordinates";
+// import { url } from "inspector";
 
 const Board: React.FC = () => {
   const [boardData, setBoardData] = useState<boardData_Type>({
@@ -21,8 +22,26 @@ const Board: React.FC = () => {
   const [ValidMoves, setValidMoves] = useState<moves_Type[][][]>([]);
 
   useEffect(() => {
-    if(boardData.BoardLayout.length)
-      setValidMoves(findValidMoves(boardData));
+    const url = "http://localhost:5000/chess/validmoves";
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(boardData),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setValidMoves(data);
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardData.turn]);
 

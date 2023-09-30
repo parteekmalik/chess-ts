@@ -1,7 +1,7 @@
 // updateGameState.tsx
 import { handleMoveProps } from "../types";
 import { updatedMovesPlayed } from "./updateMovesPlayed";
-import { movePiece } from "../ValidMovesLogic/logic/movePiece";
+import { movePiece } from "./movePiece";
 import _ from "lodash";
 
 const handleMove = (props: handleMoveProps) => {

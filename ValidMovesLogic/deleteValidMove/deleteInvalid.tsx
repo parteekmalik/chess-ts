@@ -1,6 +1,6 @@
 import { boardData_Type, moves_Type } from "../../types";
 import _ from "lodash";
-import { movePiece } from "../logic/movePiece";
+import { movePiece } from "../../dispatch/movePiece";
 import { iskingInCheck } from "../king check/isKingInCheck";
 import { updatedMovesPlayed } from "../../dispatch/updateMovesPlayed";
 
