@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 import { boardSize, initialPosition, checkForValidClick, boardData_Type, HintsProps, selectedPieceProps, moves_Type } from "../types";
 import ChessBoard from "../piece and hints/ChessBoard";
 import ChessBoardHints from "../piece and hints/ChessBoardHints";
-import findValidMoves from "../ValidMovesLogic/findValidMoves";
 import HandleMove from "../dispatch/updateGameState";
 import Highlight from "../piece and hints/highlight";
 import Coordinates from "../coordinates/coordinates";
+import { findValidMoves } from "chess-validmoves";
 // import { url } from "inspector";
 
 const Board: React.FC = () => {
@@ -22,26 +22,7 @@ const Board: React.FC = () => {
   const [ValidMoves, setValidMoves] = useState<moves_Type[][][]>([]);
 
   useEffect(() => {
-    const url = "http://localhost:5000/chess/validmoves";
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(boardData),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setValidMoves(data);
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error);
-      });
+    setValidMoves(findValidMoves(boardData));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardData.turn]);
 
