@@ -5,7 +5,7 @@ function App() {
   return (
     <div className="App">
       <Board />
-      <button>flip</button>
+      {/* <button>flip</button> */}
     </div>
   );
 }

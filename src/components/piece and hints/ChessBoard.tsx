@@ -1,26 +1,25 @@
 // ChessBoard.tsx
 import { squareSize } from "../types";
-import "./piecesHints.css"
+import "./piecesHints.css" 
 
 interface ChessBoardProps {
-  BoardLayout: string[][];
+  BoardLayout: ({ square: string; type: string; color: string; } | null)[][];
 }
 const ChessBoard: React.FC<ChessBoardProps> = (props) => {
   const { BoardLayout } = props;
   const squares: JSX.Element[] = [];
   BoardLayout.forEach((row, rowIndex) =>
-    row.forEach((square, colIndex) => {
-      const position = `${rowIndex},${colIndex}`;
+    row.forEach((position, colIndex) => {
       const Style = {
         transform: `translate(${colIndex * squareSize}px, ${rowIndex * squareSize}px)`,
       };
 
-      if (square !== "") {
+      if (position) {
         squares.push(
           <div
-            key={position}
-            className={`piece ${square}`}
-            id={position}
+            key={position.square}
+            className={`piece ${position.color + position.type}`}
+            id={position.square}
             style={Style}
           ></div>
         );
