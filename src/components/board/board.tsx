@@ -4,25 +4,26 @@ import React, { useState, useEffect } from "react";
 import { boardSize, checkForValidClick, HintsProps, selectedPieceProps } from "../types";
 import ChessBoard from "../piece and hints/ChessBoard";
 import ChessBoardHints from "../piece and hints/ChessBoardHints";
-// import Highlight from "../piece and hints/highlight";
+import Highlight from "../piece and hints/highlight";
 import Coordinates from "../coordinates/coordinates";
 
 import { Chess, SQUARES, Square, PieceSymbol } from "chess.js";
 import _ from "lodash";
 
 const Board: React.FC = () => {
-  const [SelectedMoves, setSelectedMoves] = useState<HintsProps>({ isShowHint: true, availableMoves: [] });
   const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, row: 0, col: 0 });
-
-  const [game, setGame] = useState(new Chess());
-  const [moveundo, setMoveundo] = useState<string[]>([]);
+  const [game, setGame] = useState<Chess>(new Chess());
+  const [moveundone, setMoveundo] = useState<string[]>([]);
 
   useEffect(() => {
-    if (game.turn() === "b") randomMove();
+    if (game.turn() === "b") {
+      randomMove();
+      setSelectedPiece({ isSelected: false, row: 0, col: 0 });
+    }
   }, [game.turn()]);
 
   const randomMove = () => {
-    if (moveundo.length) return;
+    if (moveundone.length) return;
     const newgame = _.cloneDeep(game);
     if (!newgame.isGameOver()) {
       const moves = newgame.moves();
@@ -34,16 +35,16 @@ const Board: React.FC = () => {
   };
   const handleprev = (event: React.MouseEvent) => {
     const newgame = _.cloneDeep(game);
-    if (newgame.history()[newgame.history().length - 1]) setMoveundo([...moveundo, newgame.history()[newgame.history().length - 1]]);
+    if (newgame.history()[newgame.history().length - 1]) setMoveundo([...moveundone, newgame.history()[newgame.history().length - 1]]);
     newgame.undo();
     setGame(newgame);
   };
   const handlenext = (event: React.MouseEvent) => {
     const newgame = _.cloneDeep(game);
-    if (moveundo.length) {
-      newgame.move(moveundo[moveundo.length - 1]);
-      moveundo.pop();
-      setMoveundo(moveundo);
+    if (moveundone.length) {
+      newgame.move(moveundone[moveundone.length - 1]);
+      moveundone.pop();
+      setMoveundo(moveundone);
     }
     setGame(newgame);
   };
@@ -57,6 +58,7 @@ const Board: React.FC = () => {
     }
 
     if (selectedPiece.isSelected) {
+      if (moveundone.length) return;
       const from = SQUARES[selectedPiece.row * 8 + selectedPiece.col] as string;
       const to = SQUARES[row * 8 + col] as string;
       console.log("from->", from, "to ->", to);
@@ -75,17 +77,8 @@ const Board: React.FC = () => {
       }
     }
     setSelectedPiece({ isSelected: false, row: 0, col: 0 });
-    setSelectedMoves({ ...SelectedMoves, availableMoves: [] });
 
-    if (game.board()[row][col]) {
-      setSelectedPiece({ isSelected: true, row, col });
-      setSelectedMoves({
-        ...SelectedMoves,
-        availableMoves: game
-          .moves({ verbose: true, square: SQUARES[row * 8 + col] })
-          .map((move) => ({ from: move.from as Square, to: move.to as Square, promotion: move.promotion })),
-      });
-    }
+    if (game.board()[row][col]) setSelectedPiece({ isSelected: true, row, col });
   };
 
   return (
@@ -94,9 +87,9 @@ const Board: React.FC = () => {
       <button onClick={handlenext}>next</button>
       <div className="chess-board" onClick={clickHandle} style={{ width: boardSize + "px", height: boardSize + "px" }}>
         <Coordinates />
-        {/* <Highlight selectedPiece={selectedPiece} movesPlayed={boardData.movesPlayed} /> */}
+        <Highlight selectedPiece={selectedPiece} game={game} />
         <ChessBoard BoardLayout={game.board()} />
-        <ChessBoardHints Hints={SelectedMoves.availableMoves} BoardLayout={game.board()} />
+        <ChessBoardHints selectedPiece={selectedPiece} game={game} />
       </div>
       <div>{}</div>
     </>
