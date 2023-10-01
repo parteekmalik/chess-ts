@@ -22,13 +22,16 @@ const Board: React.FC = () => {
     }
   }, [game.turn()]);
 
+  useEffect(()=>{
+    console.log(game.history());
+  },[game])
+
   const randomMove = () => {
     if (moveundone.length) return;
     const newgame = _.cloneDeep(game);
     if (!newgame.isGameOver()) {
       const moves = newgame.moves();
       const move = moves[Math.floor(Math.random() * moves.length)];
-      console.log(moves);
       newgame.move(move);
       setGame(newgame);
     }
@@ -61,7 +64,6 @@ const Board: React.FC = () => {
       if (moveundone.length) return;
       const from = SQUARES[selectedPiece.row * 8 + selectedPiece.col] as string;
       const to = SQUARES[row * 8 + col] as string;
-      console.log("from->", from, "to ->", to);
       const newGame = _.cloneDeep(game);
 
       try {
