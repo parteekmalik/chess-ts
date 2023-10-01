@@ -1,6 +1,7 @@
 import React from "react";
 import { squareSize } from "../types";
-import { Chess, Move, SQUARES } from "chess.js";
+import { Chess, Move, SQUARES, Square } from "chess.js";
+import { toRowCol } from "../toRow_col";
 
 const PrevHighlight: React.FC<{ history: Move }> = ({ history }) => {
   const from = {
@@ -21,17 +22,16 @@ const PrevHighlight: React.FC<{ history: Move }> = ({ history }) => {
 };
 
 export interface HighlightProps {
-  selectedPiece: { isSelected: boolean; row: number; col: number };
+  selectedPiece: { isSelected: boolean; square: Square };
   game: Chess;
 }
 const Highlight: React.FC<HighlightProps> = (props) => {
   const { selectedPiece, game } = props;
   const history = game.history({ verbose: true }).pop();
+  const [row, col] = toRowCol(selectedPiece.square);
   return (
     <>
-      {selectedPiece.isSelected && (
-        <div className="highlight" style={{ transform: `translate(${selectedPiece.col * squareSize}px, ${selectedPiece.row * squareSize}px)` }}></div>
-      )}
+      {selectedPiece.isSelected && <div className="highlight" style={{ transform: `translate(${col * squareSize}px, ${row * squareSize}px)` }}></div>}
       {history && <PrevHighlight history={history} />}
     </>
   );

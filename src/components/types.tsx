@@ -1,15 +1,13 @@
-import { PieceSymbol,Square } from "chess.js";
+import { PieceSymbol, Square } from "chess.js";
 
 export interface HintsProps {
   isShowHint: boolean;
-  availableMoves: {from:Square,to:Square,promotion: PieceSymbol | undefined}[];
+  availableMoves: { from: Square; to: Square; promotion: PieceSymbol | undefined }[];
 }
 export interface selectedPieceProps {
   isSelected: boolean;
-  row: number;
-  col: number;
+  square: Square;
 }
-
 
 export const checkForValidClick = (event: React.MouseEvent) => {
   const { clientX, clientY, currentTarget } = event;

@@ -1,9 +1,8 @@
 // ChessBoardHints.tsx
 import { SQUARES, Square, PieceSymbol, Chess } from "chess.js";
 import { squareSize, HintsProps, selectedPieceProps } from "../types";
+import { toRowCol } from "../toRow_col";
 
-// Hints: {from:Square,to:Square,promotion: PieceSymbol | undefined}[];
-// BoardLayout: ({ square: string; type: string; color: string } | null)[][];
 interface ChessBoardProps {
   selectedPiece: selectedPieceProps;
   game: Chess;
@@ -15,11 +14,10 @@ const ChessBoardHints: React.FC<ChessBoardProps> = (props) => {
   const squares: JSX.Element[] = [];
   if (selectedPiece.isSelected) {
     game
-      .moves({ verbose: true, square: SQUARES[selectedPiece.row * 8 + selectedPiece.col] })
+      .moves({ verbose: true, square: selectedPiece.square })
       .map((move) => ({ from: move.from as Square, to: move.to as Square, promotion: move.promotion }))
       .forEach((square) => {
-        const rowIndex = Math.floor(SQUARES.indexOf(square.to) / 8);
-        const colIndex = SQUARES.indexOf(square.to) % 8;
+        const [rowIndex, colIndex] = toRowCol(square.to);
         const Style = {
           transform: `translate(${colIndex * squareSize}px, ${rowIndex * squareSize}px)`,
         };

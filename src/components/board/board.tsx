@@ -11,20 +11,20 @@ import { Chess, SQUARES, Square, PieceSymbol } from "chess.js";
 import _ from "lodash";
 
 const Board: React.FC = () => {
-  const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, row: 0, col: 0 });
+  const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, square: "a0" as Square });
   const [game, setGame] = useState<Chess>(new Chess());
   const [moveundone, setMoveundo] = useState<string[]>([]);
 
   useEffect(() => {
     if (game.turn() === "b") {
       randomMove();
-      setSelectedPiece({ isSelected: false, row: 0, col: 0 });
+      setSelectedPiece({ isSelected: false, square: "a0" as Square });
     }
   }, [game.turn()]);
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log(game.history());
-  },[game])
+  }, [game]);
 
   const randomMove = () => {
     if (moveundone.length) return;
@@ -56,14 +56,14 @@ const Board: React.FC = () => {
     const { isValid, row, col } = checkForValidClick(event);
 
     if (!isValid) {
-      setSelectedPiece({ isSelected: false, row: 0, col: 0 });
+      setSelectedPiece({ isSelected: false, square: "a0" as Square });
       return;
     }
 
     if (selectedPiece.isSelected) {
       if (moveundone.length) return;
-      const from = SQUARES[selectedPiece.row * 8 + selectedPiece.col] as string;
-      const to = SQUARES[row * 8 + col] as string;
+      const from = selectedPiece.square;
+      const to = SQUARES[row * 8 + col];
       const newGame = _.cloneDeep(game);
 
       try {
@@ -78,9 +78,9 @@ const Board: React.FC = () => {
         }
       }
     }
-    setSelectedPiece({ isSelected: false, row: 0, col: 0 });
+    setSelectedPiece({ isSelected: false, square: "a0" as Square });
 
-    if (game.board()[row][col]) setSelectedPiece({ isSelected: true, row, col });
+    if (game.board()[row][col]) setSelectedPiece({ isSelected: true, square: SQUARES[row * 8 + col] });
   };
 
   return (
