@@ -53,12 +53,9 @@ const Board: React.FC = () => {
   };
 
   const clickHandle = (event: React.MouseEvent) => {
-    const { isValid, row, col } = checkForValidClick(event);
+    const { isValid, row, col } = checkForValidClick(event, setSelectedPiece);
 
-    if (!isValid) {
-      setSelectedPiece({ isSelected: false, square: "a0" as Square });
-      return;
-    }
+    if (!isValid) return;
 
     if (selectedPiece.isSelected) {
       if (moveundone.length) return;

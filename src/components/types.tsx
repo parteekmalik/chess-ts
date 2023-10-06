@@ -9,7 +9,7 @@ export interface selectedPieceProps {
   square: Square;
 }
 
-export const checkForValidClick = (event: React.MouseEvent) => {
+export const checkForValidClick = (event: React.MouseEvent, setSelectedPiece: React.Dispatch<React.SetStateAction<{ isSelected: boolean; square: Square }>>) => {
   const { clientX, clientY, currentTarget } = event;
   const { left, top, right, bottom } = currentTarget.getBoundingClientRect();
 
@@ -19,6 +19,7 @@ export const checkForValidClick = (event: React.MouseEvent) => {
   const col = isValid ? Math.floor((clientX - left) / squareSize) : -1;
   const row = isValid ? Math.floor((clientY - top) / squareSize) : -1;
 
+  if (!isValid) setSelectedPiece({ isSelected: false, square: "a0" as Square });
   return { isValid, row, col };
 };
 export const boardSize: number = 600;
