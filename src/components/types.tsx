@@ -22,5 +22,5 @@ export const checkForValidClick = (event: React.MouseEvent, setSelectedPiece: Re
   if (!isValid) setSelectedPiece({ isSelected: false, square: "a0" as Square });
   return { isValid, row, col };
 };
-export const boardSize: number = 600;
+export const boardSize: number = 300;
 export const squareSize: number = boardSize / 8;

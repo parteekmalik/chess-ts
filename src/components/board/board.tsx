@@ -9,32 +9,59 @@ import Coordinates from "../coordinates/coordinates";
 
 import { Chess, SQUARES, Square, PieceSymbol } from "chess.js";
 import _ from "lodash";
+import io from "socket.io-client";
+
+const socket = io("http://localhost:3001");
 
 const Board: React.FC = () => {
   const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, square: "a0" as Square });
   const [game, setGame] = useState<Chess>(new Chess());
   const [moveundone, setMoveundo] = useState<string[]>([]);
+  const [userid, setUserid] = useState<number>(0);
+  const [gameid, setGameid] = useState<string>("12345");
 
   useEffect(() => {
-    if (game.turn() === "b") {
-      randomMove();
+    // Listen for the "message" event and update the messages array
+    socket.on("message-rcv", (msg: string) => {
+      console.log("message-rcv -> ",msg);
+      setGame((game)=>{
+        const newgame = _.cloneDeep(game);
+        newgame.move(msg);
+        setSelectedPiece({ isSelected: false, square: "a0" as Square });
+        return newgame;
+      })
+    });
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      socket.off("message-rcv");
+    };
+  }, [socket]);
+
+  const handleconnect = () => {
+    socket.emit("connectwithuserid", { userid });
+  };
+
+  const clickHandle = (event: React.MouseEvent) => {
+    const { isValid, row, col } = checkForValidClick(event, setSelectedPiece);
+
+    if (!isValid || moveundone.length) return;
+
+    if (selectedPiece.isSelected) {
+      if (moveundone.length) return;
+
+      const requestData = {
+        from: selectedPiece.square,
+        to: SQUARES[row * 8 + col],
+        userid: userid,
+      };
+
+      socket.emit("message", requestData);
+
       setSelectedPiece({ isSelected: false, square: "a0" as Square });
     }
-  }, [game.turn()]);
-
-  useEffect(() => {
-    console.log(game.history());
-  }, [game]);
-
-  const randomMove = () => {
-    if (moveundone.length) return;
-    const newgame = _.cloneDeep(game);
-    if (!newgame.isGameOver()) {
-      const moves = newgame.moves();
-      const move = moves[Math.floor(Math.random() * moves.length)];
-      newgame.move(move);
-      setGame(newgame);
-    }
+    if (game.board()[row][col]) setSelectedPiece({ isSelected: true, square: SQUARES[row * 8 + col] });
+    else setSelectedPiece({ isSelected: false, square: "a0" as Square });
   };
   const handleprev = (event: React.MouseEvent) => {
     const newgame = _.cloneDeep(game);
@@ -52,36 +79,16 @@ const Board: React.FC = () => {
     setGame(newgame);
   };
 
-  const clickHandle = (event: React.MouseEvent) => {
-    const { isValid, row, col } = checkForValidClick(event, setSelectedPiece);
-
-    if (!isValid) return;
-
-    if (selectedPiece.isSelected) {
-      if (moveundone.length) return;
-      const from = selectedPiece.square;
-      const to = SQUARES[row * 8 + col];
-      const newGame = _.cloneDeep(game);
-
-      try {
-        newGame.move({ from, to });
-        setGame(newGame);
-      } catch {
-        try {
-          newGame.move({ from, to, promotion: "q" as PieceSymbol });
-          setGame(newGame);
-        } catch {
-          console.log("invalid move");
-        }
-      }
-    }
-    setSelectedPiece({ isSelected: false, square: "a0" as Square });
-
-    if (game.board()[row][col]) setSelectedPiece({ isSelected: true, square: SQUARES[row * 8 + col] });
-  };
-
   return (
     <>
+      <button
+        onClick={() => {
+          setUserid(userid + 1);
+        }}
+      >
+        increse userid
+      </button>
+      <button onClick={handleconnect}>connect</button>
       <button onClick={handleprev}>prev</button>
       <button onClick={handlenext}>next</button>
       <div className="chess-board" onClick={clickHandle} style={{ width: boardSize + "px", height: boardSize + "px" }}>
@@ -90,7 +97,7 @@ const Board: React.FC = () => {
         <ChessBoard BoardLayout={game.board()} />
         <ChessBoardHints selectedPiece={selectedPiece} game={game} />
       </div>
-      <div>{}</div>
+      {/* <div>{}</div> */}
     </>
   );
 };
