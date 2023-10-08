@@ -9,19 +9,19 @@ import Contact from "./components/Contact/Contact";
 import Live from "./components/Live/Live";
 
 const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/" element={<Layout />}>
-      <Route path="" element={<Home />} />
-      <Route path="about" element={<About />} />
-      <Route path="contact" element={<Contact />} />
-      <Route path="Live/:gameid" element={<Live />} />
-    </Route>
-  )
+    createRoutesFromElements(
+        <Route path="/" element={<Layout />}>
+            <Route path="" element={<Home />} />
+            <Route path="about" element={<About />} />
+            <Route path="contact" element={<Contact />} />
+            <Route path="Live/:gameid/:userid" element={<Live />} />
+        </Route>
+    )
 );
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+    <React.StrictMode>
+        <RouterProvider router={router} />
+    </React.StrictMode>
 );
