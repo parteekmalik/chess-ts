@@ -8,6 +8,10 @@
   background-size: 100%;
   position: absolute;
 }
+button{
+  margin: 20px;
+  background-color: aqua;
+}
 .chess-board {
   background-image: url("../images/board_img.png");
   background-repeat: no-repeat;
