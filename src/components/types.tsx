@@ -1,4 +1,4 @@
-import { PieceSymbol, Square } from "chess.js";
+import { PieceSymbol, Square,SQUARES } from "chess.js";
 
 export interface HintsProps {
   isShowHint: boolean;
@@ -16,11 +16,17 @@ export const checkForValidClick = (event: React.MouseEvent, setSelectedPiece: Re
   // Check if the click is within the boundaries of the target element
   const isValid = clientX >= left && clientX <= right && clientY >= top && clientY <= bottom;
 
+  const squareSize: number = (bottom-top) / 8;
+
   const col = isValid ? Math.floor((clientX - left) / squareSize) : -1;
   const row = isValid ? Math.floor((clientY - top) / squareSize) : -1;
 
   if (!isValid) setSelectedPiece({ isSelected: false, square: "a0" as Square });
   return { isValid, row, col };
 };
-export const boardSize: number = 300;
-export const squareSize: number = boardSize / 8;
+
+export const toRowCol = (square: Square): number[] => {
+  const rowIndex = Math.floor(SQUARES.indexOf(square) / 8);
+  const colIndex = SQUARES.indexOf(square) % 8;
+  return [rowIndex, colIndex];
+};

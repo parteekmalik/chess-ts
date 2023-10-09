@@ -1,7 +1,6 @@
 // board.tsx
-import "./board.css";
 import React, { useState, useEffect } from "react";
-import { boardSize, checkForValidClick, HintsProps, selectedPieceProps } from "../types";
+import { checkForValidClick, selectedPieceProps } from "../types";
 import ChessBoard from "../piece and hints/ChessBoard";
 import ChessBoardHints from "../piece and hints/ChessBoardHints";
 import Highlight from "../piece and hints/highlight";
@@ -19,6 +18,7 @@ const Board: React.FC = () => {
     const [game, setGame] = useState<Chess>(new Chess());
     const [moveundone, setMoveundo] = useState<string[]>([]);
     const [userid, setUserid] = useState(useParams().userid);
+    const [turn, setTurn] = useState(useParams().turn);
     const [gameid, setGameid] = useState(useParams().gameid);
 
     useEffect(() => {
@@ -40,7 +40,7 @@ const Board: React.FC = () => {
     }, [socket]);
 
     useEffect(() => {
-        socket.emit("connectwithuserid", { userid });
+        socket.emit("connectwithuserid", { userid, gameid });
     }, []);
 
     const clickHandle = (event: React.MouseEvent) => {
@@ -48,7 +48,7 @@ const Board: React.FC = () => {
 
         if (!isValid || moveundone.length) return;
 
-        if (selectedPiece.isSelected) {
+        if (selectedPiece.isSelected && turn == game.turn()) {
             if (moveundone.length) return;
 
             const requestData = {
@@ -82,19 +82,18 @@ const Board: React.FC = () => {
 
     return (
         <div>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleprev}>
+            <button className="m-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handleprev}>
                 prev
             </button>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handlenext}>
+            <button className="m-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={handlenext}>
                 next
             </button>
-            <div className="chess-board" onClick={clickHandle} style={{ width: boardSize + "px", height: boardSize + "px" }}>
+            <div className='bg-[url("./assets/images/board_img.png")] bg-no-repeat bg-[length:100%_100%] relative mt-[100px] m-auto w-[400px] h-[400px]' onClick={clickHandle}>
                 <Coordinates />
                 <Highlight selectedPiece={selectedPiece} game={game} />
                 <ChessBoard BoardLayout={game.board()} />
-                <ChessBoardHints selectedPiece={selectedPiece} game={game} />
+                {turn == game.turn() && <ChessBoardHints selectedPiece={selectedPiece} game={game} />}
             </div>
-            {/* <div>{}</div> */}
         </div>
     );
 };

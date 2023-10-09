@@ -1,32 +1,46 @@
 // ChessBoardHints.tsx
-import { SQUARES, Square, PieceSymbol, Chess } from "chess.js";
-import { squareSize, HintsProps, selectedPieceProps } from "../types";
-import { toRowCol } from "../toRow_col";
+import { Square, Chess } from "chess.js";
+import { selectedPieceProps } from "../types";
+import { toRowCol } from "../types";
 
 interface ChessBoardProps {
-  selectedPiece: selectedPieceProps;
-  game: Chess;
+    selectedPiece: selectedPieceProps;
+    game: Chess;
 }
 const ChessBoardHints: React.FC<ChessBoardProps> = (props) => {
-  const { selectedPiece, game } = props;
-  const BoardLayout = game.board();
+    const { selectedPiece, game } = props;
+    const BoardLayout = game.board();
 
-  const squares: JSX.Element[] = [];
-  if (selectedPiece.isSelected) {
-    game
-      .moves({ verbose: true, square: selectedPiece.square })
-      .map((move) => ({ from: move.from as Square, to: move.to as Square, promotion: move.promotion }))
-      .forEach((square) => {
-        const [rowIndex, colIndex] = toRowCol(square.to);
-        const Style = {
-          transform: `translate(${colIndex * squareSize}px, ${rowIndex * squareSize}px)`,
-        };
-        if (BoardLayout[rowIndex][colIndex])
-          squares.push(<div key={"hint" + square.to + square.promotion} className={`hint-capture`} id={square.to + square.promotion} style={Style}></div>);
-        else squares.push(<div key={"hint" + square.to + square.promotion} className={`hint`} id={square.to + square.promotion} style={Style}></div>);
-      });
-  }
+    const squares: JSX.Element[] = [];
+    if (selectedPiece.isSelected) {
+        game.moves({ verbose: true, square: selectedPiece.square })
+            .map((move) => ({ from: move.from as Square, to: move.to as Square, promotion: move.promotion }))
+            .forEach((square) => {
+                const [rowIndex, colIndex] = toRowCol(square.to);
+                const Style = {
+                    transform: `translate(${colIndex * 100}%, ${rowIndex * 100}%)`,
+                };
+                if (BoardLayout[rowIndex][colIndex])
+                    squares.push(
+                        <div
+                            key={"hint" + square.to + square.promotion}
+                            className={`w-[12.5%] h-[12.5%] bg-no-repeat bg-[length:100%_100%] absolute bg-clip-content box-border rounded-[50%] border-solid border-[rgba(0,0,0,0.1)] border-[10px]`}
+                            id={square.to + square.promotion}
+                            style={Style}
+                        ></div>
+                    );
+                else
+                    squares.push(
+                        <div
+                            key={"hint" + square.to + square.promotion}
+                            className={`bg-[rgba(0,0,0,0.1)] p-[4.2%] w-[12.5%] h-[12.5%] bg-no-repeat bg-[length:100%_100%] absolute bg-clip-content box-border rounded-[50%]`}
+                            id={square.to + square.promotion}
+                            style={Style}
+                        ></div>
+                    );
+            });
+    }
 
-  return <>{squares}</>;
+    return <>{squares}</>;
 };
 export default ChessBoardHints;
