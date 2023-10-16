@@ -1,8 +1,8 @@
 import React from "react";
-import { Chess, Move, SQUARES, Square } from "chess.js";
+import { Chess, Color, Move, SQUARES, Square } from "chess.js";
 import { toRowCol } from "../types";
 
-const PrevHighlight: React.FC<{ history: Move }> = ({ history }) => {
+const PrevHighlight: React.FC<{ history: Move; flip: Color }> = ({ history, flip }) => {
     const from = {
         row: Math.floor(SQUARES.indexOf(history.to) / 8),
         col: SQUARES.indexOf(history.to) % 8,
@@ -16,11 +16,11 @@ const PrevHighlight: React.FC<{ history: Move }> = ({ history }) => {
         <>
             <div
                 className="w-[12.5%] h-[12.5%] bg-no-repeat bg-[length:100%_100%] absolute bg-[rgb(255,255,51,0.5)]"
-                style={{ transform: `translate(${from.col * 100}%, ${from.row * 100}%)` }}
+                style={{ transform: `translate(${from.col * 100}%, ${(flip == "w" ? from.row : 7 - from.row) * 100}%)` }}
             ></div>
             <div
                 className="w-[12.5%] h-[12.5%] bg-no-repeat bg-[length:100%_100%] absolute bg-[rgb(255,255,51,0.5)]"
-                style={{ transform: `translate(${to.col * 100}%, ${to.row * 100}%)` }}
+                style={{ transform: `translate(${to.col * 100}%, ${(flip == "w" ? to.row : 7 - to.row) * 100}%)` }}
             ></div>
         </>
     );
@@ -29,9 +29,11 @@ const PrevHighlight: React.FC<{ history: Move }> = ({ history }) => {
 export interface HighlightProps {
     selectedPiece: { isSelected: boolean; square: Square };
     game: Chess;
+    turn: Color;
+    flip: Color;
 }
 const Highlight: React.FC<HighlightProps> = (props) => {
-    const { selectedPiece, game } = props;
+    const { selectedPiece, game, flip } = props;
     const history = game.history({ verbose: true }).pop();
     const [row, col] = toRowCol(selectedPiece.square);
     return (
@@ -39,10 +41,10 @@ const Highlight: React.FC<HighlightProps> = (props) => {
             {selectedPiece.isSelected && (
                 <div
                     className="w-[12.5%] h-[12.5%] bg-no-repeat bg-[length:100%_100%] absolute bg-[rgb(255,255,51,0.5)]"
-                    style={{ transform: `translate(${col * 100}%, ${row * 100}%)` }}
+                    style={{ transform: `translate(${col * 100}%, ${(flip == ("w" as Color) ? row : 7 - row) * 100}%)` }}
                 ></div>
             )}
-            {history && <PrevHighlight history={history} />}
+            {history && <PrevHighlight flip={flip} history={history} />}
         </>
     );
 };

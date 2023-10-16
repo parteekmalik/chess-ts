@@ -10,7 +10,7 @@ const ComputerBoard: React.FC = () => {
     const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, square: "a0" as Square });
     const [game, setGame] = useState<Chess>(new Chess());
     const [moveundone, setMoveundo] = useState<string[]>([]);
-    const [turn , setTurn] = useState<Color>("w");
+    const [turn, setTurn] = useState<Color>("w");
 
     const clickHandle = (props: { from: Square; to: Square }) => {
         const { from, to } = props;
@@ -29,12 +29,16 @@ const ComputerBoard: React.FC = () => {
             randomMove();
         }
     }, [game.turn()]);
+
     const randomMove = () => {
-        const newgame = _.cloneDeep(game);
-        const moves = game.moves();
-        newgame.move(moves[Math.floor(Math.random() * moves.length)]);
-        setGame(newgame);
-        setSelectedPiece({ ...selectedPiece, isSelected: false });
+        if (moveundone.length) return;
+        if (!game.isGameOver()) {
+            const newgame = _.cloneDeep(game);
+            const moves = newgame.moves();
+            newgame.move(moves[Math.floor(Math.random() * moves.length)]);
+            setGame(newgame);
+            setSelectedPiece({ ...selectedPiece, isSelected: false });
+        }
     };
 
     return (

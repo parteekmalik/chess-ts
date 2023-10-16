@@ -1,15 +1,19 @@
 // ChessBoard.tsx
+import { Color } from "chess.js";
+
 interface ChessBoardProps {
     BoardLayout: ({ square: string; type: string; color: string } | null)[][];
+    turn: Color;
+    flip: Color;
 }
 const ChessBoard: React.FC<ChessBoardProps> = (props) => {
-    const { BoardLayout } = props;
+    const { BoardLayout, flip } = props;
     const squares: JSX.Element[] = [];
     BoardLayout.forEach((row, rowIndex) =>
         row.forEach((position, colIndex) => {
             if (position != null) {
                 const Style = {
-                    transform: `translate(${colIndex * 100}%, ${rowIndex * 100}%)`,
+                    transform: `translate(${colIndex * 100}%, ${(flip == "w" ? rowIndex : 7 - rowIndex) * 100}%)`,
                     backgroundImage: `url(/src/assets/images/${position.color + position.type}.png)`,
                 };
                 squares.push(

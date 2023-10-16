@@ -1,56 +1,36 @@
-const Coordinates: React.FC = () => {
-  return (
-    <svg viewBox="0 0 100 100" className="select-none absolute left-0 top-0">
-      <text x="0.75" y="3.5" fontSize="2.8" className="fill-[#8d675e]">
-        1
-      </text>
-      <text x="0.75" y="15.75" fontSize="2.8" className="fill-[#e7cdb2]">
-        2
-      </text>
-      <text x="0.75" y="28.25" fontSize="2.8" className="fill-[#8d675e]">
-        3
-      </text>
-      <text x="0.75" y="40.75" fontSize="2.8" className="fill-[#e7cdb2]">
-        4
-      </text>
-      <text x="0.75" y="53.25" fontSize="2.8" className="fill-[#8d675e]">
-        5
-      </text>
-      <text x="0.75" y="65.75" fontSize="2.8" className="fill-[#e7cdb2]">
-        6
-      </text>
-      <text x="0.75" y="78.25" fontSize="2.8" className="fill-[#8d675e]">
-        7
-      </text>
-      <text x="0.75" y="90.75" fontSize="2.8" className="fill-[#e7cdb2]">
-        8
-      </text>
-      <text x="10" y="99" fontSize="2.8" className="fill-[#e7cdb2]">
-        h
-      </text>
-      <text x="22.5" y="99" fontSize="2.8" className="fill-[#8d675e]">
-        g
-      </text>
-      <text x="35" y="99" fontSize="2.8" className="fill-[#e7cdb2]">
-        f
-      </text>
-      <text x="47.5" y="99" fontSize="2.8" className="fill-[#8d675e]">
-        e
-      </text>
-      <text x="60" y="99" fontSize="2.8" className="fill-[#e7cdb2]">
-        d
-      </text>
-      <text x="72.5" y="99" fontSize="2.8" className="fill-[#8d675e]">
-        c
-      </text>
-      <text x="85" y="99" fontSize="2.8" className="fill-[#e7cdb2]">
-        b
-      </text>
-      <text x="97.5" y="99" fontSize="2.8" className="fill-[#8d675e]">
-        a
-      </text>
-    </svg>
-  );
+import { Color } from "chess.js";
+
+const Coordinates: React.FC<{ turn: Color; flip: Color }> = (props) => {
+    const ranks: number[] = props.flip == "b" ? [1, 2, 3, 4, 5, 6, 7, 8] : [8, 7, 6, 5, 4, 3, 2, 1];
+    const ranksLoc: number[] = [3.5, 15.75, 28.25, 40.75, 53.25, 65.75, 78.25, 90.75];
+    const files: string[] = props.flip == "b" ? ["h", "g", "f", "e", "d", "c", "b", "a"] : ["a", "b", "c", "d", "e", "f", "g", "h"];
+    const filesLoc: number[] = [10, 22.5, 35, 47.5, 60, 72.5, 85, 97.5];
+    return (
+        <svg viewBox="0 0 100 100" className="select-none absolute left-0 top-0">
+            {ranks.map((_, i) => (
+                <text
+                    key={i}
+                    x="0.75" // Center the text horizontally
+                    y={ranksLoc[i]}
+                    fontSize="2.8"
+                    className={i % 2 === 0 ? "fill-[#000000]" : "fill-[#ffffff]"}
+                >
+                    {ranks[i]}
+                </text>
+            ))}
+            {files.map((letter, i) => (
+                <text
+                    key={i}
+                    x={filesLoc[i]} // Center the text horizontally
+                    y="99"
+                    fontSize="2.8"
+                    className={i % 2 === 0 ? "fill-[#000000]" : "fill-[#ffffff]"}
+                >
+                    {files[i]}
+                </text>
+            ))}
+        </svg>
+    );
 };
 
 export default Coordinates;

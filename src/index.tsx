@@ -17,9 +17,9 @@ const router = createBrowserRouter(
             <Route path="" element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
-            <Route path="live/:gameid/:userid/:turn" element={<Live />} />
-            <Route path="live/:gameid/:userid" element={<Live />} />
-            <Route path="live/:gameid" element={<Live />} />
+            <Route path="live/:matchid/:userid/:turn" element={<Live />} />
+            <Route path="live/:matchid/:userid" element={<Live />} />
+            <Route path="live/:matchid" element={<Live />} />
             <Route path="puzzle" element={<Puzzle />} />
             <Route path="play/online" element={<Online />} />
             <Route path="play/computer" element={<Computer />} />
