@@ -1,6 +1,6 @@
 // board.tsx
 import React, { useState, useEffect } from "react";
-import {  selectedPieceProps } from "../../modules/types";
+import { selectedPieceProps } from "../../modules/types";
 
 import { Chess, Square, Color } from "chess.js";
 import _ from "lodash";
@@ -42,7 +42,6 @@ const getTimeTillMove = (index: number, moveTime: number[], turn: Color) => {
 const LiveBoard: React.FC = () => {
     let hasLoaded = false;
     const [isover, setIsover] = useState<boolean>(false);
-    const [flip, setFlip] = useState<Color>(useParams().turn as Color);
     const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, square: "a0" as Square });
     const [game, setGame] = useState<Chess>(new Chess());
     const [moveundone, setMoveundo] = useState<string[]>([]);
@@ -186,7 +185,6 @@ const LiveBoard: React.FC = () => {
                         setMoveundo={setMoveundo}
                         setGame={setGame}
                         turn={turn}
-                        flip={flip}
                     />
                     <Banner
                         playerId={"player"}
@@ -215,17 +213,7 @@ const LiveBoard: React.FC = () => {
                         </div>
                     </div>
                 )}
-                <div className="" id="settings-bar">
-                    <div
-                        className="m-3 bg-green-500 text-white font-bold py-2 px-4 rounded cursor-pointer"
-                        onClick={() => {
-                            setFlip((cur) => (cur == "w" ? "b" : "w"));
-                        }}
-                    >
-                        flip
-                    </div>
-                    <div className="m-3 bg-green-500 text-white font-bold py-2 px-4 rounded cursor-pointer">setting</div>
-                </div>
+
                 <Displaymovesandbuttons
                     clickHandle={clickHandle}
                     selectedPiece={selectedPiece}
@@ -235,7 +223,6 @@ const LiveBoard: React.FC = () => {
                     setMoveundo={setMoveundo}
                     setGame={setGame}
                     turn={turn}
-                    flip={flip}
                 />
             </div>
         </div>

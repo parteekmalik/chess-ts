@@ -38,7 +38,6 @@ interface DisplaymovesandbuttonsProps {
     setMoveundo: React.Dispatch<React.SetStateAction<string[]>>;
     setGame: React.Dispatch<React.SetStateAction<Chess>>;
     turn: Color;
-    flip: Color;
 }
 
 const Displaymovesandbuttons: React.FC<DisplaymovesandbuttonsProps> = (props) => {
