@@ -171,11 +171,6 @@ const LiveBoard: React.FC = () => {
         <div className="">
             <div className="flex flex-row justify-center ">
                 <div className="flex flex-col relative">
-                    <Banner
-                        playerId={"opponent"}
-                        // time={moveundone.length > 0 ? getTimeTillMove(game.history().length, moveTime, turn).opponentTime : opponentLastTime}
-                        time={opponentLastTime}
-                    />
                     <Board
                         clickHandle={clickHandle}
                         selectedPiece={selectedPiece}
@@ -185,11 +180,8 @@ const LiveBoard: React.FC = () => {
                         setMoveundo={setMoveundo}
                         setGame={setGame}
                         turn={turn}
-                    />
-                    <Banner
-                        playerId={"player"}
-                        // time={moveundone.length > 0 ? getTimeTillMove(game.history().length, moveTime, turn).playerTime : playerLastTime}
-                        time={playerLastTime}
+                        opponent={{ name: "opponent", time: opponentLastTime }}
+                        player={{ name: "player", time: playerLastTime }}
                     />
                 </div>
                 {overStats.isover && (

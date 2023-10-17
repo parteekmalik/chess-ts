@@ -52,6 +52,8 @@ const ComputerBoard: React.FC = () => {
                 setMoveundo={setMoveundo}
                 setGame={setGame}
                 turn={turn}
+                opponent={{ name: "stockfish" }}
+                player={{ name: "player" }}
             />
         </div>
     );
