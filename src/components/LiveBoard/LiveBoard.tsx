@@ -12,8 +12,6 @@ import Banner from "../../modules/banner/banner";
 import moment from "moment";
 import axios from "axios";
 
-const socket = io("http://localhost:3001");
-
 async function makeHttpRequest(url: string): Promise<any> {
     try {
         const response = await axios.get(url);
@@ -40,7 +38,8 @@ const getTimeTillMove = (index: number, moveTime: number[], turn: Color) => {
     else return { opponentTime: whiteTimeTaken, playerTime: blackTimeTaken };
 };
 const LiveBoard: React.FC = () => {
-    let hasLoaded = false;
+    const [hasLoaded,setHasLoaded] =useState<boolean>(false);
+    const [socket, setSocket] = useState(io("http://localhost:3001"));
     const [isover, setIsover] = useState<boolean>(false);
     const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, square: "a0" as Square });
     const [game, setGame] = useState<Chess>(new Chess());
@@ -86,7 +85,7 @@ const LiveBoard: React.FC = () => {
         if (!hasLoaded) {
             socket.emit("connectwithuserid", { userid, matchid });
             // console.log("connectwithuserid");
-            hasLoaded = true;
+            setHasLoaded(true);
         }
         async function initialize_prev_moves(msg: {
             history: string[];
