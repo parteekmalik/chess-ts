@@ -2,7 +2,7 @@ import React from "react";
 import convertMsToplayerTime from "../convertMsToTime";
 
 interface BannerProps {
-    data: { name: string; time?: number;gameTime?: number };
+    data: { name: string; time?: number;gameTime?: { baseTime: number, incrementTime: number } };
 }
 const Banner: React.FC<BannerProps> = (props) => {
     const { name, time,gameTime } = props.data;
@@ -15,7 +15,7 @@ const Banner: React.FC<BannerProps> = (props) => {
             </div>
             {time !== undefined && gameTime !== undefined ? (
                 <div className="m-3 ml-auto bg-green-500 text-white font-bold py-2 px-4 rounded">
-                    {convertMsToplayerTime(60000 * gameTime - time)}</div>
+                    {convertMsToplayerTime(60000 * gameTime.baseTime - time)}</div>
             ) : null}
         </div>
     );

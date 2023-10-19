@@ -41,7 +41,7 @@ interface DisplaymovesandbuttonsProps {
 }
 
 const Displaymovesandbuttons: React.FC<DisplaymovesandbuttonsProps> = (props) => {
-    const { game, moveundone, setGame, setSelectedPiece, setMoveundo, selectedPiece,flip } = props;
+    const { game, moveundone, setGame, setSelectedPiece, setMoveundo, selectedPiece } = props;
     const handleprev = (event: React.MouseEvent) => {
         const newgame = _.cloneDeep(game);
         if (newgame.history()[newgame.history().length - 1]) setMoveundo([...moveundone, newgame.history()[newgame.history().length - 1]]);

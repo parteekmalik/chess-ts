@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export default function Home() {
     return (
-        <div className="flex flex-col justify-center items-center ">
+        <div className="flex m-auto flex-col justify-center items-center ">
             <div className="max-w-[110rem] text-gray-800 ">
                 <div className="w-[100%] flex flex-row justify-center items-center mb-10  max-w-[108rem]">
                     <img className="max-w-[40rem] w-[40rem]  m-10" src="./src/assets/images/board_img.png" alt="chess_board"></img>

@@ -38,7 +38,7 @@ const getTimeTillMove = (index: number, moveTime: number[], turn: Color) => {
 };
 const LiveBoard: React.FC = () => {
     const [hasLoaded,setHasLoaded] =useState<boolean>(false);
-    const [gameType,setGameType] = useState(10);
+    const [gameType,setGameType] = useState({ baseTime: 10, incrementTime: 0 });
     const [socket, setSocket] = useState(io("http://localhost:3001"));
     const [isover, setIsover] = useState<boolean>(false);
     const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, square: "a0" as Square });

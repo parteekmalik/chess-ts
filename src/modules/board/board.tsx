@@ -14,7 +14,7 @@ interface BoardProps {
     turn: Color;
     opponent: { name: string; time?: number };
     player: { name: string; time?: number };
-    gameType?: number;
+    gameType?: { baseTime: number, incrementTime: number };
     // Make the specific props optional
     selectedPiece?: selectedPieceProps;
     clickHandle?: (props: { from: Square; to: Square }) => void;
