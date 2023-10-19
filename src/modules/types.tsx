@@ -11,8 +11,8 @@ export interface selectedPieceProps {
 
 export const checkForValidClick = (
     event: React.MouseEvent,
-    setSelectedPiece: React.Dispatch<React.SetStateAction<{ isSelected: boolean; square: Square }>>,
-    flip: Color
+    flip: Color,
+    setSelectedPiece?: React.Dispatch<React.SetStateAction<{ isSelected: boolean; square: Square }>>,
 ) => {
     const { clientX, clientY, currentTarget } = event;
     const { left, top, right, bottom } = currentTarget.getBoundingClientRect();
@@ -25,7 +25,7 @@ export const checkForValidClick = (
     const col = isValid ? Math.floor((clientX - left) / squareSize) : -1;
     const row = isValid ? Math.floor((clientY - top) / squareSize) : -1;
 
-    if (!isValid) setSelectedPiece({ isSelected: false, square: "a0" as Square });
+    if (!isValid) setSelectedPiece ? setSelectedPiece({ isSelected: false, square: "a0" as Square }) : {};
     if (flip == "w" as Color) return { isValid, square: SQUARES[row * 8 + col] };
     else return { isValid, square: SQUARES[(7 - row) * 8 +  col] };
 };

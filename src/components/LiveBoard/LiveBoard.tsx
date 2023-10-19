@@ -8,7 +8,6 @@ import io from "socket.io-client";
 import { useParams } from "react-router-dom";
 import Board from "../../modules/board/board";
 import Displaymovesandbuttons from "../../modules/displaymovesandbuttons/displaymovesandbuttons";
-import Banner from "../../modules/banner/banner";
 import moment from "moment";
 import axios from "axios";
 
@@ -39,6 +38,7 @@ const getTimeTillMove = (index: number, moveTime: number[], turn: Color) => {
 };
 const LiveBoard: React.FC = () => {
     const [hasLoaded,setHasLoaded] =useState<boolean>(false);
+    const [gameType,setGameType] = useState(10);
     const [socket, setSocket] = useState(io("http://localhost:3001"));
     const [isover, setIsover] = useState<boolean>(false);
     const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, square: "a0" as Square });
@@ -181,6 +181,7 @@ const LiveBoard: React.FC = () => {
                         turn={turn}
                         opponent={{ name: "opponent", time: opponentLastTime }}
                         player={{ name: "player", time: playerLastTime }}
+                        gameType={gameType}
                     />
                 </div>
                 {overStats.isover && (
