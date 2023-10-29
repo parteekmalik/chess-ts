@@ -10,15 +10,17 @@ import Live from "./components/LiveBoard/LiveBoard";
 import Puzzle from "./components/Puzzle/Puzzle";
 import Online from "./components/Online/Online";
 import Computer from "./components/Computer/Computer";
-import Login from "./components/Login/Login";
 import Logout from "./components/Logout/Logout";
+import RegisterForm from "./components/register/register";
+import LoginForm from "./components/Login/Login";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/" element={<Layout />}>
             <Route path="" element={<Home />} />
             <Route path="about" element={<About />} />
-            <Route path="login" element={<Login />} />
+            <Route path="login" element={<LoginForm />} />
+            <Route path="register" element={<RegisterForm />} />
             <Route path="logout" element={<Logout />} />
             <Route path="contact" element={<Contact />} />
             <Route path="live/:matchid/:userid/:turn" element={<Live />} />

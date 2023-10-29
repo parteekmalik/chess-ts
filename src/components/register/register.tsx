@@ -1,43 +1,39 @@
-// src/LoginForm.js
+// src/RegisterForm.js
 import React, { useState } from "react";
 import axios from "axios";
 import { redirect, useNavigate } from "react-router-dom";
 
-const LoginForm = () => {
+const RegisterForm = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [istaken, setIstaken] = useState(false);
     const navigate = useNavigate();
 
-    const [loginError, setLoginError] = useState(false);
-
-    const handleLogin = async () => {
+    const handleRegister = async () => {
         try {
-            console.log(username, password);
-            const response = await axios.get(`http://localhost:3002/login/${username}/${password}`);
+            const response = await axios.get(`http://localhost:3002/register/${username}/${password}`);
 
             if (response.status === 200) {
-                // Save the username to sessionStorage on successful login
-                sessionStorage.setItem("username", username);
-                navigate("/");
+                navigate("/login");
             }
         } catch (error) {
-            setLoginError(true);
+            setIstaken(true);
         }
     };
 
     return (
         <>
-            login
+            register
             <div className="flex flex-col justify-center items-center bg-gray-200 m-auto">
                 <input className="m-5" type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
                 <input className="mb-2" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                {loginError && <div className="text-red-800">username or password is incorrect</div>}
-                <button className="m-5" onClick={handleLogin}>
-                    Login
+                {istaken && <div className="text-red-800">username is not available(try another)</div>}
+                <button className="m-5" onClick={handleRegister}>
+                    register
                 </button>
             </div>
         </>
     );
 };
 
-export default LoginForm;
+export default RegisterForm;

@@ -36,10 +36,22 @@ const getTimeTillMove = (index: number, moveTime: number[], turn: Color) => {
     if (turn == "w") return { playerTime: whiteTimeTaken, opponentTime: blackTimeTaken };
     else return { opponentTime: whiteTimeTaken, playerTime: blackTimeTaken };
 };
+
+// const socket = io("http://localhost:3001",{
+//     autoConnect: false
+// });
+const liveBoardLoader = async ()=> {
+    const gameid = useParams();
+    const response = await axios.get(`http://localhost:3002/live/${gameid}`);
+}
 const LiveBoard: React.FC = () => {
-    const [hasLoaded,setHasLoaded] =useState<boolean>(false);
-    const [gameType,setGameType] = useState({ baseTime: 10, incrementTime: 0 });
-    const [socket, setSocket] = useState(io("http://localhost:3001"));
+    const [hasLoaded, setHasLoaded] = useState<boolean>(false);
+    const [gameType, setGameType] = useState({ baseTime: 10, incrementTime: 0 });
+    const [socket, setSocket] = useState(
+        io("http://localhost:3001", {
+            autoConnect: false,
+        })
+    );
     const [isover, setIsover] = useState<boolean>(false);
     const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, square: "a0" as Square });
     const [game, setGame] = useState<Chess>(new Chess());
@@ -83,10 +95,14 @@ const LiveBoard: React.FC = () => {
     //socket.io lisners
     useEffect(() => {
         if (!hasLoaded) {
+            // socket.connect();
             socket.emit("connectwithuserid", { userid, matchid });
-            // console.log("connectwithuserid");
+            console.log("connectwithuserid");
             setHasLoaded(true);
+            // hasLoaded = false;
         }
+    });
+    useEffect(() => {
         async function initialize_prev_moves(msg: {
             history: string[];
             startedAt: Date;

@@ -1,18 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Board from "../../modules/board/board";
 import Banner from "../../modules/banner/banner";
 import { Chess } from "chess.js";
+import axios from "axios";
 
 function Online() {
-    const navigate = useNavigate();
-    const [userName, setUserName] = useState("");
-    const [selectedGameType, setSelectedGameType] = useState<{
-        baseTime: number;
-        incrementTime: number;
-    }>({ baseTime: 10, incrementTime: 0 });
-    const [selectedoption, setSelectedoption] = useState("new game");
-    const [isGameOption, setIsGameOption] = useState(false);
     const gameTypes = {
         bullet: [
             { baseTime: 1, incrementTime: 0 },
@@ -30,11 +23,37 @@ function Online() {
             { baseTime: 30, incrementTime: 0 },
         ],
     };
+    const navigate = useNavigate();
+    const [userName, setUserName] = useState("");
+    const [selectedGameType, setSelectedGameType] = useState<{
+        baseTime: number;
+        incrementTime: number;
+    }>({ baseTime: 10, incrementTime: 0 });
+    const [isSelectedoption, setIsSelectedoption] = useState("new game");
+    const [isGameOption, setIsGameOption] = useState(false);
+    useEffect(() => {
+        if (!sessionStorage.getItem("username")) navigate("/login");
+    }, []);
 
-    const handleSubmit = (e: any) => {
+    // const handleSubmit = (e: any) => {
+    //     e.preventDefault();
+    //     // localStorage.setItem("userName", userName);
+    //     navigate("/live/12345/1/w");
+    // };
+    const [userid, setUUserid] = useState("1");
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // localStorage.setItem("userName", userName);
-        navigate("/live/12345/1/w");
+
+        try {
+            const payload = { userid, rating: "1000", gameType: selectedGameType };
+            const response = await axios.post("http://localhost:3002/new", payload);
+            console.log("Response:", response.data);
+            navigate(`/live/${response.data.gameid}/${userid}/${response.data.white === userid ? "w" : "b"}`);
+            // Do something with the response data
+        } catch (error) {
+            console.error("Error:", error);
+            // Handle the error
+        }
     };
     return (
         <div className="flex justify-center h-full">
@@ -48,30 +67,34 @@ function Online() {
             <div className="flex flex-col h-full  text-white" id="options">
                 <div className="flex text-xl  cursor-pointer">
                     <div
-                        className={`p-5 ${selectedoption === "new game" ? "bg-gray-500" : "bg-gray-700"}`}
-                        onClick={() => setSelectedoption("new game")}
+                        className={`p-5 ${isSelectedoption === "new game" ? "bg-gray-500" : "bg-gray-700"}`}
+                        onClick={() => setIsSelectedoption("new game")}
                     >
                         new game
                     </div>
-                    <div className={`p-5 ${selectedoption === "games" ? "bg-gray-500" : "bg-gray-700"}`} onClick={() => setSelectedoption("games")}>
+                    <div
+                        className={`p-5 ${isSelectedoption === "games" ? "bg-gray-500" : "bg-gray-700"}`}
+                        onClick={() => setIsSelectedoption("games")}
+                    >
                         games
                     </div>
                     <div
-                        className={`p-5 ${selectedoption === "players" ? "bg-gray-500" : "bg-gray-700"}`}
-                        onClick={() => setSelectedoption("players")}
+                        className={`p-5 ${isSelectedoption === "players" ? "bg-gray-500" : "bg-gray-700"}`}
+                        onClick={() => setIsSelectedoption("players")}
                     >
                         players
                     </div>
                 </div>
 
                 <div className="flex h-full flex-col bg-gray-500 user">
-                    {selectedoption === "new game" && (
+                    {isSelectedoption === "new game" && (
                         <>
                             <div
                                 className="my-2 mx-10 bg-gray-400 text-white font-bold py-2 px-4 rounded cursor-pointer text-center"
                                 onClick={() => setIsGameOption((prev) => !prev)}
                             >
-                                {selectedGameType.baseTime} | {selectedGameType.incrementTime}
+                                {selectedGameType.baseTime}
+                                {selectedGameType.incrementTime > 0 ? " | " + selectedGameType.incrementTime : " min"}
                             </div>
                             {isGameOption && (
                                 <>
@@ -88,7 +111,8 @@ function Online() {
                                                         className="bg-slate-700 rounded px-5 py-2 m-2 cursor-pointer"
                                                         onClick={() => setSelectedGameType(game)}
                                                     >
-                                                        {game.baseTime} | {game.incrementTime}
+                                                        {game.baseTime}
+                                                        {game.incrementTime > 0 ? " | " + game.incrementTime : " min"}
                                                     </li>
                                                 ))}
                                             </ul>
@@ -96,7 +120,10 @@ function Online() {
                                     ))}
                                 </>
                             )}
-                            <div className="mt-2 mx-10  mb-20 bg-green-600 text-white font-bold py-2 px-4 rounded cursor-pointer text-center">
+                            <div
+                                className="mt-2 mx-10  mb-20 bg-green-600 text-white font-bold py-2 px-4 rounded cursor-pointer text-center"
+                                onClick={handleSubmit}
+                            >
                                 Play
                             </div>
                             <div className="flex text-2xl justify-center m-3 bg-gray-400 text-white font-bold py-2 px-4 rounded cursor-pointer text-center">
