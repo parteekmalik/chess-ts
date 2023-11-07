@@ -37,21 +37,21 @@ const getTimeTillMove = (index: number, moveTime: number[], turn: Color) => {
     else return { opponentTime: whiteTimeTaken, playerTime: blackTimeTaken };
 };
 
-// const socket = io("http://localhost:3001",{
-//     autoConnect: false
-// });
-const liveBoardLoader = async ()=> {
-    const gameid = useParams();
-    const response = await axios.get(`http://localhost:3002/live/${gameid}`);
-}
+// const liveBoardLoader = async ()=> {
+//     const gameid = useParams();
+//     const response = await axios.get(`http://localhost:3002/live/${gameid}`);
+// }
+console.log("hiiii");
+const socket = io("http://localhost:3001");
+// let hasLoaded = false;
 const LiveBoard: React.FC = () => {
     const [hasLoaded, setHasLoaded] = useState<boolean>(false);
     const [gameType, setGameType] = useState({ baseTime: 10, incrementTime: 0 });
-    const [socket, setSocket] = useState(
-        io("http://localhost:3001", {
-            autoConnect: false,
-        })
-    );
+    // const [socket, setSocket] = useState(
+    //     io("http://localhost:3001", {
+    //         autoConnect: false,
+    //     })
+    // );
     const [isover, setIsover] = useState<boolean>(false);
     const [selectedPiece, setSelectedPiece] = useState<selectedPieceProps>({ isSelected: false, square: "a0" as Square });
     const [game, setGame] = useState<Chess>(new Chess());
@@ -70,10 +70,13 @@ const LiveBoard: React.FC = () => {
 
     useEffect(() => {
         console.log("useeffect moveTime -> ",moveTime.map((d) => moment(d).toDate())); //prettier-ignore
-        const { opponentTime, playerTime } = getTimeTillMove(game.history().length + moveundone.length, moveTime, turn);
-        console.log("opponentTime -> ", opponentTime, "playerTime -> ", playerTime);
-        setOpponentLastTime(opponentTime);
-        setPlayerLastTime(playerTime);
+        makeHttpRequest("http://localhost:3002/getTime").then((data: Date) => {
+            moveTime.push(moment(data).toDate().getTime());
+            const { opponentTime, playerTime } = getTimeTillMove(game.history().length + moveundone.length, moveTime, turn);
+            console.log("opponentTime -> ", opponentTime, "playerTime -> ", playerTime);
+            setOpponentLastTime(opponentTime);
+            setPlayerLastTime(playerTime);
+        });
     }, [moveTime, game]);
 
     useEffect(() => {
@@ -96,80 +99,52 @@ const LiveBoard: React.FC = () => {
     useEffect(() => {
         if (!hasLoaded) {
             // socket.connect();
-            socket.emit("connectwithuserid", { userid, matchid });
-            console.log("connectwithuserid");
-            setHasLoaded(true);
+            setHasLoaded(() => {
+                socket.emit("connectwithuserid", { userid, matchid });
+                console.log("connectwithuserid");
+                return true;
+            });
             // hasLoaded = false;
         }
-    });
+        return () => {};
+    }, []);
     useEffect(() => {
-        async function initialize_prev_moves(msg: {
-            history: string[];
-            startedAt: Date;
-            moveTime: Date[];
-            curTime: Date;
-            stats: { isover: boolean; winner: string; reason: string };
-        }) {
-            const { history, stats } = msg;
-            let { moveTime } = msg;
-            console.log(msg);
-
-            setGame((game) => {
-                const g = _.cloneDeep(game);
-                history.map((m) => g.move(m));
-                return g;
-            });
-            if (stats.isover) moveTime.pop();
-            await makeHttpRequest("http://localhost:3002/getTime").then((data) => {
-                moveTime.push(moment(data).toDate());
-                setMoveTime(moveTime.map((d) => moment(d).toDate().getTime()));
-            });
-            setOverStats(stats);
-        }
         socket.on(
             "initialize-prev-moves",
-            (msg: {
-                history: string[];
-                startedAt: Date;
-                moveTime: Date[];
-                curTime: Date;
-                stats: { isover: boolean; winner: string; reason: string };
-            }) => {
-                initialize_prev_moves(msg);
+            (msg: { history: string[]; moveTime: Date[]; stats: { isover: boolean; winner: string; reason: string } }) => {
+                console.log("initialize_prev_moves");
+                const { history, stats } = msg;
+                let { moveTime } = msg;
+                console.log(msg);
+
+                setGame((g) => {
+                    for (let i = g.history().length; i < history.length; i++) g.move(history[i]);
+                    return g;
+                });
+
+                setMoveTime(moveTime.map((d) => moment(d).toDate().getTime()));
+                setOverStats(stats);
             }
         );
-        socket.on("message-rcv", (msg: { move: string; time: Date }) => {
-            const { move, time } = msg;
-            const moveTime = moment(time).toDate().getTime();
-            console.log("message-rcv -> ", msg, moveTime, moment().toDate().getTime());
-            setMoveTime((t) => [...t, moveTime]);
-            setGame((g) => {
-                let game = _.cloneDeep(g);
-                game.move(move);
-                setSelectedPiece({ ...selectedPiece, isSelected: false });
-                return game;
-            });
-        });
-        socket.on("game-over-byMove", (msg: { move: string; time: Date; stats: { isover: boolean; reason: string; winner: string } }) => {
+
+        socket.on("message-rcv", (msg: { move: string[]; time: Date[]; stats?: { isover: boolean; reason: string; winner: string } }) => {
             setIsover(true);
             const { move, time, stats } = msg;
-            const moveTime = moment(time).toDate().getTime();
-            console.log("message-rcv -> ", msg, moveTime, moment().toDate().getTime());
-            setMoveTime((t) => [...t, moveTime]);
+            console.log("message-rcv -> ", msg);
+            setMoveTime((t) => [...t, ...time.map((d) => moment(d).toDate().getTime())]);
+
             setGame((g) => {
-                let game = _.cloneDeep(g);
-                game.move(move);
-                setSelectedPiece({ ...selectedPiece, isSelected: false });
-                return game;
+                for (let i = g.history().length; i < move.length; i++) g.move(move[i]);
+                return g;
             });
-            setOverStats(stats);
+            setSelectedPiece({ ...selectedPiece, isSelected: false });
+            if (stats) setOverStats(stats);
         });
 
         // Clean up the event listener when the component unmounts
         return () => {
             socket.off("message-rcv");
             socket.off("initialize-prev-moves");
-            socket.off("game-over-byMove");
         };
     }, []);
 
