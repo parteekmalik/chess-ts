@@ -1,7 +1,8 @@
 // src/LoginForm.js
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { redirect, useNavigate } from "react-router-dom";
+import PageContext from "../../contexts/page/PageContext";
 
 const LoginForm = () => {
     const [username, setUsername] = useState("");
@@ -9,6 +10,7 @@ const LoginForm = () => {
     const navigate = useNavigate();
 
     const [loginError, setLoginError] = useState(false);
+    const { PageState, PageDispatch } = useContext(PageContext);
 
     const handleLogin = async () => {
         try {
@@ -17,7 +19,9 @@ const LoginForm = () => {
 
             if (response.status === 200) {
                 // Save the username to sessionStorage on successful login
-                sessionStorage.setItem("username", username);
+                PageDispatch({ type: "update_uid", payload: username });
+
+                sessionStorage.setItem("uid", username);
                 navigate("/");
             }
         } catch (error) {

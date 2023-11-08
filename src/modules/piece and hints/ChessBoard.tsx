@@ -1,19 +1,18 @@
 // ChessBoard.tsx
 import { Color } from "chess.js";
+import { useContext } from "react";
+import SocketContext from "../../contexts/socket/SocketContext";
 
-interface ChessBoardProps {
-    BoardLayout: ({ square: string; type: string; color: string } | null)[][];
-    turn: Color;
-    flip: Color;
-}
+interface ChessBoardProps {}
 const ChessBoard: React.FC<ChessBoardProps> = (props) => {
-    const { BoardLayout, flip } = props;
+    const { game, flip } = useContext(SocketContext).SocketState;
+
     const squares: JSX.Element[] = [];
-    BoardLayout.forEach((row, rowIndex) =>
+    game.board().forEach((row, rowIndex) =>
         row.forEach((position, colIndex) => {
             if (position != null) {
                 const Style = {
-                    transform: `translate(${colIndex * 100}%, ${(flip == "w" ? rowIndex : 7 - rowIndex) * 100}%)`,
+                    transform: `translate(${colIndex * 100}%, ${(flip === "w" ? rowIndex : 7 - rowIndex) * 100}%)`,
                     backgroundImage: `url(/src/assets/images/${position.color + position.type}.png)`,
                 };
                 squares.push(
