@@ -1,45 +1,47 @@
 import { createContext } from "react";
 import { Socket } from "socket.io-client";
-import { Chess, Color } from "chess.js";
+import { Chess, Color, Square } from "chess.js";
 import { selectedPieceProps } from "../../modules/types";
-import { ISocketContextActions } from "./SocketReducer";
+import { ISocketContextActions, moveTimeType } from "./SocketReducer";
 
 export interface ISocketContextState {
     socket: Socket | undefined;
-    game: Chess;
-    movesTime: number[];
-    oponentId: string;
-    playerId: string;
-    whitePlayerId:string;
-    blackPlayerId:string;
+    whitePlayerId: string;
+    blackPlayerId: string;
     matchid: string;
     stats: {
         isover: boolean;
         reason: string;
         winner: string;
     };
-    movesUndone: string[];
-    selectedPiece: selectedPieceProps;
+    gameType: { baseTime: number; incrementTime: number };
+    game: Chess;
     flip: Color;
+    selectedPiece: Square | "";
+    movesUndone: string[];
+    movesTime: number[];
+    whiteTime: number;
+    blackTime: number;
 }
 
 export const defaultSocketContextState: ISocketContextState = {
     socket: undefined,
-    game: new Chess(),
-    movesTime: [],
-    whitePlayerId:"",
-    blackPlayerId:"",
-    oponentId: "",
-    playerId: "",
+    whitePlayerId: "",
+    blackPlayerId: "",
     matchid: "not_set",
     stats: {
         isover: false,
         winner: "",
         reason: "",
     },
-    movesUndone: [],
-    selectedPiece: { isSelected: false, square: "a1" },
+    gameType: { baseTime: 0, incrementTime: 0 },
+    game: new Chess(),
     flip: "w",
+    selectedPiece: "",
+    movesUndone: [],
+    movesTime: [],
+    whiteTime: 0,
+    blackTime: 0,
 };
 
 export interface ISocketContextProps {

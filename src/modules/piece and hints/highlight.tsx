@@ -33,10 +33,10 @@ const Highlight: React.FC<HighlightProps> = (props) => {
     const { flip } = useContext(SocketContext).SocketState;
 
     const history = SocketState.game.history({ verbose: true }).pop();
-    const [row, col] = toRowCol(SocketState.selectedPiece.square);
+    const { row, col } = toRowCol(SocketState.selectedPiece as Square);
     return (
         <>
-            {SocketState.selectedPiece.isSelected && (
+            {SocketState.selectedPiece && (
                 <div
                     className="w-[12.5%] h-[12.5%] bg-no-repeat bg-[length:100%_100%] absolute bg-[rgb(255,255,51,0.5)]"
                     style={{ transform: `translate(${col * 100}%, ${(flip === "w" ? row : 7 - row) * 100}%)` }}

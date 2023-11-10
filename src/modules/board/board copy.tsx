@@ -24,33 +24,43 @@ const Board: React.FC<BoardProps> = (props) => {
         const { isValid, square } = checkForValidClick(event, SocketState.flip);
         if (!isValid || SocketState.movesUndone.length) return;
         if (
-            SocketState.selectedPiece.isSelected &&
+            SocketState.selectedPiece &&
             PageState.uid === (SocketState.game.turn() === "w" ? SocketState.whitePlayerId : SocketState.blackPlayerId)
         ) {
-            const from = SocketState.selectedPiece.square;
+            const from = SocketState.selectedPiece as Square;
             const to = square;
             clickHandle({ from, to });
-            SocketDispatch({ type: "update_selected_square", payload: { square: "a1", isSelected: false } });
+            SocketDispatch({ type: "update_selected_square", payload: "" });
         }
         if (SocketState.game.board()[8 - parseInt(square[1], 10)][square.charCodeAt(0) - "a".charCodeAt(0)])
-            SocketDispatch({ type: "update_selected_square", payload: { square, isSelected: true } });
-        else SocketDispatch({ type: "update_selected_square", payload: { square: "a1", isSelected: false } });
+            SocketDispatch({ type: "update_selected_square", payload: square });
+        else SocketDispatch({ type: "update_selected_square", payload: "" });
     };
 
     return (
         <div className="flex ">
             <div className="flex flex-col">
-                <Banner data={{ name: SocketState.blackPlayerId, gameTime: { baseTime: 10, incrementTime: 0 } }} />
+                <Banner
+                    data={{
+                        name: SocketState.flip === "w" ? SocketState.blackPlayerId : SocketState.whitePlayerId,
+                        time: SocketState.flip === "w" ? SocketState.blackTime : SocketState.whiteTime,
+                    }}
+                />
                 <div
                     className={` bg-[url('./assets/images/blank_board_img.png')] bg-no-repeat bg-[length:100%_100%] relative w-[500px] h-[500px]`}
                     onClick={PieceLogic}
                 >
                     <Coordinates />
-                    {SocketState.selectedPiece && <Highlight />}
+                    <Highlight />
                     <ChessBoard />
                     {SocketState.selectedPiece && <ChessBoardHints />}
                 </div>
-                <Banner data={{ name: SocketState.whitePlayerId, gameTime: { baseTime: 10, incrementTime: 0 } }} />
+                <Banner
+                    data={{
+                        name: SocketState.flip === "w" ? SocketState.whitePlayerId : SocketState.blackPlayerId,
+                        time: SocketState.flip === "w" ? SocketState.whiteTime : SocketState.blackTime,
+                    }}
+                />
             </div>
             <div className="" id="settings-bar">
                 <div

@@ -25,8 +25,8 @@ export const checkForValidClick = (event: React.MouseEvent, flip: Color) => {
     else return { isValid, square: SQUARES[(7 - row) * 8 + col] };
 };
 
-export const toRowCol = (square: Square): number[] => {
-    const rowIndex = Math.floor(SQUARES.indexOf(square) / 8);
-    const colIndex = SQUARES.indexOf(square) % 8;
-    return [rowIndex, colIndex];
+export const toRowCol = (square: Square): { row: number; col: number } => {
+    const row = Math.floor(SQUARES.indexOf(square) / 8);
+    const col = SQUARES.indexOf(square) % 8;
+    return { row, col };
 };
