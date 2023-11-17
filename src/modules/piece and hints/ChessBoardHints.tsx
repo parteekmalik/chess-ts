@@ -2,29 +2,30 @@
 import { Square, Chess, Color } from "chess.js";
 import { selectedPieceProps } from "../types";
 import { toRowCol } from "../types";
+import { useContext } from "react";
+import SocketContext from "../../contexts/socket/SocketContext";
+import PageContext from "../../contexts/page/PageContext";
 
-interface ChessBoardProps {
-    selectedPiece: selectedPieceProps;
-    game: Chess;
-    turn: Color;
-    flip: Color;
-}
+interface ChessBoardProps {}
 const ChessBoardHints: React.FC<ChessBoardProps> = (props) => {
-    const { selectedPiece, game, turn,flip } = props;
+    const { game, selectedPiece, whitePlayerId, blackPlayerId } = useContext(SocketContext).SocketState;
+    const { uid } = useContext(PageContext).PageState;
+    const { flip } = useContext(SocketContext).SocketState;
+
     const BoardLayout = game.board();
-    
+
     const squares: JSX.Element[] = [];
-    if(turn != game.turn())return squares;
-    
-    if (selectedPiece.isSelected) {
-        game.moves({ verbose: true, square: selectedPiece.square })
+    if (uid !== (game.turn() === "w" ? whitePlayerId : blackPlayerId)) return squares;
+
+    if (selectedPiece) {
+        game.moves({ verbose: true, square: selectedPiece })
             .map((move) => ({ from: move.from as Square, to: move.to as Square, promotion: move.promotion }))
             .forEach((square) => {
-                const [rowIndex, colIndex] = toRowCol(square.to);
+                const {row, col} = toRowCol(square.to);
                 const Style = {
-                    transform: `translate(${colIndex * 100}%, ${(flip == ("b" as Color) ? 7 - rowIndex : rowIndex) * 100}%)`,
+                    transform: `translate(${col * 100}%, ${(flip === "b" ? 7 - row : row) * 100}%)`,
                 };
-                if (BoardLayout[rowIndex][colIndex])
+                if (BoardLayout[row][col])
                     squares.push(
                         <div
                             key={"hint" + square.to + square.promotion}

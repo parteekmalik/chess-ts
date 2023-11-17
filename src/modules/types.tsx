@@ -9,11 +9,7 @@ export interface selectedPieceProps {
     square: Square;
 }
 
-export const checkForValidClick = (
-    event: React.MouseEvent,
-    flip: Color,
-    setSelectedPiece?: React.Dispatch<React.SetStateAction<{ isSelected: boolean; square: Square }>>,
-) => {
+export const checkForValidClick = (event: React.MouseEvent, flip: Color) => {
     const { clientX, clientY, currentTarget } = event;
     const { left, top, right, bottom } = currentTarget.getBoundingClientRect();
 
@@ -25,13 +21,12 @@ export const checkForValidClick = (
     const col = isValid ? Math.floor((clientX - left) / squareSize) : -1;
     const row = isValid ? Math.floor((clientY - top) / squareSize) : -1;
 
-    if (!isValid) setSelectedPiece ? setSelectedPiece({ isSelected: false, square: "a0" as Square }) : {};
-    if (flip == "w" as Color) return { isValid, square: SQUARES[row * 8 + col] };
-    else return { isValid, square: SQUARES[(7 - row) * 8 +  col] };
+    if (flip != ("b" as Color)) return { isValid, square: SQUARES[row * 8 + col] };
+    else return { isValid, square: SQUARES[(7 - row) * 8 + col] };
 };
 
-export const toRowCol = (square: Square): number[] => {
-    const rowIndex = Math.floor(SQUARES.indexOf(square) / 8);
-    const colIndex = SQUARES.indexOf(square) % 8;
-    return [rowIndex, colIndex];
+export const toRowCol = (square: Square): { row: number; col: number } => {
+    const row = Math.floor(SQUARES.indexOf(square) / 8);
+    const col = SQUARES.indexOf(square) % 8;
+    return { row, col };
 };
