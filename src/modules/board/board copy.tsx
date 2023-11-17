@@ -41,10 +41,11 @@ const Board: React.FC<BoardProps> = (props) => {
         <div className="flex ">
             <div className="flex flex-col">
                 <Banner
-                    data={{
-                        name: SocketState.flip === "w" ? SocketState.blackPlayerId : SocketState.whitePlayerId,
-                        time: SocketState.flip === "w" ? SocketState.blackTime : SocketState.whiteTime,
-                    }}
+                    data={
+                        SocketState.flip === "w"
+                            ? { name: SocketState.blackPlayerId, time: SocketState.blackTime }
+                            : { name: SocketState.whitePlayerId, time: SocketState.whiteTime }
+                    }
                 />
                 <div
                     className={` bg-[url('./assets/images/blank_board_img.png')] bg-no-repeat bg-[length:100%_100%] relative w-[500px] h-[500px]`}
@@ -56,10 +57,11 @@ const Board: React.FC<BoardProps> = (props) => {
                     {SocketState.selectedPiece && <ChessBoardHints />}
                 </div>
                 <Banner
-                    data={{
-                        name: SocketState.flip === "w" ? SocketState.whitePlayerId : SocketState.blackPlayerId,
-                        time: SocketState.flip === "w" ? SocketState.whiteTime : SocketState.blackTime,
-                    }}
+                    data={
+                        SocketState.flip === "w"
+                            ? { name: SocketState.whitePlayerId, time: SocketState.whiteTime }
+                            : { name: SocketState.blackPlayerId, time: SocketState.blackTime }
+                    }
                 />
             </div>
             <div className="" id="settings-bar">
