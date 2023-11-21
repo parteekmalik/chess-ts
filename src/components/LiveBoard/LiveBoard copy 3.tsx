@@ -35,7 +35,7 @@ const LiveBoard: React.FC = () => {
         sendMove(requestData);
     };
     return (
-        <div className="">
+        <div className=""> 
             <Board
                 clickHandle={clickHandle}
                 selectedPiece={selectedPiece}

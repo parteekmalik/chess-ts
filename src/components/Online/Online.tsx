@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Board from "../../modules/board/board";
 import Banner from "../../modules/banner/banner";
 import { Chess } from "chess.js";
 import axios from "axios";
+import PageContext from "../../contexts/page/PageContext";
 
 function Online() {
     const gameTypes = {
@@ -31,8 +32,10 @@ function Online() {
     }>({ baseTime: 10, incrementTime: 0 });
     const [isSelectedoption, setIsSelectedoption] = useState("new game");
     const [isGameOption, setIsGameOption] = useState(false);
+    const { uid } = useContext(PageContext).PageState;
+
     useEffect(() => {
-        if (!sessionStorage.getItem("username")) navigate("/login");
+        if (!uid) navigate("/login");
     }, []);
 
     // const handleSubmit = (e: any) => {
@@ -45,10 +48,20 @@ function Online() {
         e.preventDefault();
 
         try {
-            const payload = { userid, rating: "1000", gameType: selectedGameType };
-            const response = await axios.post("http://localhost:3002/new", payload);
-            console.log("Response:", response.data);
-            navigate(`/live/${response.data.gameid}/${userid}/${response.data.white === userid ? "w" : "b"}`);
+            const payload = { userid, gameType: { ...selectedGameType, baseTime: selectedGameType.baseTime * 60000 } };
+            const response: {
+                black: number;
+                board: string;
+                created_at: string;
+                game_type: { baseTime: number; incrementTime: number };
+                match_id: string;
+                moves_history: string[];
+                reason: string;
+                white: string;
+                winner: string;
+            } = (await axios.post("http://localhost:3002/new", payload)).data;
+            console.log("Response:", response);
+            navigate(`/live/${response.match_id}/${userid}/${response.white === userid ? "w" : "b"}`);
             // Do something with the response data
         } catch (error) {
             console.error("Error:", error);
@@ -57,31 +70,16 @@ function Online() {
     };
     return (
         <div className="flex justify-center h-full">
-            <Board
-                game={new Chess()}
-                turn={"w"}
-                opponent={{ name: "opponent", time: 0 }}
-                player={{ name: "player", time: 0 }}
-                gameType={selectedGameType}
-            />
+            <Board game={new Chess()} turn={"w"} opponent={{ name: "opponent", time: 0 }} player={{ name: "player", time: 0 }} gameType={selectedGameType} />
             <div className="flex flex-col h-full  text-white" id="options">
                 <div className="flex text-xl  cursor-pointer">
-                    <div
-                        className={`p-5 ${isSelectedoption === "new game" ? "bg-gray-500" : "bg-gray-700"}`}
-                        onClick={() => setIsSelectedoption("new game")}
-                    >
+                    <div className={`p-5 ${isSelectedoption === "new game" ? "bg-gray-500" : "bg-gray-700"}`} onClick={() => setIsSelectedoption("new game")}>
                         new game
                     </div>
-                    <div
-                        className={`p-5 ${isSelectedoption === "games" ? "bg-gray-500" : "bg-gray-700"}`}
-                        onClick={() => setIsSelectedoption("games")}
-                    >
+                    <div className={`p-5 ${isSelectedoption === "games" ? "bg-gray-500" : "bg-gray-700"}`} onClick={() => setIsSelectedoption("games")}>
                         games
                     </div>
-                    <div
-                        className={`p-5 ${isSelectedoption === "players" ? "bg-gray-500" : "bg-gray-700"}`}
-                        onClick={() => setIsSelectedoption("players")}
-                    >
+                    <div className={`p-5 ${isSelectedoption === "players" ? "bg-gray-500" : "bg-gray-700"}`} onClick={() => setIsSelectedoption("players")}>
                         players
                     </div>
                 </div>
@@ -120,10 +118,7 @@ function Online() {
                                     ))}
                                 </>
                             )}
-                            <div
-                                className="mt-2 mx-10  mb-20 bg-green-600 text-white font-bold py-2 px-4 rounded cursor-pointer text-center"
-                                onClick={handleSubmit}
-                            >
+                            <div className="mt-2 mx-10  mb-20 bg-green-600 text-white font-bold py-2 px-4 rounded cursor-pointer text-center" onClick={handleSubmit}>
                                 Play
                             </div>
                             <div className="flex text-2xl justify-center m-3 bg-gray-400 text-white font-bold py-2 px-4 rounded cursor-pointer text-center">

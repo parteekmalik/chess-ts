@@ -9,11 +9,7 @@ export interface ISocketContextState {
     whitePlayerId: string;
     blackPlayerId: string;
     matchid: string;
-    stats: {
-        isover: boolean;
-        reason: string;
-        winner: string;
-    };
+    stats: string;
     gameType: { baseTime: number; incrementTime: number };
     game: Chess;
     flip: Color;
@@ -29,11 +25,7 @@ export const defaultSocketContextState: ISocketContextState = {
     whitePlayerId: "",
     blackPlayerId: "",
     matchid: "not_set",
-    stats: {
-        isover: false,
-        winner: "",
-        reason: "",
-    },
+    stats: "",
     gameType: { baseTime: 0, incrementTime: 0 },
     game: new Chess(),
     flip: "w",

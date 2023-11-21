@@ -3,7 +3,7 @@ import { ISocketContextState } from "./SocketContext";
 import { Socket } from "socket.io-client";
 import { selectedPieceProps } from "../../modules/types";
 import { Color, Square } from "chess.js";
-import { getLastElement } from "../../modules/Utils";
+import { getLastElement, getTimeTillMove } from "../../modules/Utils";
 
 export type TSocketContextActions =
     | "update_timeDiff"
@@ -13,9 +13,9 @@ export type TSocketContextActions =
     | "recived_move"
     | "update_matchid"
     | "update_selected_square"
-    | "update_white_time"
-    | "update_black_time";
-export type TSocketContextPayload = number | null | [Socket, string] | matchDetailsType | moveType | string | (Square | "");
+    | "update_time"
+    | "updateTime";
+export type TSocketContextPayload = { whiteTime: number; blackTime: number } | number | null | [Socket, string] | matchDetailsType | moveType | string | (Square | "");
 
 export interface ISocketContextActions {
     type: TSocketContextActions;
@@ -28,11 +28,7 @@ export interface moveTimeType {
 export interface matchDetailsType {
     whitePlayerId: string;
     blackPlayerId: string;
-    stats: {
-        isover: boolean;
-        reason: string;
-        winner: string;
-    };
+    stats: string;
     gameType: { baseTime: number; incrementTime: number };
     moves: string[];
     movesTime: number[];
@@ -66,7 +62,7 @@ function makeMove(state: ISocketContextState, move: moveType) {
         movesTime: [...state.movesTime, move.time],
     };
 }
-const ignoreTypes = ["update_selected_square", "update_black_time", "update_white_time", "update_timeDff"];
+const ignoreTypes = ["update_selected_square", "update_time", "update_timeDff"];
 export const SocketReducer = (state: ISocketContextState, action: ISocketContextActions) => {
     if (!ignoreTypes.includes(action.type)) console.log("Update State - Action: " + action.type + " - Payload: ", action.payload);
 
@@ -85,37 +81,19 @@ export const SocketReducer = (state: ISocketContextState, action: ISocketContext
             return { ...state, selectedPiece: action.payload as Square | "" };
         case "flip_board":
             return { ...state, flip: (state.flip === "w" ? "b" : "w") as Color };
-        case "update_black_time": {
-            const { blackTime, whiteTime } = getTimeTillMove(state.game.history().length, state.movesTime, state.gameType);
-            return {
-                ...state,
-                whiteTime,
-                blackTime: blackTime - (moment().toDate().getTime() - getLastElement(state.movesTime)),
-            };
-        }
-        case "update_white_time": {
-            const { blackTime, whiteTime } = getTimeTillMove(state.game.history().length, state.movesTime, state.gameType);
-            return {
+        case "update_time":
+            const { whiteTime, blackTime } = getTimeTillMove(state.movesTime.length - 1, state.movesTime, state.gameType);
+            if(action.payload == "w")return {
                 ...state,
                 blackTime,
-                whiteTime: whiteTime - (moment().toDate().getTime() - getLastElement(state.movesTime)),
+                whiteTime: blackTime - (moment().toDate().getTime() - moment(getLastElement(state.movesTime)).toDate().getTime()),
             };
-        }
+            else return {
+                ...state,
+                whiteTime,
+                blackTime: blackTime - (moment().toDate().getTime() - moment(getLastElement(state.movesTime)).toDate().getTime()),
+            };
         default:
             return state;
     }
-};
-const getTimeTillMove = (index: number, moveTime: number[], gameType: { baseTime: number; incrementTime: number }) => {
-    // if (typeof moveTime[0] === "string") moveTime = moveTime.map((d) => moment(d).toDate().getTime()) as number[];
-    let whiteTime = gameType.baseTime;
-    let blackTime = gameType.baseTime;
-    for (let i = 1; i <= index; i += 2) {
-        whiteTime -= (moveTime[i] as number) - (moveTime[i - 1] as number);
-    }
-    for (let i = 2; i <= index; i += 2) {
-        blackTime -= (moveTime[i] as number) - (moveTime[i - 1] as number);
-    }
-    const res = { whiteTime, blackTime };
-    // console.log(res);
-    return res;
 };

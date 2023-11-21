@@ -6,7 +6,7 @@ import { SocketReducer } from "./SocketReducer";
 import PageContext from "../page/PageContext";
 import moment from "moment";
 import axios, { getAdapter } from "axios";
-import { getLastElement } from "../../modules/Utils";
+import { getLastElement, getTimeTillMove } from "../../modules/Utils";
 
 export interface ISocketContextComponentProps extends PropsWithChildren {}
 
@@ -38,10 +38,10 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 
     /** Incrementing time */
     useEffect(() => {
-        if (SocketState.stats.isover) return;
+        if (SocketState.stats != "") return;
         let interval: number;
-        if (SocketState.movesTime.length % 2 === 1) interval = setInterval(() => SocketDispatch({ type: "update_white_time", payload: null }), 10);
-        else interval = setInterval(() => SocketDispatch({ type: "update_black_time", payload: null }), 10);
+        if (SocketState.movesTime.length % 2 === 1) interval = setInterval(() => SocketDispatch({ type: "update_time", payload: "w" }), 10);
+        else interval = setInterval(() => SocketDispatch({ type: "update_time", payload: "b" }), 10);
         return () => {
             if (interval) clearInterval(interval);
         };
