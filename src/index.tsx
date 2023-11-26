@@ -1,4 +1,4 @@
-import React from "react";
+import React, { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
@@ -58,7 +58,9 @@ const router = createBrowserRouter(
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
-    <PageContextComponent>
-        <RouterProvider router={router} />
-    </PageContextComponent>
+    <StrictMode>
+        <PageContextComponent>
+            <RouterProvider router={router} />
+        </PageContextComponent>
+    </StrictMode>
 );

@@ -1,12 +1,15 @@
 // src/RegisterForm.js
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { redirect, useNavigate } from "react-router-dom";
+import PageContext from "../../contexts/page/PageContext";
 
 const RegisterForm = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [istaken, setIstaken] = useState(false);
+    const { PageState, PageDispatch } = useContext(PageContext);
+
     const navigate = useNavigate();
 
     const handleRegister = async () => {
@@ -20,7 +23,9 @@ const RegisterForm = () => {
             setIstaken(true);
         }
     };
-
+    useEffect(() => {
+        if (PageState.uid) navigate("/");
+    }, []);
     return (
         <>
             register

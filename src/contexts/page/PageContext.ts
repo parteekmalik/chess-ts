@@ -8,7 +8,7 @@ export const defaultPageContextState: IPageContextState = {
     uid: sessionStorage.getItem("uid"),
 };
 export type TPageContextActions = "update_uid";
-export type TPageContextPayload =  string;
+export type TPageContextPayload = string | null;
 
 export interface IPageContextActions {
     type: TPageContextActions;
@@ -19,7 +19,7 @@ export const PageReducer = (state: IPageContextState, action: IPageContextAction
 
     switch (action.type) {
         case "update_uid":
-            return { ...state, uid: action.payload as string };
+            return { ...state, uid: action.payload as string | null };
         default:
             return state;
     }

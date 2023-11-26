@@ -33,22 +33,32 @@ function Online() {
     const [isSelectedoption, setIsSelectedoption] = useState("new game");
     const [isGameOption, setIsGameOption] = useState(false);
     const { uid } = useContext(PageContext).PageState;
+    let isloading = true;
+    const { PageState, PageDispatch } = useContext(PageContext);
 
     useEffect(() => {
-        if (!uid) navigate("/login");
+        const guestId = async () => {
+            if (uid) return;
+
+            const guestUserId: string = (await axios.get(`http://localhost:3002/getGuestId`)).data;
+            console.log(guestUserId);
+            // Save the username to sessionStorage on successful login
+            PageDispatch({ type: "update_uid", payload: guestUserId });
+
+            sessionStorage.setItem("uid", guestUserId);
+        };
+        if (isloading) {
+            console.info(PageState.uid, sessionStorage.getItem("uid"));
+            guestId();
+        }
+        isloading = false;
     }, []);
 
-    // const handleSubmit = (e: any) => {
-    //     e.preventDefault();
-    //     // localStorage.setItem("userName", userName);
-    //     navigate("/live/12345/1/w");
-    // };
-    const [userid, setUUserid] = useState("1");
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
-            const payload = { userid, gameType: { ...selectedGameType, baseTime: selectedGameType.baseTime * 60000 } };
+            const payload = { userid: uid, gameType: { ...selectedGameType, baseTime: selectedGameType.baseTime * 60000 } };
             const response: {
                 black: number;
                 board: string;
@@ -61,7 +71,7 @@ function Online() {
                 winner: string;
             } = (await axios.post("http://localhost:3002/new", payload)).data;
             console.log("Response:", response);
-            navigate(`/live/${response.match_id}/${userid}/${response.white === userid ? "w" : "b"}`);
+            navigate(`/live/${response.match_id}/${uid}/${response.white === uid ? "w" : "b"}`);
             // Do something with the response data
         } catch (error) {
             console.error("Error:", error);
@@ -70,7 +80,13 @@ function Online() {
     };
     return (
         <div className="flex justify-center h-full">
-            <Board game={new Chess()} turn={"w"} opponent={{ name: "opponent", time: 0 }} player={{ name: "player", time: 0 }} gameType={selectedGameType} />
+            <Board
+                game={new Chess()}
+                turn={"w"}
+                opponent={{ name: "opponent", time: 0 }}
+                player={{ name: PageState.uid as string, time: 0 }}
+                gameType={selectedGameType}
+            />
             <div className="flex flex-col h-full  text-white" id="options">
                 <div className="flex text-xl  cursor-pointer">
                     <div className={`p-5 ${isSelectedoption === "new game" ? "bg-gray-500" : "bg-gray-700"}`} onClick={() => setIsSelectedoption("new game")}>

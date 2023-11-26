@@ -1,5 +1,5 @@
 // src/LoginForm.js
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { redirect, useNavigate } from "react-router-dom";
 import PageContext from "../../contexts/page/PageContext";
@@ -28,6 +28,9 @@ const LoginForm = () => {
             setLoginError(true);
         }
     };
+    useEffect(() => {
+        if (PageState.uid) navigate("/");
+    }, []);
 
     return (
         <>
