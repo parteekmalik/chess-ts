@@ -1,12 +1,14 @@
 // ChessBoard.tsx
-import { Color } from "chess.js";
+import { Chess, Color } from "chess.js";
 import { useContext } from "react";
 import SocketContext from "../../contexts/socket/SocketContext";
 
-interface ChessBoardProps {}
+interface ChessBoardProps {
+    game: Chess;
+    flip: Color;
+}
 const ChessBoard: React.FC<ChessBoardProps> = (props) => {
-    const { game, flip } = useContext(SocketContext).SocketState;
-
+    const { game, flip } = props;
     const squares: JSX.Element[] = [];
     game.board().forEach((row, rowIndex) =>
         row.forEach((position, colIndex) => {
@@ -16,12 +18,7 @@ const ChessBoard: React.FC<ChessBoardProps> = (props) => {
                     backgroundImage: `url(/src/assets/images/${position.color + position.type}.png)`,
                 };
                 squares.push(
-                    <div
-                        key={position.square}
-                        className={`w-[12.5%] h-[12.5%] bg-no-repeat bg-[length:100%_100%] absolute`}
-                        id={position.square}
-                        style={Style}
-                    ></div>
+                    <div key={position.square} className={`w-[12.5%] h-[12.5%] bg-no-repeat bg-[length:100%_100%] absolute`} id={position.square} style={Style}></div>
                 );
             }
         })

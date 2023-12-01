@@ -27,22 +27,24 @@ const PrevHighlight: React.FC<{ history: Move; flip: Color }> = ({ history, flip
     );
 };
 
-export interface HighlightProps {}
+export interface HighlightProps {
+    selectedPiece: Square | "";
+    lastMove: Move | undefined;
+    flip: Color;
+}
 const Highlight: React.FC<HighlightProps> = (props) => {
-    const { SocketState, SocketDispatch } = useContext(SocketContext);
-    const { flip } = useContext(SocketContext).SocketState;
+    const { selectedPiece, lastMove, flip } = props;
 
-    const history = SocketState.game.history({ verbose: true }).pop();
-    const { row, col } = toRowCol(SocketState.selectedPiece as Square);
+    const { row, col } = toRowCol(selectedPiece as Square);
     return (
         <>
-            {SocketState.selectedPiece && (
+            {selectedPiece && (
                 <div
                     className="w-[12.5%] h-[12.5%] bg-no-repeat bg-[length:100%_100%] absolute bg-[rgb(255,255,51,0.5)]"
                     style={{ transform: `translate(${col * 100}%, ${(flip === "w" ? row : 7 - row) * 100}%)` }}
                 ></div>
             )}
-            {history && <PrevHighlight flip={flip} history={history} />}
+            {lastMove && <PrevHighlight flip={flip} history={lastMove} />}
         </>
     );
 };

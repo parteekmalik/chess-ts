@@ -18,15 +18,12 @@ interface BoardProps {
 const Board: React.FC<BoardProps> = (props) => {
     const { clickHandle } = props;
     const { SocketState, SocketDispatch } = useContext(SocketContext);
-    const { PageState, PageDispatch } = useContext(PageContext);
+    const { uid } = useContext(PageContext).PageState;
 
     const PieceLogic = (event: React.MouseEvent) => {
         const { isValid, square } = checkForValidClick(event, SocketState.flip);
         if (!isValid || SocketState.movesUndone.length) return;
-        if (
-            SocketState.selectedPiece &&
-            PageState.uid === (SocketState.game.turn() === "w" ? SocketState.whitePlayerId : SocketState.blackPlayerId)
-        ) {
+        if (SocketState.selectedPiece && uid === (SocketState.game.turn() === "w" ? SocketState.whitePlayerId : SocketState.blackPlayerId)) {
             const from = SocketState.selectedPiece as Square;
             const to = square;
             clickHandle({ from, to });
@@ -47,14 +44,18 @@ const Board: React.FC<BoardProps> = (props) => {
                             : { name: SocketState.whitePlayerId, time: SocketState.whiteTime }
                     }
                 />
-                <div
-                    className={` bg-[url('./assets/images/blank_board_img.png')] bg-no-repeat bg-[length:100%_100%] relative w-[500px] h-[500px]`}
-                    onClick={PieceLogic}
-                >
-                    <Coordinates />
-                    <Highlight />
-                    <ChessBoard />
-                    {SocketState.selectedPiece && <ChessBoardHints />}
+                <div className={` bg-[url('./assets/images/blank_board_img.png')] bg-no-repeat bg-[length:100%_100%] relative w-[500px] h-[500px]`} onClick={PieceLogic}>
+                    <Coordinates flip={SocketState.flip} />
+                    <Highlight selectedPiece={SocketState.selectedPiece} flip={SocketState.flip} lastMove={SocketState.game.history({ verbose: true }).pop()} />
+                    <ChessBoard game={SocketState.game} flip={SocketState.flip} />
+                    {SocketState.selectedPiece && (
+                        <ChessBoardHints
+                            game={SocketState.game}
+                            selectedPiece={SocketState.selectedPiece}
+                            flip={SocketState.flip}
+                            isShow={uid !== (SocketState.game.turn() === "w" ? SocketState.whitePlayerId : SocketState.blackPlayerId)}
+                        />
+                    )}
                 </div>
                 <Banner
                     data={
