@@ -18,7 +18,7 @@ function Puzzle() {
             <div className="flex flex-col w-[50%]">
                 <h2>Socket IO Information:</h2>
                 {Object.entries({ ...PuzzleState, ...PageState }).map(([key, value]) => {
-                    return key !== "socket" && key !== "game" ? (
+                    return  !["socket","game","puzzleList"].includes(key) ? (
                         <div key={key}>
                             {key}: {JSON.stringify(value)}
                         </div>

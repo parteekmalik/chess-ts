@@ -7,18 +7,7 @@ import { Chess } from "chess.js";
 
 export interface IPuzzleContextComponentProps extends PropsWithChildren {}
 
-async function makeHttpRequest(url: string): Promise<any> {
-    try {
-        const response = await axios.get(url);
-        // You can handle the response data here
-        console.log("Response data:", response.data);
-        return response.data;
-    } catch (error) {
-        // Handle errors
-        console.error("Error:", (error as Error).message);
-        throw error;
-    }
-}
+
 const PuzzleContextComponent: React.FunctionComponent<IPuzzleContextComponentProps> = (props) => {
     const { children } = props;
 
@@ -29,7 +18,7 @@ const PuzzleContextComponent: React.FunctionComponent<IPuzzleContextComponentPro
     const updatePuzzle = () => {
         const data = axios.get("http://localhost:3002/getpuzzles").then((data) => {
             console.log(data.data);
-            PuzzleDispatch({ type: "update_puzzle", payload: data.data as Tpuzzle });
+            PuzzleDispatch({ type: "update_puzzle_list", payload: data.data as Tpuzzle[] });
         });
     };
     useEffect(() => {
@@ -50,7 +39,7 @@ const PuzzleContextComponent: React.FunctionComponent<IPuzzleContextComponentPro
                 PuzzleDispatch({ type: "flag_wrong_move", payload: null });
             } else if (!nextMove) {
                 console.log("completed Puzzle");
-                updatePuzzle();
+                PuzzleDispatch({ type: "update_puzzle", payload: PuzzleState.puzzleNo + 1 });
             } else PuzzleDispatch({ type: "move_piece", payload: nextMove });
         }
     }, [PuzzleState.game.turn()]);
