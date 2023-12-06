@@ -46,7 +46,6 @@ export type IPuzzleContextActions =
 
 export const PuzzleReducer = (state: IPuzzleContextState, action: IPuzzleContextActions) => {
     console.log("Update State - Action: " + action.type + " - Payload: ", action.payload);
-
     switch (action.type) {
         case "update_puzzle_list": {
             const puzzle = action.payload[0];
@@ -62,10 +61,13 @@ export const PuzzleReducer = (state: IPuzzleContextState, action: IPuzzleContext
             };
         }
         case "update_puzzle": {
+            const puzzleList = state.puzzleList;
+            console.log(puzzleList[state.puzzleNo]);
+            puzzleList[state.puzzleNo].solved = true;
             const puzzle = state.puzzleList[action.payload];
             const game = new Chess(puzzle.fen);
             game.move(puzzle.moves[0]);
-            return { ...state, puzzle, game, solveFor: game.turn(), flip: game.turn(), puzzleNo: action.payload };
+            return { ...state, puzzle, game, solveFor: game.turn(), flip: game.turn(), puzzleNo: action.payload, puzzleList };
         }
         case "update_selected_square":
             return { ...state, selectedPiece: action.payload };
@@ -83,7 +85,7 @@ export const PuzzleReducer = (state: IPuzzleContextState, action: IPuzzleContext
                     console.log("wrong move");
                 }
             }
-            return { ...state, game, selectedPiece: "" as ""  };
+            return { ...state, game, selectedPiece: "" as "" };
         }
         case "flag_wrong_move":
             return { ...state, wrongMove: true };
