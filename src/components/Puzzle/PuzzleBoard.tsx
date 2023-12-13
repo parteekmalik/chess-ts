@@ -56,7 +56,7 @@ const PuzzleBoard: React.FC<BoardProps> = (props) => {
                     <button
                         className={`${buttonStyle}`}
                         onClick={() => {
-                            if (PuzzleState.wrongMove) PuzzleDispatch({ type: "undo", payload: null });
+                            if (PuzzleState.wrongMove) PuzzleDispatch({ type: "undoMove", payload: null });
                         }}
                     >
                         retry

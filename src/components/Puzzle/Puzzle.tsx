@@ -13,7 +13,7 @@ function Puzzle() {
     const { PageState, PageDispatch } = useContext(PageContext);
 
     function handleClick(payload: { from: string; to: string } | string) {
-        PuzzleDispatch({ type: "move_piece", payload });
+        if (PuzzleState.curMove === PuzzleState.onMove) PuzzleDispatch({ type: "move_piece", payload });
     }
     return (
         <div className="flex w-full">
@@ -26,7 +26,7 @@ function Puzzle() {
                         </div>
                     ) : null;
                 })}
-                <div className="flex flex-wrap gap-5">
+                <div className="flex w-[500px] flex-wrap gap-5">
                     {PuzzleState.game.moves().map((m) => (
                         <div
                             className=" p-2 bg-slate-500 text-white"

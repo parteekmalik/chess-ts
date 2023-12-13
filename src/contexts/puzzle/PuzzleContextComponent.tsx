@@ -7,7 +7,6 @@ import { Chess } from "chess.js";
 
 export interface IPuzzleContextComponentProps extends PropsWithChildren {}
 
-
 const PuzzleContextComponent: React.FunctionComponent<IPuzzleContextComponentProps> = (props) => {
     const { children } = props;
 
@@ -24,10 +23,17 @@ const PuzzleContextComponent: React.FunctionComponent<IPuzzleContextComponentPro
     useEffect(() => {
         if (loading) {
             updatePuzzle();
+            window.addEventListener("keydown", (e) => {
+                e.preventDefault();
+                console.log(e);
+                if (e.key === "ArrowLeft") PuzzleDispatch({ type: "prevMove", payload: null });
+                else if (e.key === "ArrowRight") PuzzleDispatch({ type: "nextMove", payload: null });
+            },false);
         }
         setLoading(false);
         // eslint-disable-next-line
     }, []);
+
     useEffect(() => {
         const { game, solveFor, puzzle } = PuzzleState;
         const nextMoveN = game.history().length;
@@ -40,7 +46,7 @@ const PuzzleContextComponent: React.FunctionComponent<IPuzzleContextComponentPro
             } else if (!nextMove) {
                 console.log("completed Puzzle");
                 PuzzleDispatch({ type: "update_puzzle", payload: PuzzleState.puzzleNo + 1 });
-            } else PuzzleDispatch({ type: "move_piece", payload: nextMove });
+            } else if(PuzzleState.curMove === PuzzleState.onMove) PuzzleDispatch({ type: "move_piece", payload: nextMove });
         }
     }, [PuzzleState.game.turn()]);
 

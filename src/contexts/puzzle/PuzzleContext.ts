@@ -21,6 +21,8 @@ export interface IPuzzleContextState {
     flip: Color;
     wrongMove: boolean;
     livesLeft: number;
+    curMove: number;
+    onMove: number;
 }
 
 export const defaultPuzzleContextState: IPuzzleContextState = {
@@ -32,6 +34,8 @@ export const defaultPuzzleContextState: IPuzzleContextState = {
     solveFor: "w",
     flip: "w",
     wrongMove: false,
+    curMove: 1,
+    onMove: 1,
     livesLeft: 3,
 };
 
@@ -40,7 +44,9 @@ export type IPuzzleContextActions =
     | { type: "update_puzzle_list"; payload: Tpuzzle[] }
     | { type: "move_piece"; payload: { from: string; to: string } | string }
     | { type: "flag_wrong_move"; payload: null }
-    | { type: "undo"; payload: null }
+    | { type: "undoMove"; payload: null }
+    | { type: "prevMove"; payload: null }
+    | { type: "nextMove"; payload: null }
     | { type: "update_puzzle"; payload: number }
     | { type: "flip_board"; payload: null };
 
@@ -67,7 +73,7 @@ export const PuzzleReducer = (state: IPuzzleContextState, action: IPuzzleContext
             const puzzle = state.puzzleList[action.payload];
             const game = new Chess(puzzle.fen);
             game.move(puzzle.moves[0]);
-            return { ...state, puzzle, game, solveFor: game.turn(), flip: game.turn(), puzzleNo: action.payload, puzzleList };
+            return { ...state, puzzle, game, solveFor: game.turn(), flip: game.turn(), puzzleNo: action.payload, puzzleList, curMove: 1, onMove: 1 };
         }
         case "update_selected_square":
             return { ...state, selectedPiece: action.payload };
@@ -85,14 +91,28 @@ export const PuzzleReducer = (state: IPuzzleContextState, action: IPuzzleContext
                     console.log("wrong move");
                 }
             }
-            return { ...state, game, selectedPiece: "" as "" };
+            const moveN = state.onMove + 1;
+            return { ...state, game, selectedPiece: "" as "", onMove: moveN, curMove: moveN };
         }
         case "flag_wrong_move":
             return { ...state, wrongMove: true };
-        case "undo": {
+        case "nextMove": {
+            if (state.curMove === state.onMove) return state;
+            const { game } = state;
+            game.move(state.puzzle?.moves[state.curMove] as string);
+            return { ...state, game, wrongMove: false, curMove: state.curMove + 1 };
+        }
+        case "prevMove": {
+            if (state.curMove === 0) return state;
             const { game } = state;
             game.undo();
-            return { ...state, game, wrongMove: false };
+            return { ...state, game, wrongMove: false, curMove: state.curMove - 1 };
+        }
+        case "undoMove": {
+            if (!state.wrongMove) return state;
+            const { game } = state;
+            game.undo();
+            return { ...state, game, wrongMove: false, curMove: state.curMove - 1, onMove: state.onMove - 1 };
         }
         default:
             return state;
