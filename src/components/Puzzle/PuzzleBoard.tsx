@@ -53,7 +53,7 @@ const PuzzleBoard: React.FC<BoardProps> = (props) => {
                     </div>
                 </div>
                 <div className="flex justify-center gap-10">
-                    <button
+                    {/* <button
                         className={`${buttonStyle}`}
                         onClick={() => {
                             if (PuzzleState.wrongMove) PuzzleDispatch({ type: "undoMove", payload: null });
@@ -61,7 +61,13 @@ const PuzzleBoard: React.FC<BoardProps> = (props) => {
                     >
                         retry
                     </button>
-                    <button className={`${buttonStyle}`}>hint</button>
+                    <button className={`${buttonStyle}`}>hint</button> */}
+                    <button className={`${buttonStyle}`} onClick={() => PuzzleDispatch({ type: "prevMove", payload: null })}>
+                        prev
+                    </button>
+                    <button className={`${buttonStyle}`} onClick={() => PuzzleDispatch({ type: "nextMove", payload: null })}>
+                        next
+                    </button>
                 </div>
             </div>
             <div className="" id="settings-bar">
