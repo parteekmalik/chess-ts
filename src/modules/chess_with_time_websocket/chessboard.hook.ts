@@ -40,14 +40,8 @@ export const useChessLiveBoard = (props: {
         }
         socket.on(
             "initialize-prev-moves",
-            (msg: {
-                history: string[];
-                startedAt: Date;
-                moveTime: Date[];
-                curTime: Date;
-                stats: { isover: boolean; winner: string; reason: string };
-            }) => {
-                const { history, stats } = msg;
+            (msg: { history: string[]; startedAt: Date; moveTime: Date[]; curTime: Date; game_stats: { isover: boolean; winner: string; reason: string } }) => {
+                const { history, game_stats } = msg;
                 let { moveTime } = msg;
                 console.log("initialize-prev-moves -> ", msg);
                 setMoveTimes([...moveTimes, ...moveTime.map((d) => moment(d).toDate().getTime())]);
@@ -55,7 +49,7 @@ export const useChessLiveBoard = (props: {
                     for (let i = game.history.length; i < history.length; i++) g.move(history[i]);
                     return _.cloneDeep(g);
                 });
-                setOverStats(stats.reason);
+                setOverStats(game_stats.reason);
             }
         );
         socket.on("message-rcv", (msg: { move: string; time: Date }) => {
@@ -68,8 +62,8 @@ export const useChessLiveBoard = (props: {
                 return _.cloneDeep(g);
             });
         });
-        socket.on("game-over-byMove", (msg: { move: string; time: Date; stats: { isover: boolean; reason: string; winner: string } }) => {
-            const { move, time, stats } = msg;
+        socket.on("game-over-byMove", (msg: { move: string; time: Date; game_stats: { isover: boolean; reason: string; winner: string } }) => {
+            const { move, time, game_stats } = msg;
             const moveTime = moment(time).toDate().getTime();
             console.log("message-rcv -> ", msg, moveTime, moment().toDate().getTime());
             setMoveTimes([...moveTimes, moveTime]);
@@ -77,7 +71,7 @@ export const useChessLiveBoard = (props: {
                 g.move(move);
                 return _.cloneDeep(g);
             });
-            setOverStats(stats.reason);
+            setOverStats(game_stats.reason);
         });
 
         // Clean up the event listener when the component unmounts

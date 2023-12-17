@@ -38,20 +38,32 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
 
     /** Incrementing time */
     useEffect(() => {
-        if (SocketState.stats != "") return;
+        if (SocketState.match_details.game_stats != "") return;
         let interval: number;
-        if (SocketState.movesTime.length % 2 === 1) interval = setInterval(() => SocketDispatch({ type: "update_time", payload: "w" }), 10);
+        if (SocketState.match_prev_details.movesTime.length % 2 === 1) interval = setInterval(() => SocketDispatch({ type: "update_time", payload: "w" }), 10);
         else interval = setInterval(() => SocketDispatch({ type: "update_time", payload: "b" }), 10);
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [SocketState.movesTime]);
+    }, [SocketState.match_prev_details.movesTime]);
 
     useEffect(() => {
-        socket.connect();
-        SocketDispatch({ type: "update_socket", payload: [socket, matchid as string] });
-        StartListeners();
-        SendHandshake();
+        if (loading) {
+            socket.connect();
+            SocketDispatch({ type: "update_socket", payload: [socket, matchid as string] });
+            StartListeners();
+            SendHandshake();
+            window.addEventListener(
+                "keydown",
+                (e) => {
+                    e.preventDefault();
+                    console.log(e);
+                    if (e.key === "ArrowLeft") SocketDispatch({ type: "prevMove", payload: null });
+                    else if (e.key === "ArrowRight") SocketDispatch({ type: "nextMove", payload: null });
+                },
+                false
+            );
+        }
         setLoading(false);
         // eslint-disable-next-line
     }, []);
@@ -70,11 +82,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     const SendHandshake = () => {
         console.info("Sending handshake to server ...");
         // SocketEmiter("handshake", {});
-        SocketEmiter("handshake", { uid: PageState.uid as string, matchid: matchid as string });
-    };
-    const SocketEmiter = (type: string, payload: any) => {
-        console.info("Emitted - Action: " + type + " - Payload: ", payload);
-        socket.emit(type, payload);
+        SocketState.SocketEmiter("handshake", { uid: PageState.uid as string, matchid: matchid as string });
     };
 
     return (
@@ -82,7 +90,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
             {loading ? (
                 <p>... loading Socket IO ....</p>
             ) : (
-                <SocketContextProvider value={{ SocketState, SocketDispatch, SocketEmiter }}>{children}</SocketContextProvider>
+                <SocketContextProvider value={{ SocketState, SocketDispatch }}>{children}</SocketContextProvider>
             )}
         </>
     );

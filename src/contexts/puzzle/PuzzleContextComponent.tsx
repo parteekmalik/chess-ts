@@ -16,41 +16,49 @@ const PuzzleContextComponent: React.FunctionComponent<IPuzzleContextComponentPro
     const [PuzzleState, PuzzleDispatch] = useReducer(PuzzleReducer, defaultPuzzleContextState);
     const updatePuzzle = () => {
         const data = axios.get("http://localhost:3002/getpuzzles").then((data) => {
-            console.log(data.data);
-            PuzzleDispatch({ type: "update_puzzle_list", payload: data.data as Tpuzzle[] });
+            const payload = data.data.map((data: any) => ({ ...data, solved: false } as Tpuzzle));
+            PuzzleDispatch({ type: "update_puzzle_list", payload });
+            PuzzleDispatch({ type: "update_puzzle", payload: 0 });
         });
     };
     useEffect(() => {
         if (loading) {
             updatePuzzle();
-            window.addEventListener("keydown", (e) => {
-                e.preventDefault();
-                console.log(e);
-                if (e.key === "ArrowLeft") PuzzleDispatch({ type: "prevMove", payload: null });
-                else if (e.key === "ArrowRight") PuzzleDispatch({ type: "nextMove", payload: null });
-            },false);
+            window.addEventListener(
+                "keydown",
+                (e) => {
+                    e.preventDefault();
+                    console.log(e);
+                    if (e.key === "ArrowLeft") PuzzleDispatch({ type: "prevMove", payload: null });
+                    else if (e.key === "ArrowRight") PuzzleDispatch({ type: "nextMove", payload: null });
+                },
+                false
+            );
         }
         setLoading(false);
         // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
-        const { game, solveFor, puzzle } = PuzzleState;
+        const { game, curMove, onMove, puzzle } = PuzzleState;
         const nextMoveN = game.history().length;
         const nextMove = puzzle?.moves[nextMoveN];
         const iswrong = puzzle?.moves[nextMoveN - 1] !== PuzzleState.game.history()[nextMoveN - 1];
+
         console.log("nextMove -> ", nextMove);
-        if (game.turn() !== solveFor) {
+        if (curMove === onMove && puzzle != undefined) {
             if (iswrong) {
-                PuzzleDispatch({ type: "flag_wrong_move", payload: null });
+                PuzzleDispatch({ type: "update_puzzle_result", payload: false });
+                PuzzleDispatch({ type: "update_puzzle", payload: PuzzleState.puzzleNo + 1 });
             } else if (!nextMove) {
                 console.log("completed Puzzle");
+                PuzzleDispatch({ type: "update_puzzle_result", payload: true });
                 PuzzleDispatch({ type: "update_puzzle", payload: PuzzleState.puzzleNo + 1 });
-            } else if(PuzzleState.curMove === PuzzleState.onMove) PuzzleDispatch({ type: "move_piece", payload: nextMove });
+            } else if (onMove % 2 === 0) PuzzleDispatch({ type: "move_piece", payload: nextMove });
         }
     }, [PuzzleState.game.turn()]);
 
-    return <>{loading ? <p>... loading Socket IO ....</p> : <PuzzleContextProvider value={{ PuzzleState, PuzzleDispatch }}>{children}</PuzzleContextProvider>}</>;
+    return <>{loading ? <p>... loading Puzzle IO ....</p> : <PuzzleContextProvider value={{ PuzzleState, PuzzleDispatch }}>{children}</PuzzleContextProvider>}</>;
 };
 
 export default PuzzleContextComponent;

@@ -109,27 +109,24 @@ const LiveBoard: React.FC = () => {
         return () => {};
     }, []);
     useEffect(() => {
-        socket.on(
-            "initialize-prev-moves",
-            (msg: { history: string[]; moveTime: Date[]; stats: { isover: boolean; winner: string; reason: string } }) => {
-                console.log("initialize_prev_moves");
-                const { history, stats } = msg;
-                let { moveTime } = msg;
-                console.log(msg);
+        socket.on("initialize-prev-moves", (msg: { history: string[]; moveTime: Date[]; game_stats: { isover: boolean; winner: string; reason: string } }) => {
+            console.log("initialize_prev_moves");
+            const { history, game_stats } = msg;
+            let { moveTime } = msg;
+            console.log(msg);
 
-                setGame((g) => {
-                    for (let i = g.history().length; i < history.length; i++) g.move(history[i]);
-                    return g;
-                });
+            setGame((g) => {
+                for (let i = g.history().length; i < history.length; i++) g.move(history[i]);
+                return g;
+            });
 
-                setMoveTime(moveTime.map((d) => moment(d).toDate().getTime()));
-                setOverStats(stats);
-            }
-        );
+            setMoveTime(moveTime.map((d) => moment(d).toDate().getTime()));
+            setOverStats(game_stats);
+        });
 
-        socket.on("message-rcv", (msg: { move: string[]; time: Date[]; stats?: { isover: boolean; reason: string; winner: string } }) => {
+        socket.on("message-rcv", (msg: { move: string[]; time: Date[]; game_stats?: { isover: boolean; reason: string; winner: string } }) => {
             setIsover(true);
-            const { move, time, stats } = msg;
+            const { move, time, game_stats } = msg;
             console.log("message-rcv -> ", msg);
             setMoveTime((t) => [...t, ...time.map((d) => moment(d).toDate().getTime())]);
 
@@ -138,7 +135,7 @@ const LiveBoard: React.FC = () => {
                 return g;
             });
             setSelectedPiece({ ...selectedPiece, isSelected: false });
-            if (stats) setOverStats(stats);
+            if (game_stats) setOverStats(game_stats);
         });
 
         // Clean up the event listener when the component unmounts

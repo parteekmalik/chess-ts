@@ -42,11 +42,11 @@ function Puzzle() {
                 </div>
             </div>
             <div className="flex">
-                <PuzzleBoard clickHandle={handleClick} />
+                <PuzzleBoard />
                 <div className="flex h-full gap-5 w-[500px] flex-wrap border p-5">
                     {PuzzleState.puzzleList.map((puz, index) => {
                         if (PuzzleState.puzzleNo > index) {
-                            console.log(PuzzleState.puzzleNo, "  -> ", index);
+                            // console.log(PuzzleState.puzzleNo, "  -> ", index);
                             return (
                                 <div className="flex flex-col gap-2" key={puz.id}>
                                     <img className={`flex h-[18px] w-[18px]  text-[]`} src={`${puz.solved ? wrighturl : wrongurl}`}></img>

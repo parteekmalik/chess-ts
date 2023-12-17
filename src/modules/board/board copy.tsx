@@ -1,67 +1,49 @@
 import React, { useContext, useEffect, useState } from "react";
-import ChessBoard from "../../modules/piece and hints/ChessBoard";
-import ChessBoardHints from "../../modules/piece and hints/ChessBoardHints";
-import Highlight from "../../modules/piece and hints/highlight";
-import Coordinates from "../coordinates/coordinates";
 
 import { Chess, Color, Square } from "chess.js";
-import { checkForValidClick, selectedPieceProps } from "../types";
-import { useParams } from "react-router-dom";
 import Banner from "../banner/banner";
 import SocketContext from "../../contexts/socket/SocketContext";
 import PageContext from "../../contexts/page/PageContext";
+import ComBoard from "../../1making common component/board";
 
-interface BoardProps {
-    clickHandle: (props: { from: Square; to: Square }) => void;
-}
+interface BoardProps {}
 
 const Board: React.FC<BoardProps> = (props) => {
-    const { clickHandle } = props;
     const { SocketState, SocketDispatch } = useContext(SocketContext);
     const { uid } = useContext(PageContext).PageState;
 
-    const PieceLogic = (event: React.MouseEvent) => {
-        const { isValid, square } = checkForValidClick(event, SocketState.flip);
-        if (!isValid || SocketState.movesUndone.length) return;
-        if (SocketState.selectedPiece && uid === (SocketState.game.turn() === "w" ? SocketState.whitePlayerId : SocketState.blackPlayerId)) {
-            const from = SocketState.selectedPiece as Square;
+    function clickHandle(square: Square) {
+        if (
+            SocketState.board_data.selectedPiece &&
+            SocketState.match_prev_details.movesUndone.length === 0 &&
+            (SocketState.game.turn() === "w" ? SocketState.match_details.whitePlayerId : SocketState.match_details.blackPlayerId)
+        ) {
+            const from = SocketState.board_data.selectedPiece as Square;
             const to = square;
-            clickHandle({ from, to });
+            SocketDispatch({type:"move_piece",payload:{from, to}})
             SocketDispatch({ type: "update_selected_square", payload: "" });
         }
         if (SocketState.game.board()[8 - parseInt(square[1], 10)][square.charCodeAt(0) - "a".charCodeAt(0)])
             SocketDispatch({ type: "update_selected_square", payload: square });
         else SocketDispatch({ type: "update_selected_square", payload: "" });
-    };
+    }
 
     return (
         <div className="flex ">
             <div className="flex flex-col">
                 <Banner
                     data={
-                        SocketState.flip === "w"
-                            ? { name: SocketState.blackPlayerId, time: SocketState.blackTime }
-                            : { name: SocketState.whitePlayerId, time: SocketState.whiteTime }
+                        SocketState.board_data.flip === "w"
+                            ? { name: SocketState.match_details.blackPlayerId, time: SocketState.board_data.blackTime }
+                            : { name: SocketState.match_details.whitePlayerId, time: SocketState.board_data.whiteTime }
                     }
                 />
-                <div className={` bg-[url('./assets/images/blank_board_img.png')] bg-no-repeat bg-[length:100%_100%] relative w-[500px] h-[500px]`} onClick={PieceLogic}>
-                    <Coordinates flip={SocketState.flip} />
-                    <Highlight selectedPiece={SocketState.selectedPiece} flip={SocketState.flip} lastMove={SocketState.game.history({ verbose: true }).pop()} />
-                    <ChessBoard game={SocketState.game} flip={SocketState.flip} />
-                    {SocketState.selectedPiece && (
-                        <ChessBoardHints
-                            game={SocketState.game}
-                            selectedPiece={SocketState.selectedPiece}
-                            flip={SocketState.flip}
-                            isShow={uid !== (SocketState.game.turn() === "w" ? SocketState.whitePlayerId : SocketState.blackPlayerId)}
-                        />
-                    )}
-                </div>
+                <ComBoard State={SocketState.board_data} clickHandle={clickHandle} />
                 <Banner
                     data={
-                        SocketState.flip === "w"
-                            ? { name: SocketState.whitePlayerId, time: SocketState.whiteTime }
-                            : { name: SocketState.blackPlayerId, time: SocketState.blackTime }
+                        SocketState.board_data.flip === "w"
+                            ? { name: SocketState.match_details.whitePlayerId, time: SocketState.board_data.whiteTime }
+                            : { name: SocketState.match_details.blackPlayerId, time: SocketState.board_data.blackTime }
                     }
                 />
             </div>

@@ -3,12 +3,13 @@ import SocketContext from "../contexts/socket/SocketContext";
 import { useNavigate, useParams } from "react-router-dom";
 import Board from "../modules/board/board copy";
 import PageContext from "../contexts/page/PageContext";
+import { Square } from "chess.js";
 
 export interface IApplicationProps {}
 
 const Application: React.FunctionComponent<IApplicationProps> = (props) => {
     const navigate = useNavigate();
-    const { SocketState, SocketDispatch, SocketEmiter } = useContext(SocketContext);
+    const { SocketState, SocketDispatch } = useContext(SocketContext);
     const { PageState, PageDispatch } = useContext(PageContext);
     useEffect(() => {
         if (PageState.uid === null) {
@@ -17,9 +18,7 @@ const Application: React.FunctionComponent<IApplicationProps> = (props) => {
             navigate("/login");
         }
     }, []);
-    function handleClick(payload: { from: string; to: string }) {
-        SocketEmiter("move_sent", payload);
-    }
+
     return (
         <div className="flex w-full">
             <div className="flex flex-col w-[50%]">
@@ -32,12 +31,12 @@ const Application: React.FunctionComponent<IApplicationProps> = (props) => {
                     ) : null;
                 })}
                 <div className="flex flex-wrap gap-5">
-                    {PageState.uid === (SocketState.game.turn() === "w" ? SocketState.whitePlayerId : SocketState.blackPlayerId) &&
+                    {PageState.uid === (SocketState.game.turn() === "w" ? SocketState.match_details.whitePlayerId : SocketState.match_details.blackPlayerId) &&
                         SocketState.game.moves().map((m) => (
                             <div
                                 className=" p-2 bg-slate-500 text-white"
                                 onClick={() => {
-                                    SocketEmiter("move_sent", m);
+                                    SocketDispatch({ type: "move_piece", payload: m });
                                 }}
                                 key={m}
                             >
@@ -46,7 +45,7 @@ const Application: React.FunctionComponent<IApplicationProps> = (props) => {
                         ))}
                 </div>
             </div>
-            <Board clickHandle={handleClick} />
+            <Board />
         </div>
     );
 };

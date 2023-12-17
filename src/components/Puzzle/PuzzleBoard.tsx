@@ -1,57 +1,32 @@
 import React, { useContext, useEffect, useState } from "react";
-import ChessBoard from "../../modules/piece and hints/ChessBoard";
-import ChessBoardHints from "../../modules/piece and hints/ChessBoardHints";
-import Highlight from "../../modules/piece and hints/highlight";
 
 import { Chess, Color, Square } from "chess.js";
-import { checkForValidClick } from "../../modules/types";
-import Coordinates from "../../modules/coordinates/coordinates";
 import PuzzleContext from "../../contexts/puzzle/PuzzleContext";
 import { buttonStyle } from "../../modules/Utils";
+import Board from "../../1making common component/board";
 
-interface BoardProps {
-    clickHandle: (props: { from: Square; to: Square }) => void;
-}
+interface BoardProps {}
 
 const PuzzleBoard: React.FC<BoardProps> = (props) => {
-    const { clickHandle } = props;
+    // const { clickHandle } = props;
     const { PuzzleState, PuzzleDispatch } = useContext(PuzzleContext);
 
-    const PieceLogic = (event: React.MouseEvent) => {
-        const { isValid, square } = checkForValidClick(event, PuzzleState.flip);
-        if (!isValid) return;
-        if (PuzzleState.selectedPiece && PuzzleState.game.turn() === PuzzleState.solveFor) {
-            const from = PuzzleState.selectedPiece as Square;
+    function clickHandle(square: Square) {
+        if (PuzzleState.board_data.selectedPiece && PuzzleState.curMove === PuzzleState.onMove) {
+            const from = PuzzleState.board_data.selectedPiece as Square;
             const to = square;
-            clickHandle({ from, to });
+            PuzzleDispatch({ type: "move_piece", payload: { from, to } });
             PuzzleDispatch({ type: "update_selected_square", payload: "" });
         }
         if (PuzzleState.game.board()[8 - parseInt(square[1], 10)][square.charCodeAt(0) - "a".charCodeAt(0)])
             PuzzleDispatch({ type: "update_selected_square", payload: square });
         else PuzzleDispatch({ type: "update_selected_square", payload: "" });
-    };
+    }
 
     return (
         <div className="flex">
             <div className="flex flex-col">
-                <div className="flex flex-col">
-                    <div
-                        className={` bg-[url('./assets/images/blank_board_img.png')] bg-no-repeat bg-[length:100%_100%] relative w-[500px] h-[500px]`}
-                        onClick={PieceLogic}
-                    >
-                        <Coordinates flip={PuzzleState.flip} />
-                        <Highlight selectedPiece={PuzzleState.selectedPiece} flip={PuzzleState.flip} lastMove={PuzzleState.game.history({ verbose: true }).pop()} />
-                        <ChessBoard game={PuzzleState.game} flip={PuzzleState.flip} />
-                        {PuzzleState.selectedPiece !== "" ? (
-                            <ChessBoardHints
-                                game={PuzzleState.game}
-                                selectedPiece={PuzzleState.selectedPiece}
-                                flip={PuzzleState.flip}
-                                isShow={PuzzleState.solveFor === PuzzleState.game.turn()}
-                            />
-                        ) : null}
-                    </div>
-                </div>
+                <Board clickHandle={clickHandle} State={PuzzleState.board_data} />
                 <div className="flex justify-center gap-10">
                     {/* <button
                         className={`${buttonStyle}`}
