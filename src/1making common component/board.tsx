@@ -14,10 +14,10 @@ export type Tboard_data = {
     board_layout: string;
     flip: Color;
     selectedPiece: Square | "";
-    whiteTime?: number;
-    blackTime?: number;
     lastMove: Move | undefined;
     solveFor: Color;
+    whiteTime?: number;
+    blackTime?: number;
 };
 const ComBoard: React.FC<BoardProps> = (props) => {
     const { State, clickHandle } = props;

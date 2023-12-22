@@ -60,18 +60,18 @@ function Online() {
         try {
             const payload = { userid: uid, gameType: { ...selectedGameType, baseTime: selectedGameType.baseTime * 60000 } };
             const response: {
-                black: number;
-                board: string;
-                created_at: string;
-                game_type: { baseTime: number; incrementTime: number };
-                match_id: string;
-                moves_history: string[];
-                reason: string;
-                white: string;
-                winner: string;
+                matchId: number;
+                position: string;
+                startedAt: Date;
+                stats: string;
+                whiteId: string;
+                blackId: string;
+                baseTime: number;
+                incrementTime: number;
+                movesData: { move: string; time: string }[];
             } = (await axios.post("http://localhost:3002/new", payload)).data;
             console.log("Response:", response);
-            navigate(`/live/${response.match_id}/${uid}/${response.white === uid ? "w" : "b"}`);
+            navigate(`/live/${response.matchId}/${uid}/${response.whiteId === uid ? "w" : "b"}`);
             // Do something with the response data
         } catch (error) {
             console.error("Error:", error);
@@ -80,13 +80,13 @@ function Online() {
     };
     return (
         <div className="flex justify-center h-full">
-            <Board
+            {/* <Board
                 game={new Chess()}
                 turn={"w"}
                 opponent={{ name: "opponent", time: 0 }}
                 player={{ name: PageState.uid as string, time: 0 }}
                 gameType={selectedGameType}
-            />
+            /> */}
             <div className="flex flex-col h-full  text-white" id="options">
                 <div className="flex text-xl  cursor-pointer">
                     <div className={`p-5 ${isSelectedoption === "new game" ? "bg-gray-500" : "bg-gray-700"}`} onClick={() => setIsSelectedoption("new game")}>

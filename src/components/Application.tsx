@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useRef } from "react";
 import SocketContext from "../contexts/socket/SocketContext";
 import { useNavigate, useParams } from "react-router-dom";
-import Board from "../modules/board/board copy";
 import PageContext from "../contexts/page/PageContext";
 import { Square } from "chess.js";
+import Board from "../1making common component/boardMain";
 
 export interface IApplicationProps {}
 
@@ -31,7 +31,7 @@ const Application: React.FunctionComponent<IApplicationProps> = (props) => {
                     ) : null;
                 })}
                 <div className="flex flex-wrap gap-5">
-                    {PageState.uid === (SocketState.game.turn() === "w" ? SocketState.match_details.whitePlayerId : SocketState.match_details.blackPlayerId) &&
+                    {SocketState.game.turn() === SocketState.board_data.solveFor &&
                         SocketState.game.moves().map((m) => (
                             <div
                                 className=" p-2 bg-slate-500 text-white"
@@ -45,7 +45,7 @@ const Application: React.FunctionComponent<IApplicationProps> = (props) => {
                         ))}
                 </div>
             </div>
-            <Board />
+            <Board State={SocketState} StateDispatch={SocketDispatch} />
         </div>
     );
 };

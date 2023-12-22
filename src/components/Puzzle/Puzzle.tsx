@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import PuzzleContext, { Tpuzzle } from "../../contexts/puzzle/PuzzleContext";
 import PageContext from "../../contexts/page/PageContext";
 import PuzzleBoard from "./PuzzleBoard";
+import Board from "../../1making common component/boardMain";
 
 const wrongurl = "https://www.chess.com/bundles/web/images/svg/wrong.svg";
 const wrighturl = "https://www.chess.com/bundles/web/images/svg/solved.svg";
@@ -42,7 +43,7 @@ function Puzzle() {
                 </div>
             </div>
             <div className="flex">
-                <PuzzleBoard />
+                <Board State={PuzzleState} StateDispatch={PuzzleDispatch} />
                 <div className="flex h-full gap-5 w-[500px] flex-wrap border p-5">
                     {PuzzleState.puzzleList.map((puz, index) => {
                         if (PuzzleState.puzzleNo > index) {

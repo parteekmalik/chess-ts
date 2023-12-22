@@ -4,10 +4,11 @@ import { Chess, Color, DEFAULT_POSITION, Square } from "chess.js";
 import { selectedPieceProps } from "../../modules/types";
 import { ISocketContextActions, moveTimeType } from "./SocketReducer";
 import { Tboard_data } from "../../1making common component/board";
+import { ICommonContextState } from "../puzzle/PuzzleContext";
 
-export interface ISocketContextState {
+export interface ISocketContextState extends ICommonContextState {
+    type: "live";
     socket: Socket | undefined;
-    game: Chess;
     match_details: {
         blackPlayerId: string;
         whitePlayerId: string;
@@ -18,14 +19,8 @@ export interface ISocketContextState {
             incrementTime: number;
         };
     };
-
-    match_prev_details: {
-        board_moves_layout: string[];
-        movesTime: number[];
-        movesUndone: string[];
-    };
-    board_data: Tboard_data;
-    SocketEmiter: (type: string, payload: any) => void; 
+    startedAt: number;
+    movesData: { move: string; time: number; board_layout: string }[];
 }
 
 export const defaultSocketContextState: ISocketContextState = {
@@ -38,33 +33,32 @@ export const defaultSocketContextState: ISocketContextState = {
         game_stats: "",
         gameType: { baseTime: 0, incrementTime: 0 },
     },
-    match_prev_details: {
-        board_moves_layout: [],
-        movesTime: [],
-        movesUndone: [],
-    },
+    startedAt: 0,
+    movesData: [],
+    curMove: 0,
+    onMove: 0,
     board_data: {
         board_layout: DEFAULT_POSITION,
         flip: "w",
         selectedPiece: "",
+        lastMove: undefined,
+        solveFor: "w",
         whiteTime: 0,
         blackTime: 0,
-        lastMove: undefined,
     },
-    SocketEmiter : function (type: string, payload: any) {
-        console.info("Emitted - Action: " + type + " - Payload: ", payload);
-        this.socket?.emit(type, payload);
-    }
+    type: "live",
 };
 
 export interface ISocketContextProps {
     SocketState: ISocketContextState;
     SocketDispatch: React.Dispatch<ISocketContextActions>;
+    SocketEmiter: (type: string, payload: any) => void;
 }
 
 const SocketContext = createContext<ISocketContextProps>({
     SocketState: defaultSocketContextState,
     SocketDispatch: () => {},
+    SocketEmiter: () => {},
 });
 
 export const SocketContextConsumer = SocketContext.Consumer;

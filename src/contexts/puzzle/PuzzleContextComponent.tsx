@@ -1,9 +1,10 @@
 import React, { PropsWithChildren, useContext, useEffect, useReducer, useRef, useState } from "react";
 import axios, { getAdapter } from "axios";
 import { getLastElement, getTimeTillMove } from "../../modules/Utils";
-import { PuzzleContextProvider, PuzzleReducer, Tpuzzle, defaultPuzzleContextState } from "./PuzzleContext";
+import { PuzzleContextProvider, Tpuzzle, defaultPuzzleContextState } from "./PuzzleContext";
 import PageContext from "../page/PageContext";
 import { Chess } from "chess.js";
+import { PuzzleReducer } from "./PuzzleReducer";
 
 export interface IPuzzleContextComponentProps extends PropsWithChildren {}
 
@@ -27,10 +28,12 @@ const PuzzleContextComponent: React.FunctionComponent<IPuzzleContextComponentPro
             window.addEventListener(
                 "keydown",
                 (e) => {
-                    e.preventDefault();
-                    console.log(e);
-                    if (e.key === "ArrowLeft") PuzzleDispatch({ type: "prevMove", payload: null });
-                    else if (e.key === "ArrowRight") PuzzleDispatch({ type: "nextMove", payload: null });
+                    if (["ArrowLeft", "ArrowRight"].includes(e.key)) {
+                        e.preventDefault();
+                        console.log(e);
+                        if (e.key === "ArrowLeft") PuzzleDispatch({ type: "prevMove", payload: null });
+                        else if (e.key === "ArrowRight") PuzzleDispatch({ type: "nextMove", payload: null });
+                    }
                 },
                 false
             );

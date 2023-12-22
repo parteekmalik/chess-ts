@@ -10,41 +10,21 @@ export interface moveTimeType {
     blackTime: number;
 }
 export interface matchDetailsType {
-    whitePlayerId: string;
-    blackPlayerId: string;
-    game_stats: string;
-    gameType: { baseTime: number; incrementTime: number };
-    moves: string[];
-    movesTime: number[];
+    stats: string;
+    whiteId: string;
+    blackId: string;
+    movesData: { move: string; time: number }[];
     startedAt: number;
+    gameType: {
+        baseTime: number;
+        incrementTime: number;
+    };
+    mySide: Color;
 }
 
-function makePrevMoves(state: ISocketContextState, matchDetails: matchDetailsType) {
-    const { game } = state;
-    for (let i = game.history().length; i < matchDetails.moves.length; i++) game.move(matchDetails.moves[i]);
-    return {
-        ...state,
-        game,
-        game_stats: matchDetails.game_stats,
-        gameType: matchDetails.gameType,
-        blackPlayerId: matchDetails.blackPlayerId,
-        whitePlayerId: matchDetails.whitePlayerId,
-        movesTime: [...state.match_prev_details.movesTime, ...matchDetails.movesTime],
-    };
-}
 export interface moveType {
     move: string;
     time: number;
-}
-function makeMove(state: ISocketContextState, move: moveType) {
-    const { game } = state;
-    game.move(move.move);
-
-    return {
-        ...state,
-        game,
-        movesTime: [...state.match_prev_details.movesTime, move.time],
-    };
 }
 export type ISocketContextActions =
     | { type: "flip_board"; payload: null }
@@ -58,66 +38,94 @@ export type ISocketContextActions =
     | { type: "nextMove"; payload: null }
     | { type: "move_piece"; payload: { from: Square; to: Square } | string }
     | { type: "update_time"; payload: Color };
-const ignoreTypes = ["update_selected_square", "update_time", "update_timeDff"];
+const ignoreTypes = ["update_time"];
+
 export const SocketReducer = (state: ISocketContextState, action: ISocketContextActions) => {
     if (!ignoreTypes.includes(action.type)) console.log("Update State - Action: " + action.type + " - Payload: ", action.payload);
-
     switch (action.type) {
         case "update_socket": {
-            const [socket, matchid] = action.payload as [Socket, string];
+            const [socket, matchid] = action.payload;
             return { ...state, matchid, socket };
         }
-        case "init_match":
-            return makePrevMoves(state, action.payload as matchDetailsType);
-        case "recived_move":
-            return makeMove(state, action.payload as moveType);
+        case "init_match": {
+            const { game } = state;
+            const { payload } = action;
+            const movesData: { move: string; time: number; board_layout: string }[] = [];
+
+            for (let i = game.history().length; i < payload.movesData.length; i++) {
+                game.move(payload.movesData[i].move);
+                movesData.push({ ...payload.movesData[i], board_layout: game.fen() });
+            }
+
+            return {
+                ...state,
+                game,
+                game_stats: payload.stats,
+                gameType: payload.gameType,
+                blackPlayerId: payload.blackId,
+                whitePlayerId: payload.whiteId,
+                board_data: { ...state.board_data, board_layout: game.fen(), solveFor: payload.mySide, flip: payload.mySide },
+                movesData,
+                startedAt: payload.startedAt,
+            };
+        }
+        case "recived_move": {
+            const { game } = state;
+            const { payload } = action;
+            game.move(payload.move);
+            return {
+                ...state,
+                game,
+                movesData: [...state.movesData, { ...payload, board_layout: game.fen() }],
+                board_data: { ...state.board_data, board_layout: game.fen() },
+            };
+        }
         case "update_matchid":
-            return { ...state, matcid: action.payload as string };
+            return { ...state, matcid: action.payload };
         case "update_selected_square":
-            return { ...state, selectedPiece: action.payload as Square | "" };
+            return { ...state, selectedPiece: action.payload };
         case "flip_board":
-            return { ...state, flip: (state.board_data.flip === "w" ? "b" : "w") as Color };
+            return { ...state, board_data: { ...state.board_data, flip: (state.board_data.flip === "w" ? "b" : "w") as Color } };
         case "update_time": {
-            const { whiteTime, blackTime } = getTimeTillMove(
-                state.match_prev_details.movesTime.length - 1,
-                state.match_prev_details.movesTime,
-                state.match_details.gameType
-            );
+            const { whiteTime, blackTime } = getTimeTillMove(state.movesData.length, state.startedAt, state.movesData, state.match_details.gameType);
+            const lastMoveTime = getLastElement(state.movesData);
+            if (lastMoveTime === undefined) return state;
+            // console.log(lastMoveTime);
             if (action.payload === "w")
                 return {
                     ...state,
                     blackTime,
-                    whiteTime: blackTime - (moment().toDate().getTime() - moment(getLastElement(state.match_prev_details.movesTime)).toDate().getTime()),
+                    board_data: { ...state.board_data, whiteTime: blackTime - (moment().toDate().getTime() - moment(lastMoveTime.time).toDate().getTime()) },
                 };
             else
                 return {
                     ...state,
                     whiteTime,
-                    blackTime: blackTime - (moment().toDate().getTime() - moment(getLastElement(state.match_prev_details.movesTime)).toDate().getTime()),
+                    board_data: { ...state.board_data, blackTime: blackTime - (moment().toDate().getTime() - moment(lastMoveTime.time).toDate().getTime()) },
                 };
         }
         case "move_piece": {
-            state.SocketEmiter("move_sent", action.payload);
+            state.socket?.emit("move_sent", action.payload);
             return state;
         }
-        // case "nextMove": {
-        //     if (state.curMove === state.onMove) return state;
-        //     const { game } = state;
-        //     game.move(state.puzzle?.moves[state.curMove] as string);
-        //     return { ...state, game, wrongMove: false, curMove: state.curMove + 1 };
-        // }
-        // case "prevMove": {
-        //     if (state.curMove === 0) return state;
-        //     const { game } = state;
-        //     game.undo();
-        //     return { ...state, game, wrongMove: false, curMove: state.curMove - 1 };
-        // }
-        // case "undoMove": {
-        //     if (!state.wrongMove) return state;
-        //     const { game } = state;
-        //     game.undo();
-        //     return { ...state, game, wrongMove: false, curMove: state.curMove - 1, onMove: state.onMove - 1 };
-        // }
+        /*case "nextMove": {
+            if (state.curMove === state.onMove) return state;
+            const { game } = state;
+            game.move(state.puzzle?.moves[state.curMove] as string);
+            return { ...state, game, wrongMove: false, curMove: state.curMove + 1 };
+        }
+        case "prevMove": {
+            if (state.curMove === 0) return state;
+            const { game } = state;
+            game.undo();
+            return { ...state, game, wrongMove: false, curMove: state.curMove - 1 };
+        }
+        case "undoMove": {
+            if (!state.wrongMove) return state;
+            const { game } = state;
+            game.undo();
+            return { ...state, game, wrongMove: false, curMove: state.curMove - 1, onMove: state.onMove - 1 };
+        }*/
         default:
             return state;
     }

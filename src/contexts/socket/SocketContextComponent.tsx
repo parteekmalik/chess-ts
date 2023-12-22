@@ -6,7 +6,7 @@ import { SocketReducer } from "./SocketReducer";
 import PageContext from "../page/PageContext";
 import moment from "moment";
 import axios, { getAdapter } from "axios";
-import { getLastElement, getTimeTillMove } from "../../modules/Utils";
+import { Color } from "chess.js";
 
 export interface ISocketContextComponentProps extends PropsWithChildren {}
 
@@ -40,19 +40,21 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     useEffect(() => {
         if (SocketState.match_details.game_stats != "") return;
         let interval: number;
-        if (SocketState.match_prev_details.movesTime.length % 2 === 1) interval = setInterval(() => SocketDispatch({ type: "update_time", payload: "w" }), 10);
+        if (SocketState.movesData.length % 2 === 1) interval = setInterval(() => SocketDispatch({ type: "update_time", payload: "w" }), 10);
         else interval = setInterval(() => SocketDispatch({ type: "update_time", payload: "b" }), 10);
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [SocketState.match_prev_details.movesTime]);
+    }, [SocketState.movesData]);
 
     useEffect(() => {
         if (loading) {
             socket.connect();
             SocketDispatch({ type: "update_socket", payload: [socket, matchid as string] });
             StartListeners();
-            SendHandshake();
+
+            SendHandshake(); // Wait for the handshake to complete before proceeding.
+
             window.addEventListener(
                 "keydown",
                 (e) => {
@@ -65,6 +67,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
             );
         }
         setLoading(false);
+
         // eslint-disable-next-line
     }, []);
 
@@ -75,22 +78,26 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
         });
         /** Messages */
         socket.on("recieved_matchdetails", (msg) => {
-            SocketDispatch({ type: "init_match", payload: msg });
+            const mySide: Color = PageState.uid === msg.whiteId ? "w" : "b";
+            SocketDispatch({ type: "init_match", payload: { ...msg, mySide } });
         });
     };
 
-    const SendHandshake = () => {
+    const SendHandshake = async () => {
         console.info("Sending handshake to server ...");
-        // SocketEmiter("handshake", {});
-        SocketState.SocketEmiter("handshake", { uid: PageState.uid as string, matchid: matchid as string });
+        SocketEmiter("handshake", { uid: PageState.uid as string, matchid: matchid as string });
     };
-
+    function SocketEmiter(type: string, payload: any) {
+        console.info("Emitted - Action: " + type + " - Payload: ", payload);
+        socket.emit(type, payload);
+        return true;
+    }
     return (
         <>
             {loading ? (
                 <p>... loading Socket IO ....</p>
             ) : (
-                <SocketContextProvider value={{ SocketState, SocketDispatch }}>{children}</SocketContextProvider>
+                <SocketContextProvider value={{ SocketState, SocketDispatch, SocketEmiter }}>{children}</SocketContextProvider>
             )}
         </>
     );

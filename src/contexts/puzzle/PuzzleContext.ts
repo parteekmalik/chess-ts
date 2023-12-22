@@ -1,6 +1,7 @@
 import { Chess, Color, DEFAULT_POSITION, PieceSymbol, Square } from "chess.js";
 import { createContext } from "react";
 import { Tboard_data } from "../../1making common component/board";
+import { IPuzzleContextActions } from "./PuzzleReducer";
 export type Tpuzzle = {
     id: number;
     fen: string;
@@ -11,24 +12,25 @@ export type Tpuzzle = {
     themes: string[];
     solved: boolean;
 };
+export interface ICommonContextState {
+    board_data: Tboard_data;
+    game: Chess;
+    curMove: number;
+    onMove: number;
+}
 
-export interface IPuzzleContextState {
+export interface IPuzzleContextState extends ICommonContextState {
+    type: "puzzle" ;
     puzzleList: Tpuzzle[];
     puzzle: Tpuzzle | null;
     puzzleNo: number;
-    game: Chess;
-    wrongMove: boolean;
     livesLeft: number;
-    curMove: number;
-    onMove: number;
-    board_data: Tboard_data;
 }
 export const defaultPuzzleContextState: IPuzzleContextState = {
     puzzleList: [],
     puzzle: null,
     puzzleNo: 0,
     game: new Chess(),
-    wrongMove: false,
     curMove: 1,
     onMove: 1,
     livesLeft: 3,
@@ -39,101 +41,9 @@ export const defaultPuzzleContextState: IPuzzleContextState = {
         lastMove: undefined,
         solveFor: "w",
     },
+    type: "puzzle",
 };
 
-export type IPuzzleContextActions =
-    | { type: "update_selected_square"; payload: Square | "" }
-    | { type: "update_puzzle_list"; payload: Tpuzzle[] }
-    | { type: "move_piece"; payload: { from: string; to: string } | string }
-    | { type: "flag_wrong_move"; payload: null }
-    | { type: "undoMove"; payload: null }
-    | { type: "prevMove"; payload: null }
-    | { type: "nextMove"; payload: null }
-    | { type: "update_puzzle"; payload: number }
-    | { type: "update_puzzle_result"; payload: boolean }
-    | { type: "flip_board"; payload: null };
-
-const update_board = (props: { game: Chess; board_data: Tboard_data }) => {
-    const { game, board_data } = props;
-    const new_board_data = { ...board_data, board_layout: game.fen(), lastMove: game.history({ verbose: true })[game.history().length - 1] };
-    return new_board_data;
-};
-const update_puzzle = ({ puzzleList, board_data, puzzleNo }: { puzzleList: Tpuzzle[]; board_data: Tboard_data; puzzleNo: number }) => {
-    console.log(puzzleList[puzzleNo]);
-    const puzzle = puzzleList[puzzleNo];
-    const game = new Chess(puzzle.fen);
-    game.move(puzzle.moves[0]);
-
-    board_data.solveFor = game.turn();
-    board_data.flip = game.turn();
-
-    return { puzzle, game, puzzleNo, board_data: update_board({ board_data, game }), curMove: 1, onMove: 1 };
-};
-// const update_puzzle_list = ({ state, puzzleList }: { state: IPuzzleContextState; puzzleList: Tpuzzle[] }) => {
-//     return { puzzleList, ...update_puzzle({ board_data: state.board_data, puzzleList, puzzleNo: 0 }) };
-// };
-
-export const PuzzleReducer = (state: IPuzzleContextState, action: IPuzzleContextActions) => {
-    console.log("Update State - Action: " + action.type + " - Payload: ", action.payload);
-    switch (action.type) {
-        case "update_puzzle_list": {
-            return {
-                ...state,
-                ...update_puzzle({ board_data: state.board_data, puzzleList: action.payload, puzzleNo: 0 }),
-                puzzleList: action.payload,
-            };
-        }
-        case "update_puzzle": {
-            // return { ...state, puzzle, game, puzzleNo: action.payload, board_data: update_board({ board_data, game }), curMove: 1, onMove: 1 };
-            return { ...state, ...update_puzzle({ board_data: state.board_data, puzzleList: state.puzzleList, puzzleNo: action.payload }) };
-        }
-        case "update_puzzle_result": {
-            const puzzleList = state.puzzleList;
-            puzzleList[state.puzzleNo].solved = action.payload;
-            return { ...state, puzzleList, livesLeft: state.livesLeft - Number(action.payload === false) };
-        }
-        case "update_selected_square":
-            return { ...state, board_data: { ...state.board_data, selectedPiece: action.payload } };
-        case "flip_board":
-            return { ...state, flip: (state.board_data.flip === "w" ? "b" : "w") as Color };
-        case "move_piece": {
-            if (state.wrongMove) return state;
-            const { game, board_data } = state;
-            try {
-                game.move(action.payload);
-            } catch {
-                try {
-                    game.move({ ...(action.payload as { from: string; to: string }), promotion: "q" as PieceSymbol });
-                } catch {
-                    console.log("wrong move");
-                    return state;
-                }
-            }
-            const moveN = state.onMove + 1;
-            return { ...state, game, board_data: update_board({ board_data, game }), selectedPiece: "" as "", onMove: moveN, curMove: moveN };
-        }
-        case "nextMove": {
-            if (state.curMove === state.onMove) return state;
-            const { game } = state;
-            game.move(state.puzzle?.moves[state.curMove] as string);
-            return { ...state, game, board_data: update_board({ board_data: state.board_data, game }), wrongMove: false, curMove: state.curMove + 1 };
-        }
-        case "prevMove": {
-            if (state.curMove === 0) return state;
-            const { game } = state;
-            game.undo();
-            return { ...state, game, board_data: update_board({ board_data: state.board_data, game }), wrongMove: false, curMove: state.curMove - 1 };
-        }
-        case "undoMove": {
-            if (!state.wrongMove) return state;
-            const { game } = state;
-            game.undo();
-            return { ...state, game, wrongMove: false, curMove: state.curMove - 1, onMove: state.onMove - 1 };
-        }
-        default:
-            return state;
-    }
-};
 export interface IPuzzleContextProps {
     PuzzleState: IPuzzleContextState;
     PuzzleDispatch: React.Dispatch<IPuzzleContextActions>;
