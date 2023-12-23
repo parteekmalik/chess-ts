@@ -21,25 +21,25 @@ export function getLastElement<T>(arr: T[]): T {
 //     return res;
 // };
 
-type MoveTimeElement = number | string | { move: string; time: number; board_layout: string };
+type MoveTimeElement = number | string | { move: string; time: string; board_layout: string };
 
 const isMoveTimeString = (value: MoveTimeElement): value is string => typeof value === "string";
-const isMoveTimeObject = (value: MoveTimeElement): value is { move: string; time: number; board_layout: string } =>
+const isMoveTimeObject = (value: MoveTimeElement): value is { move: string; time: string; board_layout: string } =>
     typeof value === "object" && value !== null && "time" in value;
 
-export const getTimeTillMove = (index: number, startedAt: number, moveTime: MoveTimeElement[], gameType: { baseTime: number; incrementTime: number }) => {
+export const getTimeTillMove = (index: number | null, moveTime: MoveTimeElement[], gameType: { baseTime: number; incrementTime: number }) => {
+    if (index === null) index = moveTime.length - 1;
     moveTime = moveTime.map((element) => {
         if (isMoveTimeString(element)) {
             return moment(element).toDate().getTime();
         } else if (isMoveTimeObject(element)) {
-            return element.time;
+            return moment(element.time).toDate().getTime();
         } else {
             return element;
         }
     });
-
-    moveTime = [startedAt, ...moveTime];
-
+    // console.log(moveTime);
+    
     let whiteTime = gameType.baseTime;
     let blackTime = gameType.baseTime;
     for (let i = 1; i <= index; i += 2) {

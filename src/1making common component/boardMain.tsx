@@ -72,9 +72,9 @@ interface BoardProps {
 const checkTurnLogic = (State: ISocketContextState | IPuzzleContextState): boolean => {
     switch (State.type) {
         case "live":
-            return State.board_data.selectedPiece !== "" && State.curMove === State.onMove && State.board_data.solveFor === State.game.turn();
+            return State.board_data.selectedPiece !== "" && State.board_data.curMove === State.board_data.onMove && State.board_data.solveFor === State.game.turn();
         case "puzzle":
-            return State.board_data.selectedPiece !== "" && State.curMove === State.onMove && State.board_data.solveFor === State.game.turn();
+            return State.board_data.selectedPiece !== "" && State.board_data.curMove === State.board_data.onMove && State.board_data.solveFor === State.game.turn();
         default:
             return false;
     }
@@ -106,8 +106,8 @@ const Board: React.FC<BoardProps> = (props) => {
                     <Banner
                         data={
                             State.board_data.flip === "w"
-                                ? { name: State.match_details?.blackPlayerId, time: State.board_data.blackTime }
-                                : { name: State.match_details?.whitePlayerId, time: State.board_data.whiteTime }
+                                ? { name: State.match_details?.blackId, time: State.board_data.blackTime }
+                                : { name: State.match_details?.whiteId, time: State.board_data.whiteTime }
                         }
                     />
                 ) : null}
@@ -116,8 +116,8 @@ const Board: React.FC<BoardProps> = (props) => {
                     <Banner
                         data={
                             State.board_data.flip === "w"
-                                ? { name: State.match_details?.whitePlayerId, time: State.board_data.whiteTime }
-                                : { name: State.match_details?.blackPlayerId, time: State.board_data.blackTime }
+                                ? { name: State.match_details?.whiteId, time: State.board_data.whiteTime }
+                                : { name: State.match_details?.blackId, time: State.board_data.blackTime }
                         }
                     />
                 ) : null}

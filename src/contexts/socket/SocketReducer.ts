@@ -13,8 +13,8 @@ export interface matchDetailsType {
     stats: string;
     whiteId: string;
     blackId: string;
-    movesData: { move: string; time: number }[];
-    startedAt: number;
+    movesData: { move: string; time: string }[];
+    startedAt: string;
     gameType: {
         baseTime: number;
         incrementTime: number;
@@ -24,7 +24,7 @@ export interface matchDetailsType {
 
 export interface moveType {
     move: string;
-    time: number;
+    time: string;
 }
 export type ISocketContextActions =
     | { type: "flip_board"; payload: null }
@@ -37,6 +37,7 @@ export type ISocketContextActions =
     | { type: "prevMove"; payload: null }
     | { type: "nextMove"; payload: null }
     | { type: "move_piece"; payload: { from: Square; to: Square } | string }
+    | { type: "update_board_data"; payload: number }
     | { type: "update_time"; payload: Color };
 const ignoreTypes = ["update_time"];
 
@@ -50,10 +51,10 @@ export const SocketReducer = (state: ISocketContextState, action: ISocketContext
         case "init_match": {
             const { game } = state;
             const { payload } = action;
-            const movesData: { move: string; time: number; board_layout: string }[] = [];
+            const movesData: { move: string; time: string; board_layout: string }[] = [];
 
-            for (let i = game.history().length; i < payload.movesData.length; i++) {
-                game.move(payload.movesData[i].move);
+            for (let i = 0; i < payload.movesData.length; i++) {
+                if (i !== 0) game.move(payload.movesData[i].move);
                 movesData.push({ ...payload.movesData[i], board_layout: game.fen() });
             }
 
@@ -61,10 +62,20 @@ export const SocketReducer = (state: ISocketContextState, action: ISocketContext
                 ...state,
                 game,
                 game_stats: payload.stats,
-                gameType: payload.gameType,
-                blackPlayerId: payload.blackId,
-                whitePlayerId: payload.whiteId,
-                board_data: { ...state.board_data, board_layout: game.fen(), solveFor: payload.mySide, flip: payload.mySide },
+                match_details: {
+                    ...state.match_details,
+                    gameType: payload.gameType,
+                    blackId: payload.blackId,
+                    whiteId: payload.whiteId,
+                },
+                board_data: {
+                    ...state.board_data,
+                    board_layout: game.fen(),
+                    solveFor: payload.mySide,
+                    flip: payload.mySide,
+                    curMove: movesData.length - 1,
+                    onMove: movesData.length - 1,
+                },
                 movesData,
                 startedAt: payload.startedAt,
             };
@@ -83,50 +94,48 @@ export const SocketReducer = (state: ISocketContextState, action: ISocketContext
         case "update_matchid":
             return { ...state, matcid: action.payload };
         case "update_selected_square":
-            return { ...state, selectedPiece: action.payload };
+            return { ...state, board_data: { ...state.board_data, selectedPiece: action.payload } };
         case "flip_board":
             return { ...state, board_data: { ...state.board_data, flip: (state.board_data.flip === "w" ? "b" : "w") as Color } };
         case "update_time": {
-            const { whiteTime, blackTime } = getTimeTillMove(state.movesData.length, state.startedAt, state.movesData, state.match_details.gameType);
-            const lastMoveTime = getLastElement(state.movesData);
-            if (lastMoveTime === undefined) return state;
-            // console.log(lastMoveTime);
-            if (action.payload === "w")
-                return {
-                    ...state,
-                    blackTime,
-                    board_data: { ...state.board_data, whiteTime: blackTime - (moment().toDate().getTime() - moment(lastMoveTime.time).toDate().getTime()) },
-                };
-            else
-                return {
-                    ...state,
-                    whiteTime,
-                    board_data: { ...state.board_data, blackTime: blackTime - (moment().toDate().getTime() - moment(lastMoveTime.time).toDate().getTime()) },
-                };
+            return { ...state, board_data: { ...state.board_data, ...getTimeLeft(state, action) } };
         }
         case "move_piece": {
             state.socket?.emit("move_sent", action.payload);
             return state;
         }
-        /*case "nextMove": {
-            if (state.curMove === state.onMove) return state;
-            const { game } = state;
-            game.move(state.puzzle?.moves[state.curMove] as string);
-            return { ...state, game, wrongMove: false, curMove: state.curMove + 1 };
+        case "nextMove": {
+            if (state.board_data.curMove === state.board_data.onMove) return state;
+            return { ...state, board_data: { ...state.board_data, curMove: state.board_data.curMove + 1 } };
         }
         case "prevMove": {
-            if (state.curMove === 0) return state;
-            const { game } = state;
-            game.undo();
-            return { ...state, game, wrongMove: false, curMove: state.curMove - 1 };
+            if (state.board_data.curMove === 0) return state;
+            return { ...state, board_data: { ...state.board_data, curMove: state.board_data.curMove - 1 } };
         }
-        case "undoMove": {
-            if (!state.wrongMove) return state;
-            const { game } = state;
-            game.undo();
-            return { ...state, game, wrongMove: false, curMove: state.curMove - 1, onMove: state.onMove - 1 };
-        }*/
+        case "update_board_data": {
+            return {
+                ...state,
+                board_data: { ...state.board_data, board_layout: state.movesData[action.payload].board_layout },
+            };
+        }
         default:
             return state;
     }
+};
+
+const getTimeLeft = (state: ISocketContextState, action: ISocketContextActions) => {
+    const { whiteTime, blackTime } = getTimeTillMove(null, state.movesData, state.match_details.gameType);
+    const lastMoveTime = state.movesData.length === 0 ? state.startedAt : getLastElement(state.movesData).time;
+    if (lastMoveTime === undefined) return { blackTime: 0, whiteTime: 0 };
+    // console.log(lastMoveTime);
+    if (action.payload === "w")
+        return {
+            blackTime,
+            whiteTime: whiteTime - (moment().toDate().getTime() - moment(lastMoveTime).toDate().getTime()),
+        };
+    else
+        return {
+            whiteTime,
+            blackTime: blackTime - (moment().toDate().getTime() - moment(lastMoveTime).toDate().getTime()),
+        };
 };

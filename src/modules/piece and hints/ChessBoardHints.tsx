@@ -3,17 +3,15 @@ import { Square, Chess, Color } from "chess.js";
 import { toRowCol } from "../types";
 
 interface ChessBoardProps {
-    isShow: boolean;
     flip: Color;
     selectedPiece: Square | "";
     game: Chess;
 }
 const ChessBoardHints: React.FC<ChessBoardProps> = (props) => {
-    const { isShow, flip, selectedPiece, game } = props;
+    const { flip, selectedPiece, game } = props;
     const BoardLayout = game.board();
 
     const squares: JSX.Element[] = [];
-    if (!isShow) return squares;
 
     if (selectedPiece !== "") {
         game.moves({ verbose: true, square: selectedPiece })

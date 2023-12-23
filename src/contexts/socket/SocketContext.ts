@@ -10,8 +10,8 @@ export interface ISocketContextState extends ICommonContextState {
     type: "live";
     socket: Socket | undefined;
     match_details: {
-        blackPlayerId: string;
-        whitePlayerId: string;
+        blackId: string;
+        whiteId: string;
         matchid: string;
         game_stats: string;
         gameType: {
@@ -19,24 +19,22 @@ export interface ISocketContextState extends ICommonContextState {
             incrementTime: number;
         };
     };
-    startedAt: number;
-    movesData: { move: string; time: number; board_layout: string }[];
+    startedAt: string;
+    movesData: { move: string; time: string; board_layout: string }[];
 }
 
 export const defaultSocketContextState: ISocketContextState = {
     socket: undefined,
     game: new Chess(),
     match_details: {
-        blackPlayerId: "",
-        whitePlayerId: "",
+        blackId: "",
+        whiteId: "",
         matchid: "not_set",
         game_stats: "",
         gameType: { baseTime: 0, incrementTime: 0 },
     },
-    startedAt: 0,
-    movesData: [],
-    curMove: 0,
-    onMove: 0,
+    startedAt: "",
+    movesData: [{ board_layout: DEFAULT_POSITION, time: "", move: "" }],
     board_data: {
         board_layout: DEFAULT_POSITION,
         flip: "w",
@@ -45,6 +43,8 @@ export const defaultSocketContextState: ISocketContextState = {
         solveFor: "w",
         whiteTime: 0,
         blackTime: 0,
+        curMove: 0,
+        onMove: 0,
     },
     type: "live",
 };

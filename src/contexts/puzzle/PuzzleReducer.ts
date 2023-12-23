@@ -65,25 +65,25 @@ export const PuzzleReducer = (state: IPuzzleContextState, action: IPuzzleContext
                     return state;
                 }
             }
-            const moveN = state.onMove + 1;
+            const moveN = state.board_data.onMove + 1;
             return { ...state, game, board_data: update_board({ board_data, game }), selectedPiece: "" as "", onMove: moveN, curMove: moveN };
         }
         case "nextMove": {
-            if (state.curMove === state.onMove) return state;
+            if (state.board_data.curMove === state.board_data.onMove) return state;
             const { game } = state;
-            game.move(state.puzzle?.moves[state.curMove] as string);
-            return { ...state, game, board_data: update_board({ board_data: state.board_data, game }), wrongMove: false, curMove: state.curMove + 1 };
+            game.move(state.puzzle?.moves[state.board_data.curMove] as string);
+            return { ...state, game, board_data: update_board({ board_data: state.board_data, game }), wrongMove: false, curMove: state.board_data.curMove + 1 };
         }
         case "prevMove": {
-            if (state.curMove === 0) return state;
+            if (state.board_data.curMove === 0) return state;
             const { game } = state;
             game.undo();
-            return { ...state, game, board_data: update_board({ board_data: state.board_data, game }), wrongMove: false, curMove: state.curMove - 1 };
+            return { ...state, game, board_data: update_board({ board_data: state.board_data, game }), wrongMove: false, curMove: state.board_data.curMove - 1 };
         }
         case "undoMove": {
             const { game } = state;
             game.undo();
-            return { ...state, game, wrongMove: false, curMove: state.curMove - 1, onMove: state.onMove - 1 };
+            return { ...state, game, wrongMove: false, curMove: state.board_data.curMove - 1, onMove: state.board_data.onMove - 1 };
         }
         default:
             return state;

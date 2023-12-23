@@ -15,8 +15,6 @@ export type Tpuzzle = {
 export interface ICommonContextState {
     board_data: Tboard_data;
     game: Chess;
-    curMove: number;
-    onMove: number;
 }
 
 export interface IPuzzleContextState extends ICommonContextState {
@@ -31,11 +29,11 @@ export const defaultPuzzleContextState: IPuzzleContextState = {
     puzzle: null,
     puzzleNo: 0,
     game: new Chess(),
-    curMove: 1,
-    onMove: 1,
     livesLeft: 3,
     board_data: {
         board_layout: DEFAULT_POSITION,
+        curMove: 1,
+        onMove: 1,
         flip: "w",
         selectedPiece: "",
         lastMove: undefined,

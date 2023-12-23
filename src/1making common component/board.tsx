@@ -16,6 +16,8 @@ export type Tboard_data = {
     selectedPiece: Square | "";
     lastMove: Move | undefined;
     solveFor: Color;
+    curMove: number;
+    onMove: number;
     whiteTime?: number;
     blackTime?: number;
 };
@@ -35,13 +37,8 @@ const ComBoard: React.FC<BoardProps> = (props) => {
                 <Coordinates flip={State.flip} />
                 <Highlight selectedPiece={State.selectedPiece} flip={State.flip} lastMove={State.lastMove} />
                 <ChessBoard game={game} flip={State.flip} />
-                {State.selectedPiece !== "" ? (
-                    <ChessBoardHints
-                        game={game}
-                        selectedPiece={State.selectedPiece}
-                        flip={State.flip}
-                        isShow={"solveFor" in State && State.solveFor !== undefined && State.solveFor === game.turn()}
-                    />
+                {State.selectedPiece !== "" && State.curMove === State.onMove && State.solveFor === game.turn() ? (
+                    <ChessBoardHints game={game} selectedPiece={State.selectedPiece} flip={State.flip} />
                 ) : null}
             </div>
         </div>
