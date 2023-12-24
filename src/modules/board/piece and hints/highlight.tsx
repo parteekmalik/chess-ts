@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import { Chess, Color, Move, SQUARES, Square } from "chess.js";
-import { toRowCol } from "../types";
-import SocketContext from "../../contexts/socket/SocketContext";
+import { toRowCol } from "../../Utils";
 
 const PrevHighlight: React.FC<{ history: Move; flip: Color }> = ({ history, flip }) => {
     const from = {

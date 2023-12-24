@@ -40,7 +40,7 @@ const SocketContextComponent: React.FunctionComponent<ISocketContextComponentPro
     useEffect(() => {
         if (SocketState.match_details.game_stats != "") return;
         let interval: number;
-        if (SocketState.movesData.length % 2 === 0) interval = setInterval(() => SocketDispatch({ type: "update_time", payload: "w" }), 10);
+        if (SocketState.movesData.length % 2 === 1) interval = setInterval(() => SocketDispatch({ type: "update_time", payload: "w" }), 10);
         else interval = setInterval(() => SocketDispatch({ type: "update_time", payload: "b" }), 10);
         return () => {
             if (interval) clearInterval(interval);

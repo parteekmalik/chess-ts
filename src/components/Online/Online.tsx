@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Board from "../../modules/board/board";
-import Banner from "../../modules/banner/banner";
+import Banner from "../../modules/board/banner/banner";
 import { Chess } from "chess.js";
 import axios from "axios";
 import PageContext from "../../contexts/page/PageContext";

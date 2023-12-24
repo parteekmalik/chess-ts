@@ -6,7 +6,7 @@ import { IPuzzleContextState } from "../../contexts/puzzle/PuzzleContext";
 import { ISocketContextActions } from "../../contexts/socket/SocketReducer";
 import { IPuzzleContextActions } from "../../contexts/puzzle/PuzzleReducer";
 import PageContext from "../../contexts/page/PageContext";
-import Banner from "../banner/banner";
+import Banner from "./banner/banner";
 import ComBoard from "./board";
 import { buttonStyle } from "../Utils";
 

@@ -12,7 +12,7 @@ const PuzzleBoard: React.FC<BoardProps> = (props) => {
     const { PuzzleState, PuzzleDispatch } = useContext(PuzzleContext);
 
     function clickHandle(square: Square) {
-        if (PuzzleState.board_data.selectedPiece && PuzzleState.curMove === PuzzleState.onMove) {
+        if (PuzzleState.board_data.selectedPiece && PuzzleState.board_data.curMove === PuzzleState.board_data.onMove) {
             const from = PuzzleState.board_data.selectedPiece as Square;
             const to = square;
             PuzzleDispatch({ type: "move_piece", payload: { from, to } });

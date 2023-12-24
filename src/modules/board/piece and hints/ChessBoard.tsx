@@ -1,7 +1,5 @@
 // ChessBoard.tsx
 import { Chess, Color } from "chess.js";
-import { useContext } from "react";
-import SocketContext from "../../contexts/socket/SocketContext";
 
 interface ChessBoardProps {
     game: Chess;

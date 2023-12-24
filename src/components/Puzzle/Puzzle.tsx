@@ -14,7 +14,7 @@ function Puzzle() {
     const { PageState, PageDispatch } = useContext(PageContext);
 
     function handleClick(payload: { from: string; to: string } | string) {
-        if (PuzzleState.curMove === PuzzleState.onMove) PuzzleDispatch({ type: "move_piece", payload });
+        if (PuzzleState.board_data.curMove === PuzzleState.board_data.onMove) PuzzleDispatch({ type: "move_piece", payload });
     }
     return (
         <div className="flex w-full">

@@ -6,7 +6,6 @@ import Layout from "./Layout";
 import Home from "./components/Home/Home";
 import About from "./components/About/About";
 import Contact from "./components/Contact/Contact";
-import Live from "./components/Application";
 import Puzzle from "./components/Puzzle/Puzzle";
 import Online from "./components/Online/Online";
 import Computer from "./components/Computer/Computer";
@@ -15,6 +14,7 @@ import LoginForm from "./components/Login/Login";
 import SocketContextComponent from "./contexts/socket/SocketContextComponent";
 import PageContextComponent from "./contexts/page/PageContextComponent";
 import PuzzleContextComponent from "./contexts/puzzle/PuzzleContextComponent";
+import LiveBoard from "./components/LiveBoard/LiveBoard";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -28,7 +28,7 @@ const router = createBrowserRouter(
                 path="live/:matchid/:userid/:turn"
                 element={
                     <SocketContextComponent>
-                        <Live />
+                        <LiveBoard />
                     </SocketContextComponent>
                 }
             />
