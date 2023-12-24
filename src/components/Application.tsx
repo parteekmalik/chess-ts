@@ -3,7 +3,7 @@ import SocketContext from "../contexts/socket/SocketContext";
 import { useNavigate, useParams } from "react-router-dom";
 import PageContext from "../contexts/page/PageContext";
 import { Square } from "chess.js";
-import Board from "../1making common component/boardMain";
+import Board from "../modules/board/boardMain";
 
 export interface IApplicationProps {}
 

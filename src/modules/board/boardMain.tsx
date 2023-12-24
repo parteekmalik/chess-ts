@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import { Chess, Color, Square } from "chess.js";
-import { ISocketContextState } from "../contexts/socket/SocketContext";
-import { IPuzzleContextState } from "../contexts/puzzle/PuzzleContext";
-import { ISocketContextActions } from "../contexts/socket/SocketReducer";
-import { IPuzzleContextActions } from "../contexts/puzzle/PuzzleReducer";
-import PageContext from "../contexts/page/PageContext";
-import Banner from "../modules/banner/banner";
+import { ISocketContextState } from "../../contexts/socket/SocketContext";
+import { IPuzzleContextState } from "../../contexts/puzzle/PuzzleContext";
+import { ISocketContextActions } from "../../contexts/socket/SocketReducer";
+import { IPuzzleContextActions } from "../../contexts/puzzle/PuzzleReducer";
+import PageContext from "../../contexts/page/PageContext";
+import Banner from "../banner/banner";
 import ComBoard from "./board";
-import { buttonStyle } from "../modules/Utils";
+import { buttonStyle } from "../Utils";
 
 // export interface ISocketContextState {
 //     socket: Socket | undefined;

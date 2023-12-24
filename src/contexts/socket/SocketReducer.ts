@@ -1,7 +1,6 @@
 import moment from "moment";
 import { ISocketContextState } from "./SocketContext";
 import { Socket } from "socket.io-client";
-import { selectedPieceProps } from "../../modules/types";
 import { Color, Square } from "chess.js";
 import { getLastElement, getTimeTillMove } from "../../modules/Utils";
 

@@ -1,6 +1,6 @@
 import { Chess, Color, DEFAULT_POSITION, PieceSymbol, Square } from "chess.js";
 import { createContext } from "react";
-import { Tboard_data } from "../../1making common component/board";
+import { Tboard_data } from "../../modules/board/board";
 import { IPuzzleContextActions } from "./PuzzleReducer";
 export type Tpuzzle = {
     id: number;
@@ -18,7 +18,7 @@ export interface ICommonContextState {
 }
 
 export interface IPuzzleContextState extends ICommonContextState {
-    type: "puzzle" ;
+    type: "puzzle";
     puzzleList: Tpuzzle[];
     puzzle: Tpuzzle | null;
     puzzleNo: number;

@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import PuzzleContext, { Tpuzzle } from "../../contexts/puzzle/PuzzleContext";
 import PageContext from "../../contexts/page/PageContext";
 import PuzzleBoard from "./PuzzleBoard";
-import Board from "../../1making common component/boardMain";
+import Board from "../../modules/board/boardMain";
 
 const wrongurl = "https://www.chess.com/bundles/web/images/svg/wrong.svg";
 const wrighturl = "https://www.chess.com/bundles/web/images/svg/solved.svg";

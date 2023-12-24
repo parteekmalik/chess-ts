@@ -1,6 +1,6 @@
 // ChessBoardHints.tsx
 import { Square, Chess, Color } from "chess.js";
-import { toRowCol } from "../types";
+import { toRowCol } from "../../Utils";
 
 interface ChessBoardProps {
     flip: Color;

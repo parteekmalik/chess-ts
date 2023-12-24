@@ -1,6 +1,5 @@
 import { Color } from "chess.js";
 import { useContext } from "react";
-import SocketContext from "../../contexts/socket/SocketContext";
 
 const Coordinates: React.FC<{ flip: Color }> = (props) => {
     const { flip } = props;

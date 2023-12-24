@@ -1,5 +1,5 @@
 import { Chess, Color, PieceSymbol, Square } from "chess.js";
-import { Tboard_data } from "../../1making common component/board";
+import { Tboard_data } from "../../modules/board/board";
 import { IPuzzleContextState, Tpuzzle } from "./PuzzleContext";
 
 export type IPuzzleContextActions =

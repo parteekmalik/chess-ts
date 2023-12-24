@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Chess, Color, Square } from "chess.js";
 import PuzzleContext from "../../contexts/puzzle/PuzzleContext";
 import { buttonStyle } from "../../modules/Utils";
-import Board from "../../1making common component/board";
+import Board from "../../modules/board/board";
 
 interface BoardProps {}
 

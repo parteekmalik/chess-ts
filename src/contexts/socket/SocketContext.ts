@@ -3,7 +3,7 @@ import { Socket } from "socket.io-client";
 import { Chess, Color, DEFAULT_POSITION, Square } from "chess.js";
 import { selectedPieceProps } from "../../modules/types";
 import { ISocketContextActions, moveTimeType } from "./SocketReducer";
-import { Tboard_data } from "../../1making common component/board";
+import { Tboard_data } from "../../modules/board/board";
 import { ICommonContextState } from "../puzzle/PuzzleContext";
 
 export interface ISocketContextState extends ICommonContextState {
