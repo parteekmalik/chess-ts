@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { redirect, useNavigate } from "react-router-dom";
 import PageContext from "../../contexts/page/PageContext";
+import { serverurl } from "../../URLs";
 
 const LoginForm = () => {
     const [username, setUsername] = useState("");
@@ -15,7 +16,7 @@ const LoginForm = () => {
     const handleLogin = async () => {
         try {
             console.log(username, password);
-            const response = await axios.get(`http://localhost:3002/login/${username}/${password}`);
+            const response = await axios.get(serverurl + `/login/${username}/${password}`);
 
             if (response.status === 200) {
                 // Save the username to sessionStorage on successful login

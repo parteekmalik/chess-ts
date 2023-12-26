@@ -10,61 +10,6 @@ import Banner from "./banner/banner";
 import ComBoard from "./board";
 import { buttonStyle } from "../Utils";
 
-// export interface ISocketContextState {
-//     socket: Socket | undefined;
-//     game: Chess;
-//     match_details: {
-//         blackPlayerId: string;
-//         whitePlayerId: string;
-//         matchid: string;
-//         game_stats: string;
-//         gameType: {
-//             baseTime: number;
-//             incrementTime: number;
-//         };
-//     };
-
-//     match_prev_details: {
-//         board_moves_layout: string[];
-//         movesTime: number[];
-//         movesUndone: string[];
-//     };
-//     board_data: Tboard_data;
-//     type: string;
-//     SocketEmiter: (type: string, payload: any) => void;
-// }
-// export type Tpuzzle = {
-//     id: number;
-//     fen: string;
-//     moves: string[];
-//     opening_tags: string[];
-//     rating: number;
-//     rating_deviation: number;
-//     themes: string[];
-//     solved: boolean;
-// };
-
-// export interface IPuzzleContextState {
-//     puzzleList: Tpuzzle[];
-//     puzzle: Tpuzzle | null;
-//     puzzleNo: number;
-//     game: Chess;
-//     wrongMove: boolean;
-//     livesLeft: number;
-//     curMove: number;
-//     onMove: number;
-//     board_data: Tboard_data;
-//     type: string;
-// }
-// export type Tboard_data = {
-//     board_layout: string;
-//     flip: Color;
-//     selectedPiece: Square | "";
-//     lastMove: Move | undefined;
-//     solveFor: Color;
-//     whiteTime?: number;
-//     blackTime?: number;
-// };
 interface BoardProps {
     State: ISocketContextState | IPuzzleContextState;
     StateDispatch: React.Dispatch<ISocketContextActions> | React.Dispatch<IPuzzleContextActions>;

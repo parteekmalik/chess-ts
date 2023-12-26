@@ -5,6 +5,7 @@ import { PuzzleContextProvider, Tpuzzle, defaultPuzzleContextState } from "./Puz
 import PageContext from "../page/PageContext";
 import { Chess } from "chess.js";
 import { PuzzleReducer } from "./PuzzleReducer";
+import { serverurl } from "../../URLs";
 
 export interface IPuzzleContextComponentProps extends PropsWithChildren {}
 
@@ -16,10 +17,10 @@ const PuzzleContextComponent: React.FunctionComponent<IPuzzleContextComponentPro
     const [loading, setLoading] = useState(true);
     const [PuzzleState, PuzzleDispatch] = useReducer(PuzzleReducer, defaultPuzzleContextState);
     const updatePuzzle = () => {
-        const data = axios.get("http://localhost:3002/getpuzzles").then((data) => {
+        const data = axios.get(serverurl + "/getpuzzles").then((data) => {
             const payload = data.data.map((data: any) => ({ ...data, solved: false } as Tpuzzle));
             PuzzleDispatch({ type: "update_puzzle_list", payload });
-            PuzzleDispatch({ type: "update_puzzle", payload: 0 });
+            // PuzzleDispatch({ type: "update_puzzle", payload: 0 });
         });
     };
     useEffect(() => {
@@ -43,7 +44,8 @@ const PuzzleContextComponent: React.FunctionComponent<IPuzzleContextComponentPro
     }, []);
 
     useEffect(() => {
-        const { game, curMove, onMove, puzzle } = PuzzleState;
+        const { game, puzzle } = PuzzleState;
+        const { curMove, onMove } = PuzzleState.board_data;
         const nextMoveN = game.history().length;
         const nextMove = puzzle?.moves[nextMoveN];
         const iswrong = puzzle?.moves[nextMoveN - 1] !== PuzzleState.game.history()[nextMoveN - 1];

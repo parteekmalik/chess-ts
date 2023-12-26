@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { redirect, useNavigate } from "react-router-dom";
 import PageContext from "../../contexts/page/PageContext";
+import {  serverurl } from "../../URLs";
 
 const RegisterForm = () => {
     const [username, setUsername] = useState("");
@@ -14,7 +15,7 @@ const RegisterForm = () => {
 
     const handleRegister = async () => {
         try {
-            const response = await axios.get(`http://localhost:3002/register/${username}/${password}`);
+            const response = await axios.get(`${serverurl}/register/${username}/${password}`);
 
             if (response.status === 200) {
                 navigate("/login");

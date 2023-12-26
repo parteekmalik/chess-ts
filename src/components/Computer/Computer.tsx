@@ -1,10 +1,12 @@
 import React from "react";
-import Board from "../board/ComputerBoard";
+import ComBoard from "../../modules/board/board";
+import Board from "../../modules/board/boardMain";
 
 function Computer() {
+
     return (
-        <div>
-            <Board />
+        <div className="flex flex-row justify-center ">
+            {/* <Board State={} StateDispatch={} /> */}
         </div>
     );
 }

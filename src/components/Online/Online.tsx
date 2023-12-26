@@ -1,10 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Board from "../../modules/board/board";
-import Banner from "../../modules/board/banner/banner";
-import { Chess } from "chess.js";
 import axios from "axios";
 import PageContext from "../../contexts/page/PageContext";
+import { serverurl } from "../../URLs";
 
 function Online() {
     const gameTypes = {
@@ -40,7 +38,7 @@ function Online() {
         const guestId = async () => {
             if (uid) return;
 
-            const guestUserId: string = (await axios.get(`http://localhost:3002/getGuestId`)).data;
+            const guestUserId: string = (await axios.get(serverurl + `/getGuestId`)).data;
             console.log(guestUserId);
             // Save the username to sessionStorage on successful login
             PageDispatch({ type: "update_uid", payload: guestUserId });
@@ -69,7 +67,7 @@ function Online() {
                 baseTime: number;
                 incrementTime: number;
                 movesData: { move: string; time: string }[];
-            } = (await axios.post("http://localhost:3002/new", payload)).data;
+            } = (await axios.post(serverurl + "/new", payload)).data;
             console.log("Response:", response);
             navigate(`/live/${response.matchId}/${uid}/${response.whiteId === uid ? "w" : "b"}`);
             // Do something with the response data
