@@ -3,7 +3,6 @@ import { Chess } from "chess.js";
 import React, { useContext, useEffect, useState } from "react";
 import PuzzleContext, { Tpuzzle } from "../../contexts/puzzle/PuzzleContext";
 import PageContext from "../../contexts/page/PageContext";
-import PuzzleBoard from "./PuzzleBoard";
 import Board from "../../modules/board/boardMain";
 
 const wrongurl = "https://www.chess.com/bundles/web/images/svg/wrong.svg";
