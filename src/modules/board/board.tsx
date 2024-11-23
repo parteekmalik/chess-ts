@@ -1,48 +1,129 @@
-import React, { useContext } from "react";
+"use client";
+import { Accordion, AccordionItem, Button } from "@nextui-org/react";
+import { Chess, Color, DEFAULT_POSITION, Square } from "chess.js";
+import _ from "lodash";
+import React, { useEffect, useState } from "react";
+import { twMerge } from "tailwind-merge";
+import { checkForValidClick } from "../Utils";
+import { ChessMoveType } from "./boardMain";
 import Coordinates from "./coordinates/coordinates";
-import PuzzleContext, { IPuzzleContextState } from "../../contexts/puzzle/PuzzleContext";
-import { Chess, Color, Move, Square } from "chess.js";
-import Highlight from "./piece and hints/highlight";
 import ChessBoard from "./piece and hints/ChessBoard";
 import ChessBoardHints from "./piece and hints/ChessBoardHints";
-import { checkForValidClick } from "../Utils";
-interface BoardProps {
-    clickHandle: (square: Square) => void;
-    State: Tboard_data;
+import Highlight from "./piece and hints/highlight";
+
+export interface BoardProps {
+  handleMove: (move: ChessMoveType) => void;
+  startingBoard?: string;
+  movesPlayed: ChessMoveType[];
+  playerTurn: Color | null;
+  puzzleNo?: number;
 }
-export type Tboard_data = {
-    board_layout: string;
-    flip: Color;
-    selectedPiece: Square | "";
-    lastMove: Move | undefined;
-    solveFor: Color;
-    curMove: number;
-    onMove: number;
-    whiteTime?: number;
-    blackTime?: number;
-};
-const ComBoard: React.FC<BoardProps> = (props) => {
-    const { State, clickHandle } = props;
-    const game = new Chess(State.board_layout);
 
-    const PieceLogic = (event: React.MouseEvent) => {
-        const { isValid, square } = checkForValidClick(event, State.flip);
-        if (!isValid) return;
-        clickHandle(square);
-    };
+const ComBoard: React.FC<BoardProps> = ({ startingBoard = DEFAULT_POSITION, movesPlayed, handleMove, playerTurn, puzzleNo }) => {
+  const [game, setGame] = useState(new Chess(startingBoard));
+  const [selectedPiece, setSelectedPiece] = useState<Square | null>(null);
+  const [flip, setFlip] = useState(false);
 
-    return (
-        <div className="flex flex-col">
-            <div className={` bg-[url('./assets/images/blank_board_img.png')] bg-no-repeat bg-[length:100%_100%] relative w-[500px] h-[500px]`} onClick={PieceLogic}>
-                <Coordinates flip={State.flip} />
-                <Highlight selectedPiece={State.selectedPiece} flip={State.flip} lastMove={State.lastMove} />
-                <ChessBoard game={game} flip={State.flip} />
-                {State.selectedPiece !== "" && State.curMove === State.onMove && State.solveFor === game.turn() ? (
-                    <ChessBoardHints game={game} selectedPiece={State.selectedPiece} flip={State.flip} />
-                ) : null}
-            </div>
-        </div>
-    );
+  useEffect(() => {
+    setFlip(false);
+  }, [puzzleNo]);
+
+  useEffect(() => {
+    const game = new Chess(startingBoard);
+    movesPlayed.forEach((move) => {
+      game.move(move);
+    });
+    setGame(game);
+  }, [startingBoard, movesPlayed]);
+
+  const PieceLogic = (event: React.MouseEvent) => {
+    if (game.history().length !== movesPlayed.length) return;
+    const { isValid, square } = checkForValidClick(event, playerTurn ? (flip ? oppositeTurn(playerTurn) : playerTurn) : "w");
+    console.log("playerTurn -> ", playerTurn);
+    console.log("isValid -> ", isValid, " square -> ", square);
+    if (!isValid) return;
+    if (selectedPiece && playerTurn === game.turn()) {
+      try {
+        game.move({ from: selectedPiece, to: square as Square });
+        handleMove({ from: selectedPiece, to: square as Square });
+        setSelectedPiece(null);
+      } catch (error) {
+        console.log("invalid move from board component -> ", selectedPiece, " to -> ", square);
+        console.log("game.get(square as Square) -> ", game.get(square as Square));
+        if (game.get(square as Square)) setSelectedPiece(square!);
+        else setSelectedPiece(null);
+      }
+    } else if (game.get(square as Square)) setSelectedPiece(square!);
+  };
+
+  function oppositeTurn(turn: Color) {
+    return turn === "w" ? "b" : "w";
+  }
+  return (
+    <div className="flex grow">
+      <div
+        className={twMerge(`relative h-[400px] w-[400px] aspect-square bg-[length:100%_100%] bg-no-repeat`)}
+        style={{ backgroundImage: `url('/images/blank_board_img.png')` }}
+        onClick={PieceLogic}
+      >
+        <Coordinates flip={playerTurn ? (flip ? oppositeTurn(playerTurn) : playerTurn) : "w"} />
+        <Highlight
+          selectedPiece={selectedPiece}
+          flip={playerTurn ? (flip ? oppositeTurn(playerTurn) : playerTurn) : "w"}
+          lastMove={game.history({ verbose: true })[game.history({ verbose: true }).length - 1]}
+        />
+        <ChessBoard game={playerTurn === "b" ? (flip ? game.board() : game.board().reverse()) : flip ? game.board().reverse() : game.board()} />
+        {playerTurn === game.turn() && selectedPiece && (
+          <ChessBoardHints game={game} selectedPiece={selectedPiece} flip={playerTurn ? (flip ? oppositeTurn(playerTurn) : playerTurn) : "w"} />
+        )}
+      </div>
+
+      <Accordion variant="splitted" >
+        <AccordionItem key="1" aria-label="SETTING" title="SETTING" className="flex flex-col gap-2">
+          <div>
+            <Button
+              onPress={() => {
+                setSelectedPiece(null);
+                const newgame = _.cloneDeep(game);
+                if (newgame.history().length > 0) {
+                  newgame.undo();
+                  setGame(newgame);
+                }
+              }}
+            >
+              Back
+            </Button>
+            <Button
+              onPress={() => {
+                setSelectedPiece(null);
+                const newgame = _.cloneDeep(game);
+                if (newgame.history().length < movesPlayed.length) {
+                  newgame.move(movesPlayed[newgame.history().length]!);
+                  setGame(newgame);
+                }
+              }}
+            >
+              Next
+            </Button>
+          </div>
+          <div>
+            <Button
+              onPress={() => {
+                setFlip(!flip);
+              }}
+            >
+              Flip
+            </Button>
+          </div>
+        </AccordionItem>
+        <AccordionItem key="2" aria-label="DEBUG" title="DEBUG">
+          <div>{JSON.stringify(selectedPiece)}</div>
+          <div>{JSON.stringify(game.history())}</div>
+          <div>{JSON.stringify(game.turn())}</div>
+        </AccordionItem>
+      </Accordion>
+    </div>
+  );
 };
 
 export default ComBoard;
