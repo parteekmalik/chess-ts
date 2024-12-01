@@ -27,7 +27,7 @@ function BoardWithTime(props: BoardWithTimeProps) {
     });
 
     worker.onmessage = (e) => {
-      const { whiteTime: newWhiteTime, blackTime: newBlackTime } = e.data;
+      const { whiteTime: newWhiteTime, blackTime: newBlackTime } = e.data as { whiteTime: number; blackTime: number };
       setWhiteTime(Math.max(newWhiteTime, 0));
       setBlackTime(Math.max(newBlackTime, 0));
     };

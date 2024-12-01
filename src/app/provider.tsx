@@ -5,10 +5,11 @@ import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
 import type { ReactNode } from "react";
 import SocketContextComponent from "~/components/contexts/socket/SocketContextComponent";
+import type { Session } from "next-auth";
 
 interface ProviderProps {
   children: ReactNode;
-  session: any;
+  session: Session | null;
 }
 
 function Provider({ children, session }: ProviderProps) {

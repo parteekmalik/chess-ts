@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { io, Socket } from "socket.io-client";
+import { io, type Socket } from "socket.io-client";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -58,17 +58,17 @@ export const useSocketMessage = (): UseSocketMessageReturn => {
     newSocket.on("guest_id_assigned", (id) => {
       console.log("Guest ID:", id);
       if (typeof window !== 'undefined') {
-        sessionStorage.setItem('guestId', id);
+        sessionStorage.setItem('guestId', id as string);
       }
-      setGuestId(id);
+      setGuestId(id as string);
     });
 
-    newSocket.onAny((type, payload) => {
+    newSocket.onAny((type: string, payload: unknown) => {
       console.log("Received message:", { type, payload });
       setLastMessage({ type, payload });
     });
 
-    newSocket.on("redirect", (url) => {
+    newSocket.on("redirect", (url: string) => {
       router.push(url);
     });
     newSocket.on("disconnect", () => {

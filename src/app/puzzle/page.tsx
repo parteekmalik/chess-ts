@@ -1,12 +1,10 @@
 "use client";
-import { Button } from "@nextui-org/react";
-import { Chess } from "chess.js";
+import { Image } from "@nextui-org/react";
 import { useEffect, useReducer } from "react";
-import { defaultPuzzleContextState, IPuzzleContextState } from "~/app/puzzle/_components/PuzzleContext";
-import { IPuzzleContextActions, PuzzleReducer } from "~/app/puzzle/_components/PuzzleReducer";
+import { defaultPuzzleContextState, type IPuzzleContextState } from "~/app/puzzle/_components/PuzzleContext";
+import { type IPuzzleContextActions, PuzzleReducer } from "~/app/puzzle/_components/PuzzleReducer";
 import Board from "~/modules/board/board";
-import { ChessMoveType } from "~/modules/board/boardMain";
-import { getLastElement } from "~/modules/Utils";
+import { type ChessMoveType } from "~/modules/board/boardMain";
 import { api } from "~/trpc/react";
 
 function Puzzle() {
@@ -47,15 +45,16 @@ function Puzzle() {
           movesPlayed={PuzzleState.movesPlayed}
           handleMove={handleMove}
         />
-        <div className="h-fit grow flex flex-wrap gap-5  p-5 text-foreground">
+        <div className="flex h-fit grow flex-wrap gap-5 p-5 text-foreground">
           {PuzzleState.puzzleList.map((puz, index) => {
             if (PuzzleState.puzzleNo > index) {
               return (
-                <div className="flex flex-col items-center gap-2 rounded-md bg-background-500  p-2" key={index} style={{ width: "60px" }}>
-                  <img
+                <div className="flex flex-col items-center gap-2 rounded-md bg-background-500 p-2" key={index} style={{ width: "60px" }}>
+                  <Image
                     className={`flex h-[18px] w-[18px] text-[${PuzzleState.passedPuzzleList[index] ? "green" : "red"}]`}
                     src={`${PuzzleState.passedPuzzleList[index] ? "https://www.chess.com/bundles/web/images/svg/solved.svg" : "https://www.chess.com/bundles/web/images/svg/wrong.svg"}`}
-                  ></img>
+                    alt="puzzle status"
+                  ></Image>
                   <p>{puz.rating}</p>
                 </div>
               );

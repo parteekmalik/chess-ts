@@ -1,8 +1,8 @@
 "use client";
-import { Chess, Color } from "chess.js";
+import type { Color } from "chess.js";
 import { createContext } from "react";
-import { IPuzzleContextActions } from "./PuzzleReducer";
-import { ChessMoveType } from "~/modules/board/boardMain";
+import type { ChessMoveType } from "~/modules/board/boardMain";
+import type { IPuzzleContextActions } from "./PuzzleReducer";
 
 export type Puzzle = {
   moves: string[];
@@ -37,7 +37,7 @@ export interface IPuzzleContextProps {
 
 const PuzzleContext = createContext<IPuzzleContextProps>({
   PuzzleState: defaultPuzzleContextState,
-  PuzzleDispatch: () => {},
+  PuzzleDispatch: () => {console.log("dispatch")},
 });
 
 export const PageContextConsumer = PuzzleContext.Consumer;

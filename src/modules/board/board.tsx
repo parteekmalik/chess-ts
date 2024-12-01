@@ -1,11 +1,11 @@
 "use client";
 import { Accordion, AccordionItem, Button } from "@nextui-org/react";
-import { Chess, Color, DEFAULT_POSITION, Square } from "chess.js";
+import { Chess, type Color, DEFAULT_POSITION, type Square } from "chess.js";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { checkForValidClick } from "../Utils";
-import { ChessMoveType } from "./boardMain";
+import type { ChessMoveType } from "./boardMain";
 import Coordinates from "./coordinates/coordinates";
 import ChessBoard from "./piece and hints/ChessBoard";
 import ChessBoardHints from "./piece and hints/ChessBoardHints";
@@ -44,16 +44,16 @@ const ComBoard: React.FC<BoardProps> = ({ startingBoard = DEFAULT_POSITION, move
     if (!isValid) return;
     if (selectedPiece && playerTurn === game.turn()) {
       try {
-        game.move({ from: selectedPiece, to: square as Square });
-        handleMove({ from: selectedPiece, to: square as Square });
+        game.move({ from: selectedPiece, to: square! });
+        handleMove({ from: selectedPiece, to: square! });
         setSelectedPiece(null);
-      } catch (error) {
+      } catch {
         console.log("invalid move from board component -> ", selectedPiece, " to -> ", square);
-        console.log("game.get(square as Square) -> ", game.get(square as Square));
-        if (game.get(square as Square)) setSelectedPiece(square!);
+        console.log("game.get(square as Square) -> ", game.get(square!));
+        if (game.get(square!)) setSelectedPiece(square!);
         else setSelectedPiece(null);
       }
-    } else if (game.get(square as Square)) setSelectedPiece(square!);
+    } else if (game.get(square!)) setSelectedPiece(square!);
   };
 
   function oppositeTurn(turn: Color) {

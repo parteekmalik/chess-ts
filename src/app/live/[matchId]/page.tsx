@@ -1,11 +1,11 @@
 "use client";
-import { Button, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/react";
-import { Color } from "chess.js";
+import { Button } from "@nextui-org/react";
+import { type Color } from "chess.js";
 import moment from "moment";
 import { useParams } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
 import { useSocket } from "~/components/contexts/socket/SocketContextComponent";
-import { ChessMoveType } from "~/modules/board/boardMain";
+import type { ChessMoveType } from "~/modules/board/boardMain";
 import BoardWithTime from "./_components/BoardWithTime";
 import Result from "./_components/result";
 
@@ -25,14 +25,14 @@ const LiveBoard: React.FunctionComponent = () => {
   useEffect(() => {
     console.log("params -> ", params);
     sendMessage("join_match", params.matchId);
-  }, [params.matchId]);
+  }, [params, sendMessage]);
 
   useEffect(() => {
     if (lastMessage?.type === "joined_match") {
       sendMessage("start_match", "joined match room", params.matchId as string);
     } else if (lastMessage?.type === "match_update") {
       if ((lastMessage.payload as { matchId: string }).matchId === params.matchId) {
-        const payload = lastMessage.payload as any;
+        const payload = lastMessage.payload as { matchId: string; moves: ChessMoveType[]; players: { w: { timeLeft: string }; b: { timeLeft: string } } };
         console.log("match update -> ", lastMessage.payload);
         setMovesPlayed(payload.moves);
         setWhitePlayerTime(payload.players.w.timeLeft);
@@ -40,7 +40,7 @@ const LiveBoard: React.FunctionComponent = () => {
       }
     } else if (lastMessage?.type === "set_match_details") {
       console.log("set match details -> ", lastMessage.payload);
-      const payload = lastMessage.payload as any;
+      const payload = lastMessage.payload as { matchId: string; moves: ChessMoveType[]; players: { w: { id: string; timeLeft: string }; b: { id: string; timeLeft: string } }; config: { baseTime: number; incrementTime: number } };
 
       setGameDetails(payload.config);
       setMovesPlayed(payload.moves);

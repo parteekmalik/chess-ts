@@ -1,6 +1,6 @@
 import { Chess } from "chess.js";
-import { ChessMoveType } from "~/modules/board/boardMain";
-import { defaultPuzzleContextState, IPuzzleContextState, Puzzle } from "./PuzzleContext";
+import type { ChessMoveType } from "~/modules/board/boardMain";
+import { defaultPuzzleContextState, type IPuzzleContextState, type Puzzle } from "./PuzzleContext";
 
 export type IPuzzleContextActions =
   | { type: "update_puzzle_list"; payload: Puzzle[] }
@@ -9,10 +9,10 @@ export type IPuzzleContextActions =
   | { type: "move_piece"; payload: ChessMoveType };
 
 function nextPuzzle(state: IPuzzleContextState, puzzleno?: number): Pick<IPuzzleContextState, "movesPlayed" | "puzzleNo" | "playerTurn"> {
-  const puzzle = state.puzzleList[(puzzleno ?? state.puzzleNo) + 1] as Puzzle;
+  const puzzle = state.puzzleList[(puzzleno ?? state.puzzleNo) + 1]!;
   console.log("puzzle -> ", puzzle, puzzleno, state.puzzleNo);
   const game = new Chess(puzzle.fen);
-  game.move(puzzle.moves[0] as string);
+  game.move(puzzle.moves[0]!);
   return {
     movesPlayed: game.history(),
     playerTurn: game.turn(),
@@ -57,7 +57,7 @@ export const PuzzleReducer = (state: IPuzzleContextState, action: IPuzzleContext
 
         // playing automatically for robot if the puzzle is not solved by user
         if (puzzle.moves.length !== newState.movesPlayed.length) {
-          game.move(puzzle.moves[newState.movesPlayed.length] as string);
+          game.move(puzzle.moves[newState.movesPlayed.length]!);
           newState.movesPlayed = game.history();
         }
       } catch {

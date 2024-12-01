@@ -1,4 +1,4 @@
-import { Color, Move, SQUARES, Square } from "chess.js";
+import { type Color, type Move, SQUARES, type Square } from "chess.js";
 import React from "react";
 import { toRowCol } from "../../Utils";
 
@@ -34,7 +34,7 @@ export interface HighlightProps {
 const Highlight: React.FC<HighlightProps> = (props) => {
   const { selectedPiece, lastMove, flip } = props;
 
-  const { row, col } = toRowCol(selectedPiece as Square);
+  const { row, col } = toRowCol(selectedPiece!);
   return (
     <>
       {selectedPiece && (

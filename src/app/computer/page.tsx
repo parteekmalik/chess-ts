@@ -1,6 +1,3 @@
-import React from "react";
-import ComBoard from "../../modules/board/board";
-import Board from "../../modules/board/boardMain";
 
 function Computer() {
 

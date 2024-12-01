@@ -1,5 +1,5 @@
 // ChessBoardHints.tsx
-import { Square, Chess, Color } from "chess.js";
+import type { Square, Chess, Color } from "chess.js";
 import { toRowCol } from "../../Utils";
 
 interface ChessBoardProps {
@@ -15,13 +15,13 @@ const ChessBoardHints: React.FC<ChessBoardProps> = (props) => {
 
     if (selectedPiece !== "") {
         game.moves({ verbose: true, square: selectedPiece })
-            .map((move) => ({ from: move.from as Square, to: move.to as Square, promotion: move.promotion }))
+            .map((move) => ({ from: move.from, to: move.to, promotion: move.promotion }))
             .forEach((square) => {
                 const { row, col } = toRowCol(square.to);
                 const Style = {
                     transform: `translate(${col * 100}%, ${(flip === "b" ? 7 - row : row) * 100}%)`,
                 };
-                if (BoardLayout[row][col])
+                if (BoardLayout[row]?.[col])
                     squares.push(
                         <div
                             key={"hint" + square.to + square.promotion}

@@ -9,7 +9,7 @@ function Online() {
 
   return (
     <div className="flex h-full justify-center p-2">
-      <BoardWithTime isWhiteTurn={true} whitePlayerTime={0} blackPlayerTime={0} handleMove={() => {}} movesPlayed={[]} playerTurn={null} />
+      <BoardWithTime isWhiteTurn={true} whitePlayerTime={0} blackPlayerTime={0} handleMove={() => {console.log("move")}} movesPlayed={[]} playerTurn={null} />
       <Card>
         <CardBody>
           <Tabs
