@@ -2,7 +2,7 @@ import moment from "moment";
 
 // arrayUtils.ts
 export function getLastElement<T>(arr: T[]): T {
-    return arr[arr.length - 1];
+    return arr[arr.length - 1] as T;
 }
 // export const getTimeTillMove = (index: number, moveTime: (number | string | { move: string; time: number })[], gameType: { baseTime: number; incrementTime: number }) => {
 //     // console.log("getTimeTillMove", moveTime);
@@ -72,25 +72,7 @@ export function convertMsToTime(milliseconds: number) {
         ? `00:${padTo2Digits(seconds)}:${padTo2Digits(Math.floor((milliseconds % 1000) / 10))}`
         : "00:00:00";
 }
-export function setCookie(cname: string, cvalue: string) {
-    document.cookie = cname + "=" + cvalue + ";" + ";path=/";
-}
 
-export function getCookie(cname: string) {
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(";");
-    for (let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == " ") {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
 import { Color, PieceSymbol, Square, SQUARES } from "chess.js";
 
 
