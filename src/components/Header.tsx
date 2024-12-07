@@ -24,8 +24,8 @@ export default function Header() {
 
   const navLinks = [
     { href: "/", label: "Home", icon: <FaHome className="text-xl" /> },
-    { href: "/puzzle", label: "Puzzles", icon: <FaPuzzlePiece className="text-xl" /> },
-    { href: "/live", label: "Live", icon: <FaPuzzlePiece className="text-xl" /> },
+    { href: "/play/puzzle", label: "Puzzles", icon: <FaPuzzlePiece className="text-xl" /> },
+    { href: "/play/live", label: "Live", icon: <FaPuzzlePiece className="text-xl" /> },
     { href: "/learn", label: "Learn", icon: <FaBook className="text-xl" /> },
     { href: "/about", label: "About", icon: <FaInfoCircle className="text-xl" /> },
     { href: "/contact", label: "Portfolio", icon: <FaUser className="text-xl" /> },

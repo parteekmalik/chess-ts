@@ -1,11 +1,11 @@
 "use client";
 import { Image } from "@nextui-org/react";
 import { useEffect, useReducer } from "react";
-import { defaultPuzzleContextState, type IPuzzleContextState } from "~/app/puzzle/_components/PuzzleContext";
-import { type IPuzzleContextActions, PuzzleReducer } from "~/app/puzzle/_components/PuzzleReducer";
 import Board from "~/modules/board/board";
-import { type ChessMoveType } from "~/modules/board/boardMain";
 import { api } from "~/trpc/react";
+import { defaultPuzzleContextState, type IPuzzleContextState } from "~/app/play/puzzle/_components/PuzzleContext";
+import { type IPuzzleContextActions, PuzzleReducer } from "~/app/play/puzzle/_components/PuzzleReducer";
+import { type ChessMoveType } from "~/modules/board/boardMain";
 
 function Puzzle() {
   const [PuzzleState, PuzzleDispatch] = useReducer<React.Reducer<IPuzzleContextState, IPuzzleContextActions>>(

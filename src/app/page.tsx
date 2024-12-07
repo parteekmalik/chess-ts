@@ -50,15 +50,11 @@ export default async function Home() {
             <span className="text-2xl">{text.hero.tagline}</span>
           </p>
           <div className="my-4 flex justify-center text-base sm:text-lg">
-            <Link href="/findmatch">
-              <div className="ml-5 mr-5">{gamesToday} Games Today</div>
-            </Link>
-            <Link href="/computer">
-              <div className="ml-5 mr-5">{playingNow} Playing Now</div>
-            </Link>
+            <div className="ml-5 mr-5">{gamesToday} Games Today</div>
+            <div className="ml-5 mr-5">{playingNow} Playing Now</div>
           </div>
           <div className="flex w-full flex-col gap-4 lg:gap-8">
-            <Link href="/play/online" className="flex cursor-pointer items-center rounded-2xl bg-success-200 p-4 text-foreground">
+            <Link href="/play/live" className="flex cursor-pointer items-center rounded-2xl bg-success-200 p-4 text-foreground">
               <Image
                 className="mx-4 h-auto w-8 text-xs lg:mx-10 lg:w-12"
                 src="https://www.chess.com/bundles/web/images/color-icons/playwhite.cea685ba.svg"

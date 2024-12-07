@@ -25,7 +25,7 @@ const LiveBoard: React.FunctionComponent = () => {
   useEffect(() => {
     console.log("params -> ", params);
     sendMessage("join_match", params.matchId);
-  }, [params, sendMessage]);
+  }, [params]);
 
   useEffect(() => {
     if (lastMessage?.type === "joined_match") {

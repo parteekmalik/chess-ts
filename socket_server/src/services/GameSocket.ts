@@ -128,11 +128,15 @@ export class GameSocket {
   };
 
   private joinMatch = (socket: SocketWithUserID, matchId: string) => {
-    socket.join(matchId);
     const matchRoom = this.matchRooms[matchId];
-    if (matchRoom) {
-      matchRoom.handleRoomMessage(socket, 'get_match_details', {});
-    }
+    if (!matchRoom) {
+      socket.emit('redirect', '/');
+      return;
+    } 
+    
+    socket.join(matchId);
+    matchRoom.handleRoomMessage(socket, 'get_match_details', {});
+    
     const room = this.io.sockets.adapter.rooms.get(matchId);
     const userCount = room ? room.size : 0;
 

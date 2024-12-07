@@ -40,7 +40,7 @@ function NewMatch() {
   useEffect(() => {
     if (lastMessage?.type === "found_match") {
       const payload = lastMessage.payload as { matchId: string };
-      router.push(`/live/${payload.matchId}`);
+      router.push(`/play/live/${payload.matchId}`);
     }
   }, [lastMessage]);
 
