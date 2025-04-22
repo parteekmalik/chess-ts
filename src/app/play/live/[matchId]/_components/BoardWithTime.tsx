@@ -1,19 +1,30 @@
-import React, { useEffect, useState } from "react";
-import Board, { BoardProps } from "~/modules/board/board";
-import { ChessMoveType } from "~/modules/board/boardMain";
+import { Card, CardBody, Link, User, type UserProps } from "@nextui-org/react";
 import moment from "moment";
+import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { Avatar, Card, User, Link, UserProps } from "@nextui-org/react";
-import { CardBody } from "@nextui-org/react";
+import Board, { type BoardProps } from "~/modules/board/board";
+import { useSocket } from "~/components/contexts/socket/SocketContextComponent";
+import SidebarTabs from "./SidebarTabs";
+import MovesDisplay from "./MovesDisplay";
 
 interface BoardWithTimeProps extends BoardProps {
   whitePlayerTime: number;
   blackPlayerTime: number;
   isWhiteTurn: boolean;
 }
+export type ChatMessageType = { id: string; messgae: string };
 function BoardWithTime(props: BoardWithTimeProps) {
   const [whiteTime, setWhiteTime] = useState(0);
   const [blackTime, setBlackTime] = useState(0);
+  const [chatMessages, setchatMessages] = useState<ChatMessageType[]>([]);
+  const { lastMessage } = useSocket();
+
+  useEffect(() => {
+    if (lastMessage?.type === "chat_message") {
+      setchatMessages((prev) => [...prev, lastMessage.payload as ChatMessageType]);
+    }
+  }, [lastMessage]);
+
   useEffect(() => {
     setWhiteTime(Math.max(props.whitePlayerTime, 0));
     setBlackTime(Math.max(props.blackPlayerTime, 0));
@@ -44,13 +55,14 @@ function BoardWithTime(props: BoardWithTimeProps) {
     ),
     avatarProps: {
       radius: "sm" as const,
-      src: "https://avatars.githubusercontent.com/u/30373425?v=4"
-    }
+      src: "https://avatars.githubusercontent.com/u/30373425?v=4",
+    },
   };
   return (
-    <div className="flex flex-col gap-2 grow ">
+    <div className="flex grow flex-col gap-2">
       <TimerContainer variant="white" time={whiteTime} userDetails={defaultUserDetails} />
       <Board handleMove={props.handleMove} movesPlayed={props.movesPlayed} playerTurn={props.playerTurn} />
+      <SidebarTabs tabContents={{ play: <MovesDisplay chatMessages={chatMessages} /> }} />
       <TimerContainer variant="black" time={blackTime} userDetails={defaultUserDetails} />
     </div>
   );

@@ -1,7 +1,6 @@
 import { Chess } from "chess.js";
 import csv from "csv-parser";
-import * as fs from "fs";
-
+import fs from "fs";
 type CsvRow = {
     fen: string;
     moves: string[];
@@ -74,7 +73,7 @@ const parseCsvFile = (filePath: string): Promise<Map<number, CsvRow>> => {
         };
 
         const batchSize = 1000;
-        const batchPromises = [];
+        const batchPromises:any[] = [];
         for (let i = 0; i < rows.length; i += batchSize) {
             const batch = rows.slice(i, i + batchSize);
             const batchPromise = Promise.all(batch.map((data, index) => processRow(data, i + index)));

@@ -67,7 +67,7 @@ export class GameSocket {
         methods: ['GET', 'POST'],
         origin: [process.env.CORS_ORIGIN!, 'https://yourdomain.com', 'http://localhost:3000'],
       },
-      pingInterval: 10000,
+      pingInterval: 1000,
       pingTimeout: 5000,
     });
 

@@ -44,8 +44,13 @@ const ComBoard: React.FC<BoardProps> = ({ startingBoard = DEFAULT_POSITION, move
     if (!isValid) return;
     if (selectedPiece && playerTurn === game.turn()) {
       try {
-        game.move({ from: selectedPiece, to: square! });
-        handleMove({ from: selectedPiece, to: square! });
+        const move = { from: selectedPiece, to: square! };
+        try {
+          game.move(move);
+        } catch {
+          game.move({ ...move, promotion: 'q' });
+        }
+        handleMove(game.history()[game.history().length - 1]!);
         setSelectedPiece(null);
       } catch {
         console.log("invalid move from board component -> ", selectedPiece, " to -> ", square);
@@ -66,6 +71,7 @@ const ComBoard: React.FC<BoardProps> = ({ startingBoard = DEFAULT_POSITION, move
         style={{ backgroundImage: `url('/images/blank_board_img.png')` }}
         onClick={PieceLogic}
       >
+        {/* flip not working for coordinates, highlight, hints . possibilly make a state or memo for it */}
         <Coordinates flip={playerTurn ? (flip ? oppositeTurn(playerTurn) : playerTurn) : "w"} />
         <Highlight
           selectedPiece={selectedPiece}

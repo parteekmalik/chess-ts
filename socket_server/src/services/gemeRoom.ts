@@ -1,4 +1,4 @@
-import { Chess, Color, PieceSymbol, Square } from 'chess.js';
+import { Chess, Color } from 'chess.js';
 import moment from 'moment';
 import { Socket, Server as SocketServer } from 'socket.io';
 import { Logger } from './Logger';
@@ -48,49 +48,28 @@ export class MatchRoom {
     this.config = config;
   }
 
-  public isPlayersTurn(userId: string): boolean {
+  public oppositeTurn(turn: Color): Color {
+    return turn === 'w' ? 'b' : 'w';
+  }
+
+  private isPlayersTurn(userId: string): boolean {
     return this.players[this.game.turn()] === userId;
   }
 
-  public handleMove(socket: SocketWithUserID, msg: { from: Square; to: Square }, matchId: string) {
-    console.log('Received move:', msg);
-    const { from, to } = msg;
+  private checkAuthorisation(id: string) {
+    return Object.values(this.players).includes(id);
+  }
 
-    if (!this.isPlayersTurn(socket.userid!)) {
-      console.log('Sending error - not player turn');
-      socket.emit('error', 'Not your turn or you are not a player in this game');
-      return;
-    }
-
-    const tryMove = (promotion?: PieceSymbol) => {
-      if (this.makeMove(from, to, promotion)) {
-        const gameState = this.getGameState();
-        console.log('Sending game state:', gameState);
-        this.io.to(matchId).emit('match_update', gameState);
-        return true;
-      }
-      return false;
-    };
-
-    if (!tryMove() && !tryMove('q')) {
-      console.log('Sending error - invalid move');
+  private handleMove(socket: SocketWithUserID, move: string, matchId: string) {
+    try {
+      this.game.move(move);
+      this.movesTime.push(moment().toDate());
+      
+      const gameState = this.getGameState();
+      this.io.to(matchId).emit('match_update', gameState);
+    } catch {
       socket.emit('error', 'Invalid move');
     }
-  }
-
-  public makeMove(from: Square, to: Square, promotion?: PieceSymbol): boolean {
-    try {
-      this.game.move({ from, to, promotion });
-      this.movesTime.push(moment().toDate());
-      this.updateGameStatus();
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  public oppositeTurn(turn: Color): Color {
-    return turn === 'w' ? 'b' : 'w';
   }
 
   private updateGameStatus() {
@@ -145,23 +124,45 @@ export class MatchRoom {
   }
 
   public handleRoomMessage(socket: SocketWithUserID, type: string, payload: unknown) {
+    const authMap: { [key: string]: string } = {
+      'get_match_details': 'public',
+      'match_update': 'player',
+      'default': 'playerTurn',
+    };
+
+    const isAuthorised = this.checkAuthorisation(socket.userid!);
+    const isPlayerTurn = this.isPlayersTurn(socket.userid!);
+    
+    if (!isAuthorised && authMap[type] !== 'public') {
+      socket.emit('dockt', { message: 'Unauthorized access' });
+      return;
+    }
+    if (!isPlayerTurn && authMap[type] !== 'playerTurn') {
+      socket.emit('dockt', { message: 'Unauthorized access not yourr turn' });
+      return;
+    }
+
     switch (type) {
-      case 'match_update':
-        this.handleMove(socket, payload as { from: Square; to: Square }, this.matchId);
-        break;
       case 'get_match_details':
         socket.emit('set_match_details', this.getGameState());
-        setTimeout(() => {
-          socket.emit('match_ended', {
-            ...this.getGameState(),
-            stats: { isover: true, winner: 'w', reason: 'resignation' },
-          });
-        }, 10000);
         break;
       case 'default':
         this.broadcastMessage(socket.userid!, type, payload);
         break;
     }
+
+    if (isPlayerTurn) {
+      switch (type) {
+        case 'match_update': {
+          this.handleMove(socket, payload as string, this.matchId);
+          break;
+        }
+        case 'default': {
+          this.logger.info('ddefault', { type, payload });
+          break;
+        }
+      }
+    } 
   }
 
   private broadcastMessage(userId: string, type: string, payload: unknown) {
