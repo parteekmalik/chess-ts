@@ -13,11 +13,6 @@ import { prisma } from "../Utils";
 import { MatchRoom } from "./gemeRoom";
 import { logger } from "./Logger";
 
-interface GuestUser {
-  id: string;
-  username: string;
-}
-
 export interface UserDataType {
   id: string;
   name: string;
