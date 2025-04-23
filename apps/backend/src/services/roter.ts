@@ -1,4 +1,4 @@
-import express from 'express';
+import express from "express";
 
 const apiRouter = express.Router();
 
@@ -15,4 +15,4 @@ apiRouter.use((req, res) => {
   });
 });
 
-export  {apiRouter};
+export { apiRouter };

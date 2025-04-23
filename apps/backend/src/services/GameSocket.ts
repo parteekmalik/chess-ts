@@ -69,7 +69,7 @@ export class GameSocket {
     this.io = new SocketServer(server, {
       cors: {
         methods: ["GET", "POST"],
-        origin: ["https://yourdomain.com", "http://localhost:3000"],
+        origin: [env.AUTH_URL, "https://yourdomain.com", "http://localhost:3000"],
       },
       pingInterval: 1000,
       pingTimeout: 5000,
