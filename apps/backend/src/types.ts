@@ -1,15 +1,14 @@
-import { Chess } from 'chess.js';
+import type { Chess } from "chess.js";
 
-export interface SocketUserMap {
-  [key: string]: string;
-}
+export type SocketUserMap = Record<string, string>;
 
-export interface SocketUserMatchMap {
-  [key: string]: {
+export type SocketUserMatchMap = Record<
+  string,
+  {
     userid: string;
     matchid: string;
-  };
-}
+  }
+>;
 
 export interface GameStats {
   isover: boolean;
@@ -18,13 +17,11 @@ export interface GameStats {
 }
 
 export interface GameState {
-  players: { [key: string]: string };
+  players: Record<string, string>;
   game: Chess;
   time: Date[];
   startedAt: Date;
   stats: GameStats;
 }
 
-export interface Games {
-  [key: string]: GameState;
-} 
+export type Games = Record<string, GameState>;

@@ -1,5 +1,5 @@
 // ChessBoard.tsx
-import { type Color, type PieceSymbol, type Square } from "chess.js";
+import type { Color, PieceSymbol, Square } from "chess.js";
 
 type Board = ({
   square: Square;

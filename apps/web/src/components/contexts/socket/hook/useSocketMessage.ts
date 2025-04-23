@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-import { io, type Socket } from "socket.io-client";
+import { io } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -19,8 +20,8 @@ export const useSocketMessage = (): UseSocketMessageReturn => {
   const [lastMessage, setLastMessage] = useState<{ type: string; payload: unknown } | null>(null);
   const [isOnline, setIsOnline] = useState(true);
   const [guestId, setGuestId] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('guestId');
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("guestId");
     }
     return null;
   });
@@ -33,7 +34,7 @@ export const useSocketMessage = (): UseSocketMessageReturn => {
     const newSocket = io(SOCKET_URL, {
       reconnectionDelay: 1000,
       auth: {
-        userId: session?.user?.id ?? guestId,
+        userId: session?.user.id ?? guestId,
       },
     });
 
@@ -41,13 +42,13 @@ export const useSocketMessage = (): UseSocketMessageReturn => {
       console.log("Connected to socket server");
       setSocket(newSocket);
       setIsOnline(true);
-      
+
       // Send any pending messages once connected
       console.log("pendingMessages.length ->", pendingMessagesRef.current.length);
       pendingMessagesRef.current.forEach(({ type, payload, room }) => {
         console.log("Sending pending message ->", type, payload, room);
         if (room) {
-          newSocket.emit('room_message', { room, type, payload });
+          newSocket.emit("room_message", { room, type, payload });
         } else {
           newSocket.emit(type, payload);
         }
@@ -57,8 +58,8 @@ export const useSocketMessage = (): UseSocketMessageReturn => {
 
     newSocket.on("guest_id_assigned", (id) => {
       console.log("Guest ID:", id);
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('guestId', id as string);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("guestId", id as string);
       }
       setGuestId(id as string);
     });
@@ -75,7 +76,6 @@ export const useSocketMessage = (): UseSocketMessageReturn => {
       console.log("Disconnected from socket server");
       setIsOnline(false);
     });
-
 
     return () => {
       newSocket.disconnect();
@@ -94,7 +94,7 @@ export const useSocketMessage = (): UseSocketMessageReturn => {
     if (socket) {
       console.log("Sending message ->", type, payload, room);
       if (room) {
-        socket.emit('room_message', { room, type, payload });
+        socket.emit("room_message", { room, type, payload });
       } else {
         socket.emit(type, payload);
       }

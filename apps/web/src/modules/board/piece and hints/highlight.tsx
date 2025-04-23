@@ -1,4 +1,5 @@
-import { type Color, type Move, SQUARES, type Square } from "chess.js";
+import { SQUARES } from "chess.js";
+import type { Color, Move, Square } from "chess.js";
 import React from "react";
 import { toRowCol } from "../../Utils";
 

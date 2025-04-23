@@ -15,10 +15,10 @@
   "keywords": [],
   "license": "MIT",
   "dependencies": {
+    "@acme/auth": "workspace:*",
     "@acme/db": "workspace:*",
     "@acme/lib": "workspace:*",
     "@acme/validators": "workspace:*",
-    "@acme/auth": "workspace:*",
     "@t3-oss/env-nextjs": "^0.12.0",
     "axios": "^1.8.4",
     "body-parser": "^2.2.0",
