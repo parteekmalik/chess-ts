@@ -3,7 +3,6 @@ import express from "express";
 const apiRouter = express.Router();
 
 apiRouter.get("/", (req, res) => {
-  console.log(req.headers.cookie);
   res.send({ response: "Server is up and running." }).status(200);
 });
 
