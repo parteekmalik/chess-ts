@@ -78,14 +78,6 @@ const LiveBoard: React.FunctionComponent = () => {
     }
   }, [lastMessage]);
 
-  const handleMove = useCallback(
-    (move: ChessMoveType) => {
-      console.log("move in live board -> ", move, moment().format("HH:mm:ss"));
-      SocketEmiter("make_move_match", { move, matchId: params.matchId });
-    },
-    [params.matchId, SocketEmiter],
-  );
-
   const gameState = useMemo(() => {
     const game = new Chess();
     movesPlayed.forEach((move) => {
@@ -93,6 +85,14 @@ const LiveBoard: React.FunctionComponent = () => {
     });
     return game;
   }, [movesPlayed]);
+
+  const handleMove = useCallback(
+    (move: ChessMoveType) => {
+      console.log("move in live board -> ", move, moment().format("HH:mm:ss"));
+      SocketEmiter("make_move_match", { move, matchId: params.matchId });
+    },
+    [params.matchId, SocketEmiter],
+  );
 
   return (
     <div className="text-background-foreground flex w-full flex-col">

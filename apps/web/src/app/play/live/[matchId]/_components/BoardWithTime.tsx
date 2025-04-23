@@ -5,7 +5,6 @@ import moment from "moment";
 import { twMerge } from "tailwind-merge";
 
 import type { BoardProps } from "~/modules/board/board";
-import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 import Board from "~/modules/board/board";
 import MovesDisplay from "./MovesDisplay";
 import SidebarTabs from "./SidebarTabs";
@@ -24,7 +23,6 @@ function BoardWithTime(props: BoardWithTimeProps) {
   const [whiteTime, setWhiteTime] = useState(0);
   const [blackTime, setBlackTime] = useState(0);
   const [chatMessages, setchatMessages] = useState<ChatMessageType[]>([]);
-  const { SocketEmiter } = useBackend();
 
   useEffect(() => {
     setWhiteTime(Math.max(props.whitePlayerTime, 0));
