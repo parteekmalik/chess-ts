@@ -72,7 +72,7 @@ const LiveBoard: React.FunctionComponent = () => {
       if ((lastMessage.payload as { matchId: string }).matchId === params.matchId) {
         setOpenResult((prev) => ({
           isOpen: !prev.isOpen,
-          status: (lastMessage.payload as { stats: { isover: boolean; winner: Color | "draw"; reason: string } }).stats,
+          status: (lastMessage.payload as { stats: { isover: boolean; winner: Color | "draw"; reason: string; winnerId?: string } }).stats,
         }));
       }
     }

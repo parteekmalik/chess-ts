@@ -20,7 +20,7 @@ export class MatchRoom {
 
   private movesTime: Date[];
 
-  private stats: { isover: boolean; winner: Color | "draw"; reason: string } | null;
+  private stats: { isover: boolean; winner: Color | "draw"; reason: string; winnerId?: string } | null;
 
   private io: SocketServer;
 
@@ -70,7 +70,7 @@ export class MatchRoom {
       const gameState = this.getGameState();
       this.io.to(matchId).emit("match_update", gameState);
 
-      if(this.game.isGameOver()) {
+      if (this.game.isGameOver()) {
         this.updateGameStatus();
         this.io.to(matchId).emit("match_ended", { matchId, stats: this.stats });
       }
@@ -85,7 +85,8 @@ export class MatchRoom {
     } else if (this.game.isCheckmate()) {
       this.stats = {
         isover: true,
-        winner: this.oppositeTurn(this.game.turn()),
+        winnerId: this.players[this.oppositeTurn(this.game.turn())],
+        winner: this.game.isDraw() ? "draw" : this.oppositeTurn(this.game.turn()),
         reason: "checkmate",
       };
     }

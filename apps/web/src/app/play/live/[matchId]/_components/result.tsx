@@ -1,10 +1,10 @@
 import type { Color } from "chess.js";
-import { useState } from "react";
-import Image from "next/image";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { Button } from "@acme/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogOverlay } from "@acme/ui/dialog"; // Adjust the import path as necessary
+import { Dialog, DialogContent, DialogHeader } from "@acme/ui/dialog"; // Adjust the import path as necessary
 
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 
@@ -15,47 +15,50 @@ function Result({
 }: {
   playerTurn: Color | null;
   gameDetails: { baseTime: number; incrementTime: number } | null;
-  status: { isover: boolean; winner: Color | "draw"; reason: string } | null;
+  status: { isover: boolean; winner: Color | "draw"; reason: string; winnerId?: string } | null;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const { SocketEmiter } = useBackend();
   const router = useRouter();
+  const { data: session } = useSession();
 
   return (
-    <>
-      <Dialog defaultOpen>
-        <DialogOverlay />
-        <DialogContent className="text-background-foreground w-fit">
-          <DialogHeader className="bg-background-600 flex flex-row items-center justify-center gap-4 pr-10">
+    <Dialog defaultOpen>
+      <DialogContent className="text-background-foreground min-h-[30rem] w-fit min-w-[20rem]">
+        <DialogHeader>
+          <h1 className="text-xl font-semibold">Result</h1>
+        </DialogHeader>
+        <div className="mb-auto flex flex-col items-center gap-10 bg-background">
+          <div className="flex flex-col items-center gap-5">
             {status?.winner === playerTurn && (
-              <Image className="aspect-square w-10" src="https://www.chess.com/bundles/web/images/color-icons/cup.svg" alt="trophy" />
+              <div
+                className="bg-background-500 aspect-square h-20 w-20 rounded-full"
+                style={{ backgroundImage: "https://www.chess.com/bundles/web/images/color-icons/cup.svg", backgroundRepeat: "no-repeat" }}
+              />
             )}
-            <div className="flex flex-col items-center justify-center">
-              <h1 className="text-2xl font-bold">{status?.winner === playerTurn ? "You Won!" : status?.winner === "draw" ? "Draw!" : "You Lost!"}</h1>
+            <div className="font-semiBold flex flex-col items-center text-2xl">
+              <h1>{status?.winner === "draw" ? "Match Draw" : status?.winnerId === session?.user.id ? "You Won" : "You Lost"}</h1>
               <p className="text-foreground-muted text-tiny">by {status?.reason}</p>
             </div>
-          </DialogHeader>
-          <DialogContent className="flex flex-col items-center justify-center bg-background">
-            <div>Result</div>
-            <Button
-              disabled={isLoading}
-              onClick={() => {
-                setIsLoading(true);
-                SocketEmiter("find_match", gameDetails, (response: { data?: { matchId: string }; error?: string }) => {
-                  if (response.data) {
-                    router.push(`/play/live/${response.data.matchId}`);
-                  }
-                  setIsLoading(false);
-                });
-              }}
-            >
-              Play Again
-            </Button>
-          </DialogContent>
-          <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70">Close</DialogClose>
-        </DialogContent>
-      </Dialog>
-    </>
+          </div>
+          <Button
+            className="text-xl text-foreground"
+            disabled={isLoading}
+            onClick={() => {
+              setIsLoading(true);
+              SocketEmiter("find_match", gameDetails, (response: { data?: { matchId: string }; error?: string }) => {
+                if (response.data) {
+                  router.push(`/play/live/${response.data.matchId}`);
+                }
+                setIsLoading(false);
+              });
+            }}
+          >
+            Play Again
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
