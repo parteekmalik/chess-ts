@@ -3,7 +3,6 @@
 import type { Color } from "chess.js";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { Button } from "@nextui-org/react";
 import { Chess } from "chess.js";
 import moment from "moment";
 import { useSession } from "next-auth/react";
@@ -11,6 +10,7 @@ import toast from "react-hot-toast";
 
 import type { ChessMoveType } from "~/modules/board/boardMain";
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
+import { env } from "~/env";
 import BoardWithTime from "./_components/BoardWithTime";
 import Result from "./_components/result";
 
@@ -59,7 +59,6 @@ const LiveBoard: React.FunctionComponent = () => {
     if (lastMessage.type === "joined_match") {
       const payload = lastMessage.payload as { id: string; count: number };
       toast.success(`user ${payload.id} joined match. Total count is ${payload.count} now`);
-      // sendMessage("start_match", "joined match room", params.matchId as string);
     } else if (lastMessage.type === "match_update") {
       if ((lastMessage.payload as { matchId: string }).matchId === params.matchId) {
         const payload = lastMessage.payload as Omit<matchDetails, "config">;
@@ -83,10 +82,10 @@ const LiveBoard: React.FunctionComponent = () => {
     (move: ChessMoveType) => {
       console.log("move in live board -> ", move, moment().format("HH:mm:ss"));
       SocketEmiter("make_move_match", { move, matchId: params.matchId });
-      // sendMessage("make_move_match", { move, matchId: params.matchId });
     },
-    [params.matchId, lastMessage],
+    [params.matchId, SocketEmiter],
   );
+
   const gameState = useMemo(() => {
     const game = new Chess();
     movesPlayed.forEach((move) => {
@@ -98,6 +97,7 @@ const LiveBoard: React.FunctionComponent = () => {
   return (
     <div className="text-background-foreground flex w-full flex-col">
       <BoardWithTime
+        disabled
         gameState={gameState}
         initalFlip={iAmPlayer ?? "w"}
         isWhiteTurn={movesPlayed.length % 2 === 0}
@@ -106,55 +106,23 @@ const LiveBoard: React.FunctionComponent = () => {
         handleMove={handleMove}
       />
       {openResult.isOpen && <Result playerTurn={iAmPlayer} gameDetails={gameDetails} status={openResult.status} />}
-      <pre>{JSON.stringify([iAmPlayer, openResult.status], null, 2)}</pre>
 
-      <div className="flex flex-col">
-        <h2>Socket IO Information:</h2>
-        <div>{JSON.stringify(params)}</div>
-        {Object.entries({ lastMessage }).map(([key, value]) => {
-          return key !== "socket" && key !== "game" ? (
-            <div key={key}>
-              {key}:{" "}
-              {typeof value === "object" ? (
-                <details>
-                  <summary>Show/Hide Object</summary>
-                  <pre>{JSON.stringify(value, null, 2)}</pre>
-                </details>
-              ) : (
-                JSON.stringify(value)
-              )}
-            </div>
-          ) : null;
-        })}
-        <Button
-          onPress={() => {
-            sessionStorage.clear();
-            window.location.reload();
-          }}
-        >
-          Clear Session & Reload
-        </Button>
-        <div className="flex flex-col gap-2">
-          <span>Player Turn: {iAmPlayer}</span>
-          <span>White Time: {whitePlayerTime}</span>
-          <span>Black Time: {blackPlayerTime}</span>
-        </div>
-
-        {/* <div className="flex flex-wrap gap-5">
-          {SocketState.game.turn() === SocketState.board_data.solveFor &&
-            SocketState.game.moves().map((m) => (
-              <div
-                className="bg-slate-500 p-2 text-white"
-                onClick={() => {
-                  SocketDispatch({ type: "move_piece", payload: m });
-                }}
-                key={m}
-              >
-                {m}
+      {env.NODE_ENV === "development" && (
+        <details className="flex w-[50%] flex-col">
+          <summary className="hover:cursor-pointer">Socket IO Information:</summary>
+          <pre>
+            <div className="flex flex-col">
+              <pre>{JSON.stringify([iAmPlayer, openResult.status])}</pre>
+              <div>{JSON.stringify(params)}</div>
+              <div className="flex flex-col gap-2">
+                <span>Player Turn: {iAmPlayer}</span>
+                <span>White Time: {whitePlayerTime}</span>
+                <span>Black Time: {blackPlayerTime}</span>
               </div>
-            ))}
-        </div> */}
-      </div>
+            </div>
+          </pre>
+        </details>
+      )}
     </div>
   );
 };

@@ -1,11 +1,11 @@
 import type { UserProps } from "@nextui-org/react";
+import { useEffect, useState } from "react";
 import { Card, CardBody, Link, User } from "@nextui-org/react";
 import moment from "moment";
-import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
-import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 import type { BoardProps } from "~/modules/board/board";
+import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 import Board from "~/modules/board/board";
 import MovesDisplay from "./MovesDisplay";
 import SidebarTabs from "./SidebarTabs";
@@ -48,11 +48,15 @@ function BoardWithTime(props: BoardWithTimeProps) {
   }, [props.whitePlayerTime, props.blackPlayerTime, props.isWhiteTurn]);
 
   return (
-    <div className="flex grow gap-2">
+    <div className="flex grow justify-between px-4">
       <div className="flex flex-col gap-2">
-        <TimerContainer variant="white" time={whiteTime} userDetails={defaultUserDetails} />
-        <Board initalFlip={props.initalFlip} handleMove={props.handleMove} gameState={props.gameState} />
-        <TimerContainer variant="black" time={blackTime} userDetails={defaultUserDetails} />
+        <Board
+          initalFlip={props.initalFlip}
+          handleMove={props.handleMove}
+          gameState={props.gameState}
+          whiteBar={<TimerContainer variant="white" time={whiteTime} userDetails={defaultUserDetails} />}
+          blackBar={<TimerContainer variant="black" time={blackTime} userDetails={defaultUserDetails} />}
+        />
       </div>
       <SidebarTabs disabled={props.disabled} tabContents={{ play: <MovesDisplay chatMessages={chatMessages} /> }} />
     </div>

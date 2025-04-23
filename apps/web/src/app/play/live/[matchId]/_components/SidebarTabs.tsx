@@ -9,17 +9,15 @@ function SidebarTabs({ tabContents, disabled = false }: { tabContents?: Record<s
   return (
     <Card>
       <CardContent>
-        <Tabs>
-          <TabsList defaultValue={disabled ? "play" : "new game"}>
+        <Tabs defaultValue={disabled ? "play" : "new_game"}>
+          <TabsList className="mt-4">
             <TabsTrigger value="play">Play</TabsTrigger>
-            <TabsTrigger value="new game" disabled={disabled}>
-              New Game
-            </TabsTrigger>
+            {!disabled && <TabsTrigger value="new_game">New Game</TabsTrigger>}
             <TabsTrigger value="games">Games</TabsTrigger>
             <TabsTrigger value="players">Players</TabsTrigger>
           </TabsList>
           <TabsContent value="play">{tabContents?.play}</TabsContent>
-          <TabsContent value="new game">
+          <TabsContent value="new_game">
             <NewMatch />
           </TabsContent>
           <TabsContent value="games">{/* Content for games tab */}</TabsContent>

@@ -8,10 +8,10 @@ interface TimerMessage {
 // Listen for messages from the main thread
 self.onmessage = (event: MessageEvent<TimerMessage>) => {
   let { whiteTime, blackTime } = event.data;
-  const isWhiteTurn = true;
+
   // Timer logic (simplified)
   setInterval(() => {
-    if (isWhiteTurn) {
+    if (event.data.isWhiteTurn) {
       whiteTime -= 100; // Decrease white time
     } else {
       blackTime -= 100; // Decrease black time

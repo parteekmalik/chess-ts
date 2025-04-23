@@ -1,11 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import { Image } from "@nextui-org/react";
 import { Chess } from "chess.js";
-import { useMemo } from "react";
 
-import Board from "~/modules/board/board";
 import type { ChessMoveType } from "~/modules/board/boardMain";
+import { env } from "~/env";
+import Board from "~/modules/board/board";
 import usePuzzle from "./_components/usePuzzle";
 
 function Puzzle() {
@@ -22,11 +23,11 @@ function Puzzle() {
     });
     return game;
   }, [PuzzleState]);
-  
+
   return (
-    <div className="flex w-full flex-col p-4">
+    <div className="flex h-full w-full flex-col p-4">
       <div className="flex">
-        <Board gameState={gameState} handleMove={handleMove} />
+        <Board gameState={gameState} handleMove={handleMove} className="" />
         <div className="flex h-fit grow flex-wrap gap-5 p-5 text-foreground">
           {PuzzleState.puzzleList.map((puz, index) => {
             if (PuzzleState.puzzleNo > index) {
@@ -44,29 +45,24 @@ function Puzzle() {
           })}
         </div>
       </div>
-      <div className="flex w-[50%] flex-col">
-        <h2>Socket IO Information:</h2>
-        {Object.entries({ ...PuzzleState, movesPlayed: PuzzleState.movesPlayed }).map(([key, value]) => {
-          return !["socket", "game", "puzzleList"].includes(key) ? (
-            <div key={key}>
-              {key}: {JSON.stringify(value)}
-            </div>
-          ) : null;
-        })}
-        {/* <div className="flex w-[500px] flex-wrap gap-5">
-          {new Chess(getLastElement(PuzzleState.movesPlayed)?.board_state).moves().map((move, index) => (
-            <Button
-              className="bg-slate-500 p-2 text-white"
-              onPress={() => {
-                handleMove(move);
-              }}
-              key={index}
-            >
-              {move}
-            </Button>
-          ))}
-        </div> */}
-      </div>
+      {env.NODE_ENV === "development" && (
+        <details className="flex w-[50%] flex-col">
+          <summary className="hover:cursor-pointer">Socket IO Information:</summary>
+          <pre>
+            <code className="json">
+              {JSON.stringify(
+                Object.fromEntries(
+                  Object.entries({ ...PuzzleState, movesPlayed: PuzzleState.movesPlayed }).filter(
+                    ([key]) => !["socket", "game", "puzzleList"].includes(key),
+                  ),
+                ),
+                null,
+                2,
+              )}
+            </code>
+          </pre>
+        </details>
+      )}
     </div>
   );
 }

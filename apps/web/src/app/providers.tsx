@@ -9,9 +9,9 @@ import { Toaster } from "react-hot-toast";
 import { Provider } from "react-redux";
 
 import SocketContextComponent from "~/components/contexts/socket/SocketContextComponent";
+import Footer from "~/components/Footer";
 import { Header } from "~/components/Header";
 import { store } from "~/components/redux/store";
-import Footer from "~/components/Footer";
 
 interface ProviderProps {
   children: ReactNode;
@@ -25,10 +25,10 @@ export function Providers({ children, session }: ProviderProps) {
         <Provider store={store}>
           <NextUIProvider>
             <SocketContextComponent>
-              <main className="max-w-screen bg-background-600 flex relative h-full min-h-screen flex-row">
+              <main className="max-w-screen bg-background-600 relative flex h-full min-h-screen flex-row">
                 <Header />
-                <div className="max-w-screen flex min-h-screen z-0 grow flex-col md:mx-auto md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl">
-                  {children}
+                <div className="max-w-screen z-0 flex min-h-screen grow flex-col md:mx-auto md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl">
+                  <div className="flex-1">{children}</div>
                   <Footer />
                 </div>
               </main>

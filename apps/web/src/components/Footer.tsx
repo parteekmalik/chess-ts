@@ -25,7 +25,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="border-y bg-background-700 text-background-foreground">
+    <footer className="bg-background-700 text-background-foreground border-y">
       <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
         <div className="flex flex-col space-y-6 md:flex-row md:justify-between md:space-y-0">
           <div className="flex justify-center md:justify-start">
