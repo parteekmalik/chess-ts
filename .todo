@@ -1,0 +1,76 @@
+✅ use for icons like https://s3-symbol-logo.tradingview.com/crypto/XTVCETH.svg
+✅ add timeframe select input
+✅ add trade history below watchlist 100 max history
+✅ make chart and orderbook adjustable
+✅ use shardcn in login page
+✅ add Coin to watchlist, model design
+✅ right top will be for algo trading for later ( for now add link to analytics page )
+✅ add analytics page to show stats of trades
+✅ add balance to orderform block ( total will become red if greater than balance )
+
+✅ remove leading zero from orderform number fields
+✅ make table rows scrollable insted whole table in Posiion component
+✅ add confirmation toast for order sent
+make toast more dynamic and well structure component
+✅ binance websocket getting disconnected
+✅ prefetch analytics and wallet page
+add more details and anlytics to wallet to section
+add icon and name to right side on wallet page
+
+✅ improve trade performance latency 
+✅ add optimistic mutation on selecting coins for watchList
+✅ add optimistic mutation after order toast to reflect in Positions 
+
+✅ multiple submiting order makes multiple trades .both reding same balance .
+backend not allows google token after some time (posible fix: try to refresh token on new session)
+
+Machine Learning 
+    -> create training data sets
+    -> three outputs buy, sell, nothing in sigmoids
+    
+ANALYTICS
+    -> research on charts trading related
+    -> make it a grid for all charts and make it better
+
+
+add margin trading
+    -> borrow money
+    -> repayment
+    -> intrest
+    -> watch for liquidation
+
+add tradeing fees and widrawal and other transections
+    -> make fees adjustable for users
+
+DB
+    -> make Pin0 and Pin1 combine(can add more than 2 pins) and remove from redux use trpc(react-query for store data)
+    -> make a setting propertie in trading account
+
+Spot 
+    -> make timeframe of chart store in DB
+    -> save layout for example ratio of positions and chart (will add more in future)
+    -> make a price strip moving right -> left with price or static (make settings for it)
+    -> make layout customizeable and user can adjust to their preference (store in trading account settings)
+    -> make all tables for horizontal and vertical cards
+    watchList 
+        -> ✅ sometimes not all 24hr data loads (fix)
+        -> ✅ list somethimes takes full height 
+        -> can't find coin by name of coin
+    orderform
+        -> ✅ make minium order value 5 USDT
+        -> switching coin, order type will reset quantity
+        -> balance not updating after order completes 
+
+
+OrderBook details
+    Positions
+        -> sort posotions by totalPrice of asset
+        -> on hover asset show current totalprice and bought totalprice
+
+Backend
+    -> (fix) sell limit completed instantly
+    -> a better approach to syncing orders data
+    -> refactor codebase and reorganize
+    -> when order completes update price too
+
+FOCUS ON BACKEND

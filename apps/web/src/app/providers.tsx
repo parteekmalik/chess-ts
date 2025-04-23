@@ -1,0 +1,65 @@
+"use client";
+
+import type { Session } from "next-auth";
+import type { ReactNode } from "react";
+import { NextUIProvider } from "@nextui-org/react";
+import { SessionProvider } from "next-auth/react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { Toaster } from "react-hot-toast";
+import { Provider } from "react-redux";
+
+import SocketContextComponent from "~/components/contexts/socket/SocketContextComponent";
+import { Header } from "~/components/Header";
+import { store } from "~/components/redux/store";
+import Footer from "~/components/Footer";
+
+interface ProviderProps {
+  children: ReactNode;
+  session: Session | null;
+}
+
+export function Providers({ children, session }: ProviderProps) {
+  return (
+    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
+      <SessionProvider session={session}>
+        <Provider store={store}>
+          <NextUIProvider>
+            <SocketContextComponent>
+              <main className="max-w-screen bg-background-600 flex relative h-full min-h-screen flex-row">
+                <Header />
+                <div className="max-w-screen flex min-h-screen z-0 grow flex-col md:mx-auto md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl">
+                  {children}
+                  <Footer />
+                </div>
+              </main>
+              <Toaster
+                position="bottom-right"
+                toastOptions={{
+                  duration: 4000,
+                  style: {
+                    background: "#363636",
+                    color: "#fff",
+                  },
+                  success: {
+                    duration: 3000,
+                    iconTheme: {
+                      primary: "#2b8a3e",
+                      secondary: "#fff",
+                    },
+                  },
+                  error: {
+                    duration: 4000,
+                    iconTheme: {
+                      primary: "#e03131",
+                      secondary: "#fff",
+                    },
+                  },
+                }}
+              />
+            </SocketContextComponent>
+          </NextUIProvider>
+        </Provider>
+      </SessionProvider>
+    </NextThemesProvider>
+  );
+}
