@@ -10,15 +10,6 @@ import usePuzzle from "./_components/usePuzzle";
 
 function Puzzle() {
   const { PuzzleDispatch, PuzzleState } = usePuzzle();
-  // useEffect(() => {
-  //   const puzzle = PuzzleState.puzzleList[PuzzleState.puzzleNo];
-  //   const nextMoveN = PuzzleState.movesPlayed.length;
-  //   const nextMove = puzzle?.moves[nextMoveN];
-  //   const iswrong = puzzle?.moves[nextMoveN - 1] !== PuzzleState.movesPlayed[nextMoveN - 1];
-
-  //   console.log("Puzzlemoves -> ", puzzle?.moves);
-  //   console.log("nextMove -> ", nextMove);
-  // }, [PuzzleState.movesPlayed]);
 
   function handleMove(payload: ChessMoveType) {
     console.log("handleMove -> ", payload);
@@ -31,6 +22,7 @@ function Puzzle() {
     });
     return game;
   }, [PuzzleState]);
+  
   return (
     <div className="flex w-full flex-col p-4">
       <div className="flex">

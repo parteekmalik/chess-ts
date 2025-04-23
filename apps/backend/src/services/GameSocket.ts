@@ -71,7 +71,7 @@ export class GameSocket {
     });
 
     // Override `to(room).emit` for room-specific logging
-    if(env.NODE_ENV === "development")  this.overrideRoomEmit();
+    if (env.NODE_ENV === "development") this.overrideRoomEmit();
 
     this.io.use((socket: SocketWithContextType, next) => {
       axios
@@ -93,27 +93,6 @@ export class GameSocket {
           console.error("Authentication error:", (error as Error).message);
           socket.disconnect(true);
         });
-      // try {
-      //   const userId = socket.handshake.auth?.userId as string | undefined;
-
-      //   if (!userId) {
-      //     const guestId = `guest_${this.guestUsers.length + 1}`;
-      //     socket.userid = guestId;
-      //     this.guestUsers.push({ id: guestId, username: `Guest ${this.guestUsers.length + 1}` });
-
-      //     this.useridToSocket[guestId] = socket.id;
-
-      //     socket.emit("guest_id_assigned", guestId);
-      //   } else {
-      //     this.useridToSocket[userId] = socket.id;
-      //     socket.userid = userId;
-
-      //     socket.emit("guest_id_assigned", userId);
-      //   }
-      //   next();
-      // } catch (error) {
-      //   socket.disconnect(true);
-      // }
     });
 
     this.io.on("connect", this.handleConnection);
@@ -122,10 +101,6 @@ export class GameSocket {
   private handleConnection = (socket: SocketWithContextType) => {
     if (socket.data.userData.id) {
       this.usersToSocketID[socket.data.userData.id] = socket.id;
-      // this.usersToSocketID[socket.data.userData.id] = {
-      //   id: socket.id,
-      //   data: socket.data.userData,
-      // };
       socket.emit(AUTHENTICATION, "sucessful");
 
       logger.info(`User connected: ${socket.id} with userid: ${socket.data.userData.id}`);

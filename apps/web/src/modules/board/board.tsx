@@ -94,10 +94,7 @@ const ComBoard: React.FC<BoardProps> = ({ handleMove, gameState, initalFlip }) =
               if (movesUndone.length) {
                 const move = movesUndone.pop()!;
                 game.move(move);
-                setMovesUndone((moves) => {
-                  moves.pop();
-                  return moves;
-                });
+                setMovesUndone(movesUndone);
                 setGame(_.cloneDeep(game));
               }
             }}

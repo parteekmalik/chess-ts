@@ -1,7 +1,7 @@
-import puzzles from "../utils/puzzles.json";
+import type { Puzzle } from "@acme/lib";
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import type { Puzzle } from "@acme/lib";
+import puzzles from "../utils/puzzles.json";
 
 const puzzleList = puzzles as Record<number, Puzzle>;
 
@@ -9,7 +9,7 @@ export const puzzleRouter = createTRPCRouter({
   getPuzzles: publicProcedure.query(() => {
     const allPuzzleKeys = Object.keys(puzzleList);
     const selectedPuzzles: Puzzle[] = [];
-    
+
     // Select every 40th puzzle randomly
     for (let i = 0; i < allPuzzleKeys.length; i += 40) {
       const randomIndex = Math.floor(Math.random() * 40) + i;
