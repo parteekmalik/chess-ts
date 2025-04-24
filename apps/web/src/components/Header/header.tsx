@@ -37,7 +37,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 h-screen w-fit bg-background text-foreground shadow-md">
-      <nav className="border-gray flex h-full w-fit flex-col justify-between border-r px-4 py-3">
+      <nav className="border-gray flex h-full w-fit flex-col justify-between border-r bg-white/5 px-4 py-3">
         <div className="mx-auto flex max-w-screen-xl flex-col items-center">
           <Link href="/" className="flex items-center text-foreground">
             <Image src="/images/wp.png" alt="Logo" width={48} height={48} />

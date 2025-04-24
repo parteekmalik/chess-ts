@@ -32,7 +32,7 @@ function Puzzle() {
     <div className="flex h-full w-full flex-col p-4">
       <div className="flex gap-4">
         <Board gameState={gameState} initalFlip={gameState.turn()} handleMove={handleMove} className="" />
-        <Card className="grow gap-5 overflow-hidden p-0 text-foreground max-w-[540px]">
+        <Card className="max-w-[540px] grow gap-5 overflow-hidden p-0 text-foreground">
           <CardHeader className="flex h-fit w-full flex-col items-center bg-primary">
             <div className="flex gap-2">
               {[0, 1, 2].map((index) => (
@@ -40,7 +40,7 @@ function Puzzle() {
                   {3 - PuzzleState.livesLeft > index ? (
                     <img key={index} className="h-full w-full" src="https://www.chess.com/bundles/web/images/svg/wrong.svg" alt="" />
                   ) : (
-                    <div key={index} className="h-full w-full bg-slate-600"></div>
+                    <div key={index} className="h-full w-full bg-gray-200"></div>
                   )}
                 </div>
               ))}

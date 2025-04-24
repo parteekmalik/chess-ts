@@ -25,7 +25,7 @@ export function Providers({ children, session }: ProviderProps) {
       <SessionProvider session={session}>
         <Provider store={store}>
           <SocketContextComponent>
-            <main className="max-w-screen bg-background-600 relative flex h-full min-h-screen flex-row">
+            <main className="max-w-screen bg-white/10 relative flex h-full min-h-screen flex-row">
               <Header />
               <div className="max-w-screen z-0 flex min-h-screen grow flex-col md:mx-auto md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl">
                 <div className="flex-1">{children}</div>
