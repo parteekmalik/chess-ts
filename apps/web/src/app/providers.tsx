@@ -25,9 +25,9 @@ export function Providers({ children, session }: ProviderProps) {
       <SessionProvider session={session}>
         <Provider store={store}>
           <SocketContextComponent>
-            <main className="max-w-screen bg-white/10 relative flex h-full min-h-screen flex-row">
+            <main className="max-w-screen relative flex h-full min-h-screen flex-col bg-white/10 lg:flex-row">
               <Header />
-              <div className="max-w-screen z-0 flex min-h-screen grow flex-col md:mx-auto md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl">
+              <div className="z-0 flex w-full max-w-full grow flex-col md:mx-auto md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl">
                 <div className="flex-1">{children}</div>
                 {!footerNotShownPaths.find((i) => path.startsWith(i)) && <Footer />}
               </div>

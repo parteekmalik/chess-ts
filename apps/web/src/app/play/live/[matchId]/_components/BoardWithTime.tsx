@@ -48,7 +48,7 @@ function BoardWithTime(props: BoardWithTimeProps) {
   }, [props.whitePlayerTime, props.blackPlayerTime, props.isWhiteTurn]);
 
   return (
-    <div className="flex grow justify-between gap-4 px-4">
+    <div className="flex grow flex-col justify-between gap-4 px-4 lg:flex-row">
       <div className="flex flex-col gap-2">
         <Board
           initalFlip={props.initalFlip}

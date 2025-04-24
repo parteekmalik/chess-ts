@@ -38,7 +38,7 @@ export default async function Home() {
   const gamesToday = await db.match.count({ where: { startedAt: { gte: new Date(new Date().setDate(new Date().getDate() - 1)) } } });
   const playingNow = await db.matchResult.count({ where: { winner: "PLAYING" } });
   return (
-    <main className="m-auto flex grow flex-col items-center justify-center space-y-10 px-4 text-foreground">
+    <main className="m-auto flex grow flex-col items-center justify-center space-y-10 px-1 text-foreground">
       <div className="flex flex-col items-center justify-center lg:flex-row">
         <Image className="m-4 hidden lg:m-10 lg:block" src="/images/board_img.png" alt="chess_board" width={400} height={400} />
         <div className="m-4 flex max-h-full min-w-[50%] grow flex-col items-center justify-center lg:m-10">
@@ -85,13 +85,13 @@ export default async function Home() {
       <Card>
         <CardContent className="flex flex-col items-center justify-center gap-4 lg:flex-row lg:gap-10">
           <div className="flex flex-col items-center justify-center">
-            <p className="mt-10 text-base sm:text-lg lg:mt-20 lg:text-lg">{text.lessons.title}</p>
+            <p className="mt-10 text-xl lg:mt-20 lg:text-4xl">{text.lessons.title}</p>
             <Link href="/lessons" className="bg-background-500 text-background-foreground m-auto rounded-2xl p-4 text-base sm:text-lg">
               <p>{text.lessons.cta}</p>
             </Link>
             <div className="mt-4 flex flex-col gap-4 sm:flex-row lg:gap-10">
               <Image
-                className="aspect-square rounded-xl"
+                className="mx-auto aspect-square rounded-xl"
                 src="https://www.chess.com/bundles/web/images/faces/hikaru-nakamura.e1ca9267.jpg"
                 alt="hikaru_staring"
                 width={237}
@@ -117,7 +117,7 @@ export default async function Home() {
             </Link>
             <div className="mt-4 flex flex-col gap-4 sm:flex-row lg:gap-10">
               <Image
-                className="aspect-square rounded-xl"
+                className="mx-auto aspect-square rounded-xl"
                 src="https://www.chess.com/bundles/web/images/faces/anna-rudolf.193d08a5.jpg"
                 alt="anna_Rudolf"
                 width={237}

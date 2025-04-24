@@ -30,7 +30,7 @@ function Puzzle() {
 
   return (
     <div className="flex h-full w-full flex-col p-4">
-      <div className="flex gap-4">
+      <div className="flex flex-col gap-4 lg:flex-row">
         <Board gameState={gameState} initalFlip={gameState.turn()} handleMove={handleMove} className="" />
         <Card className="max-w-[540px] grow gap-5 overflow-hidden p-0 text-foreground">
           <CardHeader className="flex h-fit w-full flex-col items-center bg-primary">

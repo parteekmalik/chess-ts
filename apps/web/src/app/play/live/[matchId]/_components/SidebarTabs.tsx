@@ -9,7 +9,7 @@ function SidebarTabs({ disabled = false }: { disabled?: boolean }) {
     <Card className="w-full max-w-[450px]">
       <CardContent className="p-0">
         <Tabs className="w-full" defaultValue={disabled ? "play" : "new_game"}>
-          <TabsList className="mb-4 mt-4 w-full">
+          <TabsList className="mx-2 mb-4 mt-4 w-[calc(100%-1rem)]">
             <TabsTrigger className="flex-1" value="play">
               Play
             </TabsTrigger>

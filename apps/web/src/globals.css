@@ -67,3 +67,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+.chess-icon {
+  font-size: 10px;
+  width: 3em;
+  height: 3em;
+  background-size: 15.4em 180.4em;
+  background-image: url("https://www.chess.com/bundles/web/images/sprites/navsprite.fe042891.png");
+  background-repeat: no-repeat;
+}
+
+@font-face {
+  font-family: "chess-font";
+  src: url("/custom_font.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}

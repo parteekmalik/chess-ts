@@ -29,14 +29,17 @@ export default function Footer() {
       <div className="mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8">
         <div className="flex flex-col space-y-6 md:flex-row md:justify-between md:space-y-0">
           <div className="flex justify-center md:justify-start">
-            <Link href="/" className="flex items-center">
-              <img src="/images/wp.png" className="h-10 sm:h-12 lg:h-14" alt="Logo" />
-              <div className="relative">
-                <p className="absolute inset-x-0 bottom-0 text-2xl sm:text-3xl lg:text-4xl">Chess.com</p>
-              </div>
+            <Link href="/" className="relative flex text-foreground">
+              <a
+                style={{
+                  backgroundPosition: "-2.3em -3.7em",
+                }}
+                className="chess-icon"
+              />
+              <p className="ml-2 -translate-x-2 translate-y-1 text-2xl font-bold">Chess.com</p>
             </Link>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:gap-8">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:gap-8">
             {Object.entries(footerData)
               .filter(([key]) => key !== "socialIcons")
               .map(([title, items]) => (
