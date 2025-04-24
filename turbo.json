@@ -16,10 +16,8 @@
     "@acme/web#dev": {
       "persistent": true
     },
-
     "@acme/backend#build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "dependsOn": ["^build"]
     },
     "@acme/backend#dev": {
       "persistent": true
