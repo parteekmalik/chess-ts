@@ -65,4 +65,3 @@ export const invalidateSessionToken = async (token: string) => {
   const sessionToken = token.slice("Bearer ".length);
   await adapter.deleteSession?.(sessionToken);
 };
-

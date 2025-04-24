@@ -31,4 +31,4 @@ function ThemeSwitch({ className }: { className?: string }) {
   );
 }
 
-export default ThemeSwitch;
+export { ThemeSwitch };

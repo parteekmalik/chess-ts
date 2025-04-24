@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 
-import { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import { Button } from "@acme/ui/button";
 import { Dialog, DialogContent, DialogHeader } from "@acme/ui/dialog"; // Adjust the import path as necessary
 
@@ -21,7 +21,7 @@ function Result({ playerTurn, matchId }: { playerTurn: Color | null; matchId: st
   const router = useRouter();
   const { data: session } = useSession();
 
-  const winnerId = match?.[match?.stats?.winner === "BLACK" ? "blackPlayerId" : "whitePlayerId"];
+  const winnerId = match?.[match.stats?.winner === "BLACK" ? "blackPlayerId" : "whitePlayerId"];
 
   return (
     <Dialog defaultOpen>

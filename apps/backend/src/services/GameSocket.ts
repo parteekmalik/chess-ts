@@ -5,7 +5,8 @@ import { Chess } from "chess.js";
 import { Server as SocketServer } from "socket.io";
 
 import { db } from "@acme/db";
-import { AUTHENTICATION, NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import { AUTHENTICATION } from "@acme/lib/WStypes/typeForFrontendToSocket";
 
 import type { SocketUserMap } from "../types";
 import { env } from "~/env";

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Chess } from "chess.js";
@@ -8,10 +8,10 @@ import moment from "moment";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
+import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import { calculateTimeLeft } from "@acme/lib";
-import { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 
-import type { ChessMoveType } from "~/modules/board/boardMain";
+import type { ChessMoveType } from "~/components/board/boardMain";
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 import { env } from "~/env";
 import { useTRPC } from "~/trpc/react";
@@ -78,7 +78,7 @@ const LiveBoard: React.FunctionComponent = () => {
       : { w: 0, b: 0 };
     return timeData;
   }, [match?.moves]);
-  
+
   const openResult = useMemo(() => match?.stats?.winner !== "PLAYING", [match?.stats?.winner]);
 
   if (isLoading) return <div>Loading...</div>;

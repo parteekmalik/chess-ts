@@ -4,8 +4,8 @@ import { Card, CardBody, Link, User } from "@nextui-org/react";
 import moment from "moment";
 import { twMerge } from "tailwind-merge";
 
-import type { BoardProps } from "~/modules/board/board";
-import Board from "~/modules/board/board";
+import type { BoardProps } from "~/components/board/board";
+import Board from "~/components/board/board";
 import MovesDisplay from "./MovesDisplay";
 import SidebarTabs from "./SidebarTabs";
 
@@ -22,6 +22,7 @@ export interface ChatMessageType {
 function BoardWithTime(props: BoardWithTimeProps) {
   const [whiteTime, setWhiteTime] = useState(0);
   const [blackTime, setBlackTime] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [chatMessages, setchatMessages] = useState<ChatMessageType[]>([]);
 
   useEffect(() => {

@@ -4,9 +4,9 @@ import { useMemo } from "react";
 import { Image } from "@nextui-org/react";
 import { Chess } from "chess.js";
 
-import type { ChessMoveType } from "~/modules/board/boardMain";
+import type { ChessMoveType } from "~/components/board/boardMain";
+import Board from "~/components/board/board";
 import { env } from "~/env";
-import Board from "~/modules/board/board";
 import usePuzzle from "./_components/usePuzzle";
 
 function Puzzle() {

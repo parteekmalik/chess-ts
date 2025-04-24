@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import { gameTypes } from "@acme/lib";
-import { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 
@@ -27,7 +27,7 @@ function NewMatch() {
       (response: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {
         if (response.data) {
           router.push(`/play/live/${response.data.id}`);
-        }else router.push("/play/live");
+        } else router.push("/play/live");
         setIsLoading(false);
       },
     );

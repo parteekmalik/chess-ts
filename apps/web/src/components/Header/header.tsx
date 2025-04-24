@@ -1,81 +1,81 @@
 "use client";
 
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useSession } from "next-auth/react";
+import {
+  FaBook,
+  FaChevronLeft,
+  FaChevronRight,
+  FaHome,
+  FaInfoCircle,
+  FaLinkedin,
+  FaPuzzlePiece,
+  FaSignInAlt,
+  FaSignOutAlt,
+  FaUser,
+} from "react-icons/fa";
 import { twMerge } from "tailwind-merge";
 
-import { issmallerThanDevice } from "@acme/lib";
+import { ThemeSwitch } from "./ThemeSwitch";
 
-import type { RootState } from "../redux/store";
-import ThemeSwitch from "~/components/Header/ThemeSwitch";
-import ProfilePopover from "./ProfilePopover";
+export function Header() {
+  const { data: session } = useSession();
+  const [isExpanded, setIsExpanded] = useState(true);
 
-const baseURL = "/";
-
-function Header() {
-  const lastRoute = usePathname().split("/").pop();
-
-  return (
-    <header
-      className={twMerge(
-        "relative flex w-full justify-center border-b-4 border-primary bg-background",
-        "after:absolute after:left-0 after:top-[calc(100%+3px)] after:h-[50px] after:w-full after:bg-[#D3E0FB] dark:after:bg-[#0E2043]",
-      )}
-    >
-      <div className="flex w-full p-2 px-4 pb-0">
-        <div className="relative flex h-full grow items-center">
-          <div className="flex items-center justify-center gap-5">
-            <Image className=" " src="https://kite.zerodha.com/static/images/kite-logo.svg" alt="" width={30} height={20} />
-          </div>
-          <NavigationButtons lastRoute={lastRoute} fullRoute={usePathname()} />
-        </div>
-      </div>
-    </header>
-  );
-}
-
-export { Header };
-const Routes = [
-  { url: "spot", name: "Spot", icon: "" },
-  { url: "analyze", name: "Analyze", icon: "" },
-  { url: "wallet", name: "Wallet", icon: "" },
-];
-const activeRouteClasses = [
-  "relative bg-primary text-white",
-  "before:absolute before:bottom-0 before:left-[-30px] before:h-[30px] before:w-[30px] before:rounded-full before:bg-background before:shadow-[15px_15px_0_hsl(var(--primary))]",
-  "after:absolute after:bottom-0 after:right-[-30px] after:h-[30px] after:w-[30px] after:rounded-full after:bg-background after:shadow-[-15px_15px_0_hsl(var(--primary))]",
-];
-function NavigationButtons({ lastRoute }: { lastRoute?: string; fullRoute?: string }) {
-  const size = useSelector((state: RootState) => state.DeviceType);
+  const navLinks = [
+    { href: "/", label: "Home", icon: <FaHome className="text-xl" /> },
+    { href: "/play/puzzle", label: "Puzzles", icon: <FaPuzzlePiece className="text-xl" /> },
+    { href: "/play/live", label: "Live", icon: <FaPuzzlePiece className="text-xl" /> },
+    { href: "/learn", label: "Learn", icon: <FaBook className="text-xl" /> },
+    { href: "/about", label: "About", icon: <FaInfoCircle className="text-xl" /> },
+    { href: "/contact", label: "Portfolio", icon: <FaUser className="text-xl" /> },
+    { href: "https://www.linkedin.com/in/parteek-malik-0b0907312", label: "Linkedin", icon: <FaLinkedin className="text-xl" /> },
+  ];
 
   return (
-    <nav className="ml-6 flex grow items-center justify-between lg:mx-6">
-      <div className="relative flex h-full items-center">
-        {issmallerThanDevice("lg", size) ? (
-          <Link prefetch href={baseURL + lastRoute} className={twMerge("relative mx-2 rounded-t-lg px-5 py-2 capitalize", activeRouteClasses)}>
-            {lastRoute}
+    <header className="sticky top-0 z-50 h-screen w-fit bg-background text-foreground shadow-md">
+      <nav className="border-gray h-full w-fit border-r px-4 py-3">
+        <div className="mx-auto flex max-w-screen-xl flex-col items-center justify-between">
+          <Link href="/" className="flex items-center text-foreground">
+            <Image src="/images/wp.png" alt="Logo" width={48} height={48} />
+            <p className={`${isExpanded ? "block text-xl font-bold" : "hidden"} ml-2`}>Chess</p>
           </Link>
-        ) : (
-          Routes.map((x) => (
-            <Link
-              prefetch
-              href={baseURL + x.url}
-              className={twMerge("relative mx-2 rounded-t-lg px-5 py-2", lastRoute === x.url && activeRouteClasses)}
-              key={x.name}
-            >
-              {x.name}
-            </Link>
-          ))
-        )}
-      </div>
-
-      <div className="flex flex-row items-center gap-2">
-        {/* <Settings className="mr-2 hidden border-r pr-2 lg:block" /> */}
-        <ThemeSwitch className="mr-2 border-r pr-2" />
-        <ProfilePopover routes={Routes} />
-      </div>
-    </nav>
+          <div className="relative flex w-full items-center justify-between lg:order-1" id="mobile-menu-2">
+            <ul className="flex flex-col font-medium">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="bg-default-100 hover:bg-default-200 mx-auto flex w-fit items-center justify-center rounded-full p-2 transition duration-200"
+              >
+                {isExpanded ? <FaChevronLeft /> : <FaChevronRight />}
+              </button>
+              <ThemeSwitch />
+              {navLinks.map((link) => (
+                <li key={link.href} className="my-2">
+                  <Link
+                    href={link.href}
+                    className="flex items-center justify-start gap-2 rounded-lg border border-gray-300 bg-card p-3 text-card-foreground shadow-md transition duration-200 hover:shadow-lg"
+                  >
+                    {link.icon}
+                    {isExpanded && <span className="text-lg font-medium">{link.label}</span>}
+                  </Link>
+                </li>
+              ))}
+              <Link
+                href={session?.user ? "/api/auth/signout" : "/api/auth/signin"}
+                className={twMerge(
+                  "bg-success-200 mx-auto flex w-full items-center justify-center gap-4 rounded-lg border border-gray-300 py-3 text-sm font-medium text-foreground focus:outline-none focus:ring-4",
+                  session?.user && "bg-danger hover:bg-danger-600",
+                )}
+              >
+                {isExpanded && <span>{session?.user ? "Sign Out" : "Sign In"}</span>}
+                {session?.user ? <FaSignOutAlt className="text-xl" /> : <FaSignInAlt className="text-xl" />}
+              </Link>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
   );
 }

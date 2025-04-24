@@ -19,7 +19,10 @@ export interface acknoledgementResponce {
 const useSocket = () => {
   // Use state to store the socket instance instead of a ref.
   const [socketInstance, setSocketInstance] = useState<Socket | null>(null);
-  const [lastMessage, setLastMessage] = useState<{ type: string; payload: NOTIFICATION_PAYLOAD }>({ type: "init", payload: null });
+  const [lastMessage, setLastMessage] = useState<{ type: string; payload: NOTIFICATION_PAYLOAD }>({
+    type: "init",
+    payload: null as unknown as NOTIFICATION_PAYLOAD,
+  });
   const [backendServerConnection, setBackendServerConnection] = useState<BACKEND_SERVER_UPDATE_PAYLOAD>("disconneted");
 
   const { data: session } = useSession();

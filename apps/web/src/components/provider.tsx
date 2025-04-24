@@ -1,11 +1,12 @@
 "use client";
 
+import type { Session } from "next-auth";
+import type { ReactNode } from "react";
 import { NextUIProvider } from "@nextui-org/react";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "react-hot-toast";
-import type { ReactNode } from "react";
+
 import SocketContextComponent from "~/components/contexts/socket/SocketContextComponent";
-import type { Session } from "next-auth";
 
 interface ProviderProps {
   children: ReactNode;
@@ -18,28 +19,28 @@ function Provider({ children, session }: ProviderProps) {
       <NextUIProvider>
         <SocketContextComponent>
           {children}
-          <Toaster 
+          <Toaster
             position="bottom-right"
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#363636',
-                color: '#fff',
+                background: "#363636",
+                color: "#fff",
               },
               success: {
                 duration: 3000,
                 iconTheme: {
-                  primary: '#2b8a3e',
-                  secondary: '#fff'
-                }
+                  primary: "#2b8a3e",
+                  secondary: "#fff",
+                },
               },
               error: {
                 duration: 4000,
                 iconTheme: {
-                  primary: '#e03131',
-                  secondary: '#fff'
-                }
-              }
+                  primary: "#e03131",
+                  secondary: "#fff",
+                },
+              },
             }}
           />
         </SocketContextComponent>

@@ -1,6 +1,7 @@
-import { SQUARES } from "chess.js";
 import type { Color, Move, Square } from "chess.js";
 import React from "react";
+import { SQUARES } from "chess.js";
+
 import { toRowCol } from "../../Utils";
 
 const PrevHighlight: React.FC<{ history: Pick<Move, "from" | "to">; flip: Color }> = ({ history, flip }) => {

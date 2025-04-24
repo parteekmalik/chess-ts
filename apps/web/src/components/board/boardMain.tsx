@@ -1,4 +1,4 @@
-import type { IPuzzleContextState } from "~/app/puzzle/_components/PuzzleContext";
+import type { IPuzzleContextState } from "~/app/play/puzzle/_components/PuzzleReducer";
 
 export type ChessMoveType =
   | string

@@ -8,6 +8,8 @@ const SocketContextComponent: React.FunctionComponent<PropsWithChildren> = (prop
   const { children } = props;
   const { SocketEmiter, backendServerConnection, lastMessage } = useSocket();
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
   return <SocketContextProvider value={{ SocketEmiter, backendServerConnection, lastMessage }}>{children}</SocketContextProvider>;
 };
 
