@@ -43,7 +43,11 @@ const LiveBoard: React.FunctionComponent = () => {
       toast.success(`user ${payload.id} joined match. Total count is ${payload.count} now`);
     } else if (lastMessage.type === "match_update") {
       if (lastMessage.payload.id === params.matchId) {
-        const payload = lastMessage.payload;
+        const payload = {
+          ...lastMessage.payload,
+          startedAt: new Date(lastMessage.payload.startedAt),
+          moves: lastMessage.payload.moves.map((move) => ({ ...move, timestamps: new Date(move.timestamps) })),
+        };
         console.log("match update -> ", lastMessage.payload);
 
         queryClient.setQueryData(trpc.puzzle.getMatch.queryKey(params.matchId), payload);
