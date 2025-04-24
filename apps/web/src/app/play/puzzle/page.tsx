@@ -30,9 +30,9 @@ function Puzzle() {
 
   return (
     <div className="flex h-full w-full flex-col p-4">
-      <div className="flex gap-2">
+      <div className="flex gap-4">
         <Board gameState={gameState} initalFlip={gameState.turn()} handleMove={handleMove} className="" />
-        <Card className="grow gap-5 overflow-hidden p-0 text-foreground">
+        <Card className="grow gap-5 overflow-hidden p-0 text-foreground max-w-[540px]">
           <CardHeader className="flex h-fit w-full flex-col items-center bg-primary">
             <div className="flex gap-2">
               {[0, 1, 2].map((index) => (
@@ -49,7 +49,7 @@ function Puzzle() {
               Score {attempltedPuzzles.reduce((count, puz, index) => count + Number(PuzzleState.passedPuzzleList[index]), 0)}
             </h1>
           </CardHeader>
-          <CardContent className="flex p-5">
+          <CardContent className="flex flex-wrap p-5">
             {attempltedPuzzles.map((puz, index) => {
               return (
                 <div className="bg-background-500 flex flex-col items-center gap-2 rounded-md p-2" key={index} style={{ width: "60px" }}>
