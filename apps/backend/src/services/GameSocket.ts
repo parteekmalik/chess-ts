@@ -4,11 +4,10 @@ import axios from "axios";
 import { Chess } from "chess.js";
 import { Server as SocketServer } from "socket.io";
 
-import { db } from "@acme/db";
 import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import { db } from "@acme/db";
 import { AUTHENTICATION } from "@acme/lib/WStypes/typeForFrontendToSocket";
 
-import type { SocketUserMap } from "../types";
 import { env } from "~/env";
 import { MatchRoom } from "./gemeRoom";
 import { logger } from "./Logger";
@@ -19,8 +18,7 @@ export interface UserDataType {
   email: string;
   emailVerified: string | null;
   image: string;
-  spotTradingAccountId: string;
-  marginTradingAccountId: string;
+  rating: number;
 }
 
 interface SocketWithContextType extends Socket {
@@ -34,11 +32,11 @@ export class GameSocket {
 
   public io: SocketServer;
 
-  private usersToSocketID: SocketUserMap = {};
+  private usersToSocketID: Record<string, string> = {};
 
   private matchRooms: Record<string, MatchRoom> = {};
 
-  private waitingplayers: { id: string; socketId: string }[] = [];
+  private waitingplayers: Record<string, { data: UserDataType; socketId: string }[]> = {};
 
   private playerCallbacks: Record<string, (msg: { data: NOTIFICATION_PAYLOAD }) => void> = {};
 
@@ -155,24 +153,23 @@ export class GameSocket {
     ank: (msg: { data: NOTIFICATION_PAYLOAD }) => void,
   ) => {
     const userid = socket.data.userData.id;
+    const key = `${msg.baseTime}|${msg.incrementTime}`;
+    const waitingPlayers = this.waitingplayers[key]?.filter((player) => player.data.id !== userid);
 
-    const waitingPlayersArray = this.waitingplayers;
+    if (waitingPlayers?.length && userid) {
+      const compatiblePlayer = findBestMatch(waitingPlayers, socket.data.userData);
 
-    // Only proceed if there's a waiting player
-    const compatiblePlayer = waitingPlayersArray[0];
-
-    if (!waitingPlayersArray.some((player) => player.id === userid) && compatiblePlayer && userid) {
       const match = await db.match.create({
         data: {
           whitePlayerId: userid,
-          blackPlayerId: compatiblePlayer.id,
+          blackPlayerId: compatiblePlayer.data.id,
           baseTime: msg.baseTime,
           incrementTime: msg.incrementTime,
           stats: {
             create: {},
           },
           users: {
-            connect: [{ id: userid }, { id: compatiblePlayer.id }],
+            connect: [{ id: userid }, { id: compatiblePlayer.data.id }],
           },
         },
         include: {
@@ -187,10 +184,22 @@ export class GameSocket {
       this.playerCallbacks[match.blackPlayerId]!({ data: { ...match, stats: match.stats! } });
       ank({ data: { ...match, stats: match.stats! } });
 
-      this.waitingplayers = this.waitingplayers.filter((player) => player.id !== match.whitePlayerId && player.id !== match.blackPlayerId);
+      this.waitingplayers[key] = waitingPlayers.filter((player) => player.data.id !== match.whitePlayerId && player.data.id !== match.blackPlayerId);
     } else {
       this.playerCallbacks[userid] = ank;
-      this.waitingplayers.push({ id: userid, socketId: socket.id });
+      if (this.waitingplayers[key]) {
+        this.waitingplayers[key].push({ data: socket.data.userData, socketId: socket.id });
+      } else this.waitingplayers[key] = [{ data: socket.data.userData, socketId: socket.id }];
     }
   };
+}
+
+function findBestMatch(
+  waitingPlayers: {
+    data: UserDataType;
+    socketId: string;
+  }[],
+  currentPlayer: UserDataType,
+) {
+  return waitingPlayers.sort((a, b) => Math.abs(a.data.rating - currentPlayer.rating) - Math.abs(b.data.rating - currentPlayer.rating))[0]!;
 }

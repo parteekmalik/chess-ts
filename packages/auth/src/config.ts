@@ -12,6 +12,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
+      rating: number;
     } & DefaultSession["user"];
   }
 }
@@ -35,12 +36,13 @@ export const authConfig = {
   secret: env.AUTH_SECRET,
   providers: [Discord, Google],
   callbacks: {
-    session: (opts) => {
+    session: async (opts) => {
       return {
         ...opts.session,
         user: {
           ...opts.session.user,
           id: opts.user.id,
+          rating: (await db.user.findUnique({ where: { id: opts.user.id } }))?.rating ?? 1200,
         },
       };
     },
@@ -55,6 +57,7 @@ export const validateToken = async (token: string): Promise<NextAuthSession | nu
         user: {
           ...session.user,
           id: session.user.id,
+          rating: (await db.user.findUnique({ where: { id: session.user.id } }))?.rating ?? 1200,
         },
         expires: session.session.expires.toISOString(),
       }

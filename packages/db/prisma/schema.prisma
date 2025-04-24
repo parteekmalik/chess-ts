@@ -51,6 +51,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
 
+  rating  Int     @default(1200)
   matches Match[]
 }
 
@@ -79,9 +80,9 @@ model Match {
 }
 
 model MatchResult {
-  id        String      @id @default(cuid())
-  winner    MatchWinner @default(PLAYING)
-  reason    String      @default("")
+  id     String      @id @default(cuid())
+  winner MatchWinner @default(PLAYING)
+  reason String      @default("")
 
   match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
   matchId String @unique
