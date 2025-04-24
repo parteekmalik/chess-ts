@@ -30,19 +30,25 @@ function MovesDisplay({ chatMessages }: { chatMessages?: ChatMessageType[] }) {
           <div key={index} className={cn("flex w-full px-2 text-muted-foreground even:bg-white/5")}>
             <span className="flex-[0_0_20%]">{index + 1}.</span>
             <span className="flex-[0_0_40%] space-x-2">
-              <span>{move[0]!.move}</span>
-              <span className="text-xs">
-                {"("}
-                {((move[0]!.timestamps.getTime() - (result[index - 1]?.[0]?.timestamps ?? match?.startedAt)!.getTime()) / 1000).toFixed(1)} s{")"}
-              </span>
+              {move[0] && (
+                <>
+                  <span>{move[0].move}</span>
+                  <span className="text-xs">
+                    {"("}
+                    {((move[0].timestamps.getTime() - (result[index - 1]?.[0]?.timestamps ?? match?.startedAt)!.getTime()) / 1000).toFixed(1)} s{")"}
+                  </span>
+                </>
+              )}
             </span>
             <span className="flex-[0_0_40%] space-x-2">
-              <span>{move[1]?.move}</span>
               {move[1] && (
-                <span className="text-xs">
-                  {"("}
-                  {((move[1].timestamps.getTime() - move[0]!.timestamps.getTime()) / 1000).toFixed(1)} s{")"}
-                </span>
+                <>
+                  <span>{move[1].move}</span>
+                  <span className="text-xs">
+                    {"("}
+                    {((move[1].timestamps.getTime() - move[0]!.timestamps.getTime()) / 1000).toFixed(1)} s{")"}
+                  </span>
+                </>
               )}
             </span>
           </div>
