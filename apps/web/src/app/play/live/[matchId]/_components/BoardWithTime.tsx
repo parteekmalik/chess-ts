@@ -1,12 +1,13 @@
-import type { UserProps } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { Card, CardBody, Link, User } from "@nextui-org/react";
+import Link from "next/link";
 import moment from "moment";
 import { twMerge } from "tailwind-merge";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
+import { Card, CardContent } from "@acme/ui/card";
+
 import type { BoardProps } from "~/components/board/board";
 import Board from "~/components/board/board";
-import MovesDisplay from "./MovesDisplay";
 import SidebarTabs from "./SidebarTabs";
 
 interface BoardWithTimeProps extends BoardProps {
@@ -47,7 +48,7 @@ function BoardWithTime(props: BoardWithTimeProps) {
   }, [props.whitePlayerTime, props.blackPlayerTime, props.isWhiteTurn]);
 
   return (
-    <div className="flex grow justify-between px-4">
+    <div className="flex grow justify-between gap-4 px-4">
       <div className="flex flex-col gap-2">
         <Board
           initalFlip={props.initalFlip}
@@ -57,14 +58,14 @@ function BoardWithTime(props: BoardWithTimeProps) {
           blackBar={<TimerContainer variant="black" time={blackTime} userDetails={defaultUserDetails} />}
         />
       </div>
-      <SidebarTabs disabled={props.disabled} tabContents={{ play: <MovesDisplay chatMessages={chatMessages} /> }} />
+      <SidebarTabs disabled={props.disabled} />
     </div>
   );
 }
 const defaultUserDetails = {
   name: "Junior Garcia",
   description: (
-    <Link href="https://twitter.com/jrgarciadev" size="sm" isExternal>
+    <Link href="https://twitter.com/jrgarciadev" target="_blank">
       @jrgarciadev
     </Link>
   ),
@@ -73,13 +74,26 @@ const defaultUserDetails = {
     src: "https://avatars.githubusercontent.com/u/30373425?v=4",
   },
 };
-const TimerContainer = ({ variant, time, userDetails }: { variant: "white" | "black"; time: number; userDetails: UserProps }) => {
+const TimerContainer = ({ variant, time, userDetails }: { variant: "white" | "black"; time: number; userDetails: typeof defaultUserDetails }) => {
+  const imageSrc = userDetails.avatarProps.src;
+  const initials = userDetails.name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
   return (
     <Card>
-      <CardBody className="w-full flex-row justify-between">
-        <User {...userDetails} />
+      <CardContent className="flex w-full justify-between p-3">
+        <div className="flex w-fit items-center gap-4 p-0">
+          <Avatar>{imageSrc ? <AvatarImage src={imageSrc} alt={userDetails.name} /> : <AvatarFallback>{initials}</AvatarFallback>}</Avatar>
+          <div>
+            <p className="text-sm font-medium">{userDetails.name}</p>
+            {userDetails.description}
+          </div>
+        </div>
         <TimerComponent time={time} variant={variant} />
-      </CardBody>
+      </CardContent>
     </Card>
   );
 };

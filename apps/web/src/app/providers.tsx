@@ -3,7 +3,6 @@
 import type { Session } from "next-auth";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { NextUIProvider } from "@nextui-org/react";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Toaster } from "react-hot-toast";
@@ -25,41 +24,39 @@ export function Providers({ children, session }: ProviderProps) {
     <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
       <SessionProvider session={session}>
         <Provider store={store}>
-          <NextUIProvider>
-            <SocketContextComponent>
-              <main className="max-w-screen bg-background-600 relative flex h-full min-h-screen flex-row">
-                <Header />
-                <div className="max-w-screen z-0 flex min-h-screen grow flex-col md:mx-auto md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl">
-                  <div className="flex-1">{children}</div>
-                  {!footerNotShownPaths.find((i) => path.startsWith(i)) && <Footer />}
-                </div>
-              </main>
-              <Toaster
-                position="bottom-right"
-                toastOptions={{
+          <SocketContextComponent>
+            <main className="max-w-screen bg-background-600 relative flex h-full min-h-screen flex-row">
+              <Header />
+              <div className="max-w-screen z-0 flex min-h-screen grow flex-col md:mx-auto md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl">
+                <div className="flex-1">{children}</div>
+                {!footerNotShownPaths.find((i) => path.startsWith(i)) && <Footer />}
+              </div>
+            </main>
+            <Toaster
+              position="bottom-right"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: "#363636",
+                  color: "#fff",
+                },
+                success: {
+                  duration: 3000,
+                  iconTheme: {
+                    primary: "#2b8a3e",
+                    secondary: "#fff",
+                  },
+                },
+                error: {
                   duration: 4000,
-                  style: {
-                    background: "#363636",
-                    color: "#fff",
+                  iconTheme: {
+                    primary: "#e03131",
+                    secondary: "#fff",
                   },
-                  success: {
-                    duration: 3000,
-                    iconTheme: {
-                      primary: "#2b8a3e",
-                      secondary: "#fff",
-                    },
-                  },
-                  error: {
-                    duration: 4000,
-                    iconTheme: {
-                      primary: "#e03131",
-                      secondary: "#fff",
-                    },
-                  },
-                }}
-              />
-            </SocketContextComponent>
-          </NextUIProvider>
+                },
+              }}
+            />
+          </SocketContextComponent>
         </Provider>
       </SessionProvider>
     </NextThemesProvider>

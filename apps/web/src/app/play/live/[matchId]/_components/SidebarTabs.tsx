@@ -1,23 +1,30 @@
-import type { ReactNode } from "react";
-
 import { Card, CardContent } from "@acme/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
+import MovesDisplay from "./MovesDisplay";
 import NewMatch from "./NewMatch";
 
-function SidebarTabs({ tabContents, disabled = false }: { tabContents?: Record<string, ReactNode>; disabled?: boolean }) {
+function SidebarTabs({ disabled = false }: { disabled?: boolean }) {
   return (
-    <Card>
-      <CardContent>
-        <Tabs defaultValue={disabled ? "play" : "new_game"}>
-          <TabsList className="mt-4">
-            <TabsTrigger value="play">Play</TabsTrigger>
+    <Card className="w-full max-w-[450px]">
+      <CardContent className="p-0">
+        <Tabs className="w-full" defaultValue={disabled ? "play" : "new_game"}>
+          <TabsList className="mb-4 mt-4 w-full">
+            <TabsTrigger className="flex-1" value="play">
+              Play
+            </TabsTrigger>
             {!disabled && <TabsTrigger value="new_game">New Game</TabsTrigger>}
-            <TabsTrigger value="games">Games</TabsTrigger>
-            <TabsTrigger value="players">Players</TabsTrigger>
+            <TabsTrigger className="flex-1" value="games">
+              Games
+            </TabsTrigger>
+            <TabsTrigger className="flex-1" value="players">
+              Players
+            </TabsTrigger>
           </TabsList>
-          <TabsContent value="play">{tabContents?.play}</TabsContent>
-          <TabsContent value="new_game">
+          <TabsContent value="play">
+            <MovesDisplay />
+          </TabsContent>
+          <TabsContent value="new_game" className="p-4">
             <NewMatch />
           </TabsContent>
           <TabsContent value="games">{/* Content for games tab */}</TabsContent>

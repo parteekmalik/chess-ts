@@ -44,6 +44,7 @@ const ComBoard: React.FC<BoardProps> = ({ handleMove, gameState, initalFlip, whi
     if (movesUndone.length) return;
     const { isValid, square } = checkForValidClick(event, flip);
     if (!isValid) return;
+    console.log("valid", square, game.get(square), initalFlip);
     if (selectedPiece && initalFlip === game.turn() && movesUndone.length === 0) {
       try {
         const move = { from: selectedPiece, to: square };
@@ -58,7 +59,8 @@ const ComBoard: React.FC<BoardProps> = ({ handleMove, gameState, initalFlip, whi
         if (game.get(square)) setSelectedPiece(square);
         else setSelectedPiece(null);
       }
-    } else if (game.get(square)?.color === initalFlip) {
+    } else if (initalFlip && game.get(square)?.color === initalFlip) {
+      console.log(square, game.get(square), initalFlip);
       setSelectedPiece(square);
     }
   };

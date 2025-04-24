@@ -50,7 +50,7 @@ export function Header() {
               >
                 {isExpanded ? <FaChevronLeft /> : <FaChevronRight />}
               </button>
-              <ThemeSwitch />
+              <ThemeSwitch className="mx-auto" />
               {navLinks.map((link) => (
                 <li key={link.href} className="my-2">
                   <Link
