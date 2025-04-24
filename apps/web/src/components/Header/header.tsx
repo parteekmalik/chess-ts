@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import {
   FaBook,
+  FaChessPawn,
   FaChevronLeft,
   FaChevronRight,
   FaHome,
@@ -26,8 +27,8 @@ export function Header() {
 
   const navLinks = [
     { href: "/", label: "Home", icon: <FaHome className="text-xl" /> },
+    { href: "/play/live", label: "Live", icon: <FaChessPawn className="text-xl" /> },
     { href: "/play/puzzle", label: "Puzzles", icon: <FaPuzzlePiece className="text-xl" /> },
-    { href: "/play/live", label: "Live", icon: <FaPuzzlePiece className="text-xl" /> },
     { href: "/learn", label: "Learn", icon: <FaBook className="text-xl" /> },
     { href: "/about", label: "About", icon: <FaInfoCircle className="text-xl" /> },
     { href: "/contact", label: "Portfolio", icon: <FaUser className="text-xl" /> },
@@ -36,21 +37,14 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 h-screen w-fit bg-background text-foreground shadow-md">
-      <nav className="border-gray h-full w-fit border-r px-4 py-3">
-        <div className="mx-auto flex max-w-screen-xl flex-col items-center justify-between">
+      <nav className="border-gray flex h-full w-fit flex-col justify-between border-r px-4 py-3">
+        <div className="mx-auto flex max-w-screen-xl flex-col items-center">
           <Link href="/" className="flex items-center text-foreground">
             <Image src="/images/wp.png" alt="Logo" width={48} height={48} />
             <p className={`${isExpanded ? "block text-xl font-bold" : "hidden"} ml-2`}>Chess</p>
           </Link>
-          <div className="relative flex w-full items-center justify-between lg:order-1" id="mobile-menu-2">
+          <div className="flex w-full items-center justify-between lg:order-1" id="mobile-menu-2">
             <ul className="flex flex-col font-medium">
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="bg-default-100 hover:bg-default-200 mx-auto flex w-fit items-center justify-center rounded-full p-2 transition duration-200"
-              >
-                {isExpanded ? <FaChevronLeft /> : <FaChevronRight />}
-              </button>
-              <ThemeSwitch className="mx-auto" />
               {navLinks.map((link) => (
                 <li key={link.href} className="my-2">
                   <Link
@@ -74,6 +68,15 @@ export function Header() {
               </Link>
             </ul>
           </div>
+        </div>
+        <div className="mx-auto mb-14">
+          <ThemeSwitch className="mx-auto" />
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="bg-default-100 hover:bg-default-200 flex w-full items-center justify-center rounded-full p-2 transition duration-200"
+          >
+            {isExpanded ? <FaChevronLeft /> : <FaChevronRight />}
+          </button>
         </div>
       </nav>
     </header>
