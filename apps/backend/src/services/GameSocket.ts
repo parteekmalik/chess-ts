@@ -4,12 +4,11 @@ import axios from "axios";
 import { Chess } from "chess.js";
 import { Server as SocketServer } from "socket.io";
 
-import type { ChessMoveType } from "@acme/lib/puzzle";
-import { AUTHENTICATION } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import { db } from "@acme/db";
+import { AUTHENTICATION, NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 
 import type { SocketUserMap } from "../types";
 import { env } from "~/env";
-import { prisma } from "../Utils";
 import { MatchRoom } from "./gemeRoom";
 import { logger } from "./Logger";
 
@@ -40,7 +39,7 @@ export class GameSocket {
 
   private waitingplayers: { id: string; socketId: string }[] = [];
 
-  private playerCallbacks: Record<string, (data: unknown) => void> = {};
+  private playerCallbacks: Record<string, (msg: { data: NOTIFICATION_PAYLOAD }) => void> = {};
 
   private overrideRoomEmit() {
     const originalTo = this.io.to.bind(this.io);
@@ -119,10 +118,12 @@ export class GameSocket {
     }
 
     socket.on("disconnect", () => delete this.usersToSocketID[socket.data.userData.id]);
-    socket.on("find_match", (msg: { baseTime: number; incrementTime: number }, ank: (msg: unknown) => void) =>
+    socket.on("find_match", (msg: { baseTime: number; incrementTime: number }, ank: (msg: { data: NOTIFICATION_PAYLOAD }) => void) =>
       this.handleFindMatch(socket, msg, ank),
     );
-    socket.on("join_match", (matchId: string, ank: (mg: { data?: matchDetails; error?: string }) => void) => this.joinMatch(socket, matchId, ank));
+    socket.on("join_match", (matchId: string, ank: (mg: { data?: NOTIFICATION_PAYLOAD; error?: string }) => void) =>
+      this.joinMatch(socket, matchId, ank),
+    );
     socket.on("make_move_match", (props: { matchId: string; move: string }) => {
       const matchRoom = this.matchRooms[props.matchId];
       if (matchRoom) {
@@ -133,7 +134,7 @@ export class GameSocket {
     });
   };
 
-  private joinMatch = async (socket: SocketWithContextType, matchId: string, ank: (mg: { data?: matchDetails; error?: string }) => void) => {
+  private joinMatch = async (socket: SocketWithContextType, matchId: string, ank: (mg: { data?: NOTIFICATION_PAYLOAD; error?: string }) => void) => {
     const matchRoom = this.matchRooms[matchId];
     if (!matchRoom) {
       ank({ error: "404" });
@@ -142,12 +143,16 @@ export class GameSocket {
 
       const room = this.io.sockets.adapter.rooms.get(matchId);
       const userCount = room ? room.size : 0;
-      ank({ data: matchRoom.getGameState() });
+      ank({ data: matchRoom.match });
       this.io.to(matchId).emit("joined_match", { count: userCount, id: socket.data.userData.id });
     }
   };
 
-  private handleFindMatch = async (socket: SocketWithContextType, msg: { baseTime: number; incrementTime: number }, ank: (msg: unknown) => void) => {
+  private handleFindMatch = async (
+    socket: SocketWithContextType,
+    msg: { baseTime: number; incrementTime: number },
+    ank: (msg: { data: NOTIFICATION_PAYLOAD }) => void,
+  ) => {
     const userid = socket.data.userData.id;
 
     const waitingPlayersArray = this.waitingplayers;
@@ -156,27 +161,30 @@ export class GameSocket {
     const compatiblePlayer = waitingPlayersArray[0];
 
     if (!waitingPlayersArray.some((player) => player.id === userid) && compatiblePlayer && userid) {
-      const match = await prisma.match.create({
+      const match = await db.match.create({
         data: {
           whitePlayerId: userid,
           blackPlayerId: compatiblePlayer.id,
           baseTime: msg.baseTime,
           incrementTime: msg.incrementTime,
+          stats: {
+            create: {},
+          },
           users: {
             connect: [{ id: userid }, { id: compatiblePlayer.id }],
           },
         },
+        include: {
+          moves: true,
+          stats: true,
+        },
       });
 
       // Create new match room
-      this.matchRooms[match.id] = new MatchRoom(match.whitePlayerId, match.blackPlayerId, new Chess(), this.io, match.id, match.startedAt, {
-        baseTime: msg.baseTime,
-        incrementTime: msg.incrementTime,
-      });
+      this.matchRooms[match.id] = new MatchRoom(match.whitePlayerId, match.blackPlayerId, new Chess(), this.io, { ...match, stats: match.stats! });
 
-      const data = { matchId: match.id };
-      this.playerCallbacks[match.blackPlayerId]!({ data });
-      ank({ data });
+      this.playerCallbacks[match.blackPlayerId]!({ data: { ...match, stats: match.stats! } });
+      ank({ data: { ...match, stats: match.stats! } });
 
       this.waitingplayers = this.waitingplayers.filter((player) => player.id !== match.whitePlayerId && player.id !== match.blackPlayerId);
     } else {
@@ -184,10 +192,4 @@ export class GameSocket {
       this.waitingplayers.push({ id: userid, socketId: socket.id });
     }
   };
-}
-interface matchDetails {
-  matchId: string;
-  moves: ChessMoveType[];
-  players: { w: { id: string; timeLeft: number }; b: { id: string; timeLeft: number } };
-  config: { baseTime: number; incrementTime: number };
 }

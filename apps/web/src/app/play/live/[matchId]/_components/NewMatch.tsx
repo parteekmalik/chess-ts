@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+import { gameTypes } from "@acme/lib";
+import { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
-import { gameTypes } from "@acme/lib";
 
 function NewMatch() {
   const { SocketEmiter } = useBackend();
@@ -23,10 +24,10 @@ function NewMatch() {
     SocketEmiter(
       "find_match",
       { ...selectedGameType, baseTime: selectedGameType.baseTime * 60000 },
-      (response: { data?: { matchId: string }; error?: string }) => {
+      (response: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {
         if (response.data) {
-          router.push(`/play/live/${response.data.matchId}`);
-        }
+          router.push(`/play/live/${response.data.id}`);
+        }else router.push("/play/live");
         setIsLoading(false);
       },
     );

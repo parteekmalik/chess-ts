@@ -2,6 +2,7 @@
 
 import type { Session } from "next-auth";
 import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { NextUIProvider } from "@nextui-org/react";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
@@ -17,8 +18,9 @@ interface ProviderProps {
   children: ReactNode;
   session: Session | null;
 }
-
+const footerNotShownPaths = ["/play"];
 export function Providers({ children, session }: ProviderProps) {
+  const path = usePathname();
   return (
     <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
       <SessionProvider session={session}>
@@ -29,7 +31,7 @@ export function Providers({ children, session }: ProviderProps) {
                 <Header />
                 <div className="max-w-screen z-0 flex min-h-screen grow flex-col md:mx-auto md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl">
                   <div className="flex-1">{children}</div>
-                  <Footer />
+                  {!footerNotShownPaths.find((i) => path.startsWith(i)) && <Footer />}
                 </div>
               </main>
               <Toaster

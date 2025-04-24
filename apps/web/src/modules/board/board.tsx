@@ -70,11 +70,9 @@ const ComBoard: React.FC<BoardProps> = ({ handleMove, gameState, initalFlip, whi
       {flip === "w" ? blackBar : whiteBar}
       <div className={cn("flex flex-col", className)}>
         <div
-          className={twMerge(`relative aspect-square`)}
+          className={twMerge(`relative aspect-square h-[70vh]`)}
           style={{
             backgroundImage: `url('/images/blank_board_img.png')`,
-            minWidth: "25rem",
-            minHeight: "25rem",
             backgroundSize: "100% 100%",
             backgroundRepeat: "no-repeat",
           }}

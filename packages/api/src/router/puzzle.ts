@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import type { Puzzle } from "@acme/lib";
 
 import { createTRPCRouter, publicProcedure } from "../trpc";
@@ -18,5 +20,16 @@ export const puzzleRouter = createTRPCRouter({
     }
 
     return selectedPuzzles;
+  }),
+  getMatch: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    return await ctx.db.match.findUnique({
+      where: {
+        id: input,
+      },
+      include: {
+        moves: true,
+        stats: true,
+      },
+    });
   }),
 });

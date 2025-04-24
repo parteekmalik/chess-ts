@@ -1,26 +1,27 @@
 import type { Color } from "chess.js";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 
+import { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import { Button } from "@acme/ui/button";
 import { Dialog, DialogContent, DialogHeader } from "@acme/ui/dialog"; // Adjust the import path as necessary
 
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
+import { useTRPC } from "~/trpc/react";
 
-function Result({
-  playerTurn,
-  gameDetails,
-  status,
-}: {
-  playerTurn: Color | null;
-  gameDetails: { baseTime: number; incrementTime: number } | null;
-  status: { isover: boolean; winner: Color | "draw"; reason: string; winnerId?: string } | null;
-}) {
+function Result({ playerTurn, matchId }: { playerTurn: Color | null; matchId: string }) {
+  const trpc = useTRPC();
+  const { data: match } = useQuery(trpc.puzzle.getMatch.queryOptions(matchId));
+  const gameDetails = { baseTime: match?.baseTime, incrementTime: match?.incrementTime };
+
   const [isLoading, setIsLoading] = useState(false);
   const { SocketEmiter } = useBackend();
   const router = useRouter();
   const { data: session } = useSession();
+
+  const winnerId = match?.[match?.stats?.winner === "BLACK" ? "blackPlayerId" : "whitePlayerId"];
 
   return (
     <Dialog defaultOpen>
@@ -30,15 +31,12 @@ function Result({
         </DialogHeader>
         <div className="mb-auto flex flex-col items-center gap-10 bg-background">
           <div className="flex flex-col items-center gap-5">
-            {status?.winner === playerTurn && (
-              <div
-                className="bg-background-500 aspect-square h-20 w-20 rounded-full"
-                style={{ backgroundImage: "https://www.chess.com/bundles/web/images/color-icons/cup.svg", backgroundRepeat: "no-repeat" }}
-              />
+            {match?.stats?.winner === (playerTurn === "w" ? "WHITE" : "BLACK") && (
+              <img src="https://www.chess.com/bundles/web/images/color-icons/cup.svg" alt="" />
             )}
             <div className="font-semiBold flex flex-col items-center text-2xl">
-              <h1>{status?.winner === "draw" ? "Match Draw" : status?.winnerId === session?.user.id ? "You Won" : "You Lost"}</h1>
-              <p className="text-foreground-muted text-tiny">by {status?.reason}</p>
+              <h1>{match?.stats?.winner === "DRAW" ? "Match Draw" : winnerId === session?.user.id ? "You Won" : "You Lost"}</h1>
+              <p className="text-foreground-muted text-tiny">by {match?.stats?.reason}</p>
             </div>
           </div>
           <Button
@@ -46,9 +44,10 @@ function Result({
             disabled={isLoading}
             onClick={() => {
               setIsLoading(true);
-              SocketEmiter("find_match", gameDetails, (response: { data?: { matchId: string }; error?: string }) => {
+              SocketEmiter("find_match", gameDetails, (response: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {
+                console.log("find match -> ", response);
                 if (response.data) {
-                  router.push(`/play/live/${response.data.matchId}`);
+                  router.push(`/play/live/${response.data.id}`);
                 }
                 setIsLoading(false);
               });

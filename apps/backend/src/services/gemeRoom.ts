@@ -2,6 +2,10 @@ import type { Chess, Color } from "chess.js";
 import type { Socket, Server as SocketServer } from "socket.io";
 import moment from "moment";
 
+import type { Prisma } from "@acme/db";
+import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import { db } from "@acme/db";
+
 import type { UserDataType } from "./GameSocket";
 import { logger } from "./Logger";
 
@@ -16,38 +20,18 @@ export class MatchRoom {
 
   private game: Chess; // chess.js game instance
 
-  private startedAt: Date;
-
-  private movesTime: Date[];
-
-  private stats: { isover: boolean; winner: Color | "draw"; reason: string; winnerId?: string } | null;
-
   private io: SocketServer;
 
-  private matchId: string;
+  public match: NOTIFICATION_PAYLOAD;
 
-  private config: { baseTime: number; incrementTime: number };
-
-  constructor(
-    whitePlayer: string,
-    blackPlayer: string,
-    game: Chess,
-    io: SocketServer,
-    matchId: string,
-    startedAt: Date,
-    config: { baseTime: number; incrementTime: number },
-  ) {
+  constructor(whitePlayer: string, blackPlayer: string, game: Chess, io: SocketServer, match: NOTIFICATION_PAYLOAD) {
     this.players = {
       w: whitePlayer,
       b: blackPlayer,
     };
     this.game = game;
-    this.startedAt = startedAt;
-    this.movesTime = [];
-    this.stats = null;
     this.io = io;
-    this.matchId = matchId;
-    this.config = config;
+    this.match = match;
   }
 
   public oppositeTurn(turn: Color): Color {
@@ -58,77 +42,71 @@ export class MatchRoom {
     return this.players[this.game.turn()] === userId;
   }
 
-  private checkAuthorisation(id: string) {
-    return Object.values(this.players).includes(id);
+  private refreshMatch() {
+    db.match
+      .findUnique({
+        where: {
+          id: this.match.id,
+        },
+        include: {
+          moves: true,
+          stats: true,
+        },
+      })
+      .then((data) => {
+        if (data) {
+          this.match = { ...data, stats: data.stats! };
+        }
+      })
+      .catch((error) => console.log(error));
   }
 
-  private handleMove(socket: SocketWithContextType, move: string, matchId: string) {
+  private async handleMove(socket: SocketWithContextType, move: string) {
     try {
       this.game.move(move);
-      this.movesTime.push(moment().toDate());
+      const matchId = this.match.id;
 
-      const gameState = this.getGameState();
-      this.io.to(matchId).emit("match_update", gameState);
+      this.match.moves.push({
+        matchId,
+        move,
+        timestamps: moment().toDate(),
+        id: "",
+      });
 
-      if (this.game.isGameOver()) {
-        this.updateGameStatus();
-        this.io.to(matchId).emit("match_ended", { matchId, stats: this.stats });
-      }
+      this.updateGameStatus();
+      this.io.to(matchId).emit("match_update", this.match);
+
+      await db.move.create({
+        data: {
+          move,
+          matchId,
+        },
+      });
+      this.refreshMatch();
     } catch {
       socket.emit("error", "Invalid move");
     }
   }
 
   private updateGameStatus() {
-    if (this.game.isDraw()) {
-      this.stats = { isover: true, winner: "draw", reason: "repetition" };
-    } else if (this.game.isCheckmate()) {
-      this.stats = {
-        isover: true,
-        winnerId: this.players[this.oppositeTurn(this.game.turn())],
-        winner: this.game.isDraw() ? "draw" : this.oppositeTurn(this.game.turn()),
-        reason: "checkmate",
-      };
-    }
-  }
-
-  public calculateTimeLeft(turn: Color, movesTimes: Date[], testing = false): number {
-    const tempList = [this.startedAt, ...movesTimes];
-    let movesTime = tempList.map((move) => moment(move).valueOf());
-    if (testing)
-      movesTime = Array.from({ length: 6 }, (_, i) =>
-        moment(this.startedAt)
-          .add(i * 10, "seconds")
-          .valueOf(),
-      );
-    let timeLeft = this.config.baseTime;
-    if (turn === "w") {
-      for (let i = 1; i < movesTime.length; i += 2) {
-        timeLeft -= movesTime[i]! - movesTime[i - 1]!;
-        // timeLeft += this.config.incrementTime;
-      }
-    } else {
-      for (let i = 2; i < movesTime.length; i += 2) {
-        timeLeft -= movesTime[i]! - movesTime[i - 1]!;
-        // timeLeft += this.config.incrementTime;
-      }
-    }
-    if (turn === this.game.turn()) timeLeft -= moment().valueOf() - movesTime[movesTime.length - 1]!;
-
-    return timeLeft;
-  }
-
-  public getGameState() {
-    return {
-      moves: this.game.history(),
-      players: {
-        w: { id: this.players.w!, timeLeft: this.calculateTimeLeft("w", this.movesTime) },
-        b: { id: this.players.b!, timeLeft: this.calculateTimeLeft("b", this.movesTime) },
-      },
-      matchId: this.matchId,
-      stats: this.stats,
-      config: this.config,
-    };
+    if (!this.game.isGameOver()) return;
+    const data = {
+      winner: this.game.isDraw() ? "DRAW" : this.oppositeTurn(this.game.turn()) === "w" ? "WHITE" : "BLACK",
+      reason: this.game.isDraw() ? "repetition" : "checkmate",
+    } satisfies Prisma.MatchResultUpdateArgs["data"];
+    db.matchResult
+      .update({
+        where: {
+          matchId: this.match.id,
+        },
+        data: {
+          winner: data.winner,
+          reason: data.reason,
+        },
+      })
+      .catch((error) => console.log(error))
+      .finally(() => this.refreshMatch());
+    this.match.stats = { ...this.match.stats, ...data };
   }
 
   public handleRoomMessage(socket: SocketWithContextType, type: string, payload: unknown) {
@@ -143,7 +121,7 @@ export class MatchRoom {
     } else {
       switch (type) {
         case "match_update": {
-          if (isPlayerTurn) this.handleMove(socket, payload as string, this.matchId);
+          if (isPlayerTurn) this.handleMove(socket, payload as string).catch((error) => logger.error("handleMove", error));
           break;
         }
         case "default": {

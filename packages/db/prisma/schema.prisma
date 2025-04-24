@@ -80,9 +80,8 @@ model Match {
 
 model MatchResult {
   id        String      @id @default(cuid())
-  winner    MatchWinner
+  winner    MatchWinner @default(PLAYING)
   reason    String      @default("")
-  createdAt DateTime    @default(now())
 
   match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
   matchId String @unique
@@ -96,22 +95,10 @@ enum MatchWinner {
 }
 
 model Move {
-  id         String     @id @default(cuid())
-  timestamps DateTime[] @default([])
+  id         String   @id @default(cuid())
+  timestamps DateTime @default(now())
   move       String
 
   matchId String
   match   Match  @relation(fields: [matchId], references: [id])
-}
-
-model Puzzle {
-  id              String   @id @default(cuid())
-  fen             String
-  moves           String[]
-  rating          Int
-  ratingDeviation Int
-  themes          String[]
-  openingTags     String[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 }
