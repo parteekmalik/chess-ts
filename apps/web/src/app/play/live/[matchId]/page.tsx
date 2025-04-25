@@ -25,7 +25,7 @@ const LiveBoard: React.FunctionComponent = () => {
   const queryClient = useQueryClient();
 
   const { data: session } = useSession();
-  const { SocketEmiter, lastMessage } = useBackend();
+  const { SocketEmiter, lastMessage, backendServerConnection } = useBackend();
 
   const { data: match, isLoading } = useQuery(trpc.puzzle.getMatch.queryOptions(params.matchId as string));
 
@@ -35,7 +35,7 @@ const LiveBoard: React.FunctionComponent = () => {
       if (responce.data) console.info("joined match: ", responce.data.id);
       else router.push("/play/live");
     });
-  }, [params.matchId, SocketEmiter]);
+  }, [params.matchId, SocketEmiter, backendServerConnection]);
 
   useEffect(() => {
     if (lastMessage.type === "joined_match") {

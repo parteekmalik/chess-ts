@@ -61,27 +61,34 @@ const useSocket = () => {
 
   const SocketEmiter = useCallback(
     <Ev extends string>(ev: Ev, ...args: unknown[]) => {
-      if (!socketInstance?.connected) {
-        toast.error("Backend server is getting up. It will take few minutes");
+      if (!socketInstance) {
+        toast.error("Socket is not initialized yet.");
         return;
       }
-      if (env.NODE_ENV === "development") {
-        console.log("[EMIT]", ev, args);
-      }
-      args = args.map((arg) =>
+
+      // Map acknowledgment functions for debugging
+      const processedArgs = args.map((arg) =>
         typeof arg === "function"
           ? (props: acknoledgementResponce) => {
-              console.log("[ACKNOLEDGEMENT]", ev, args, props);
+              console.log("[ACKNOWLEDGEMENT]", ev, args, props);
               // eslint-disable-next-line @typescript-eslint/no-unsafe-call
               arg(props);
             }
           : arg,
       );
-      return socketInstance.emit(ev, ...args);
+
+      // Create a new interval that tries to send the message every 100ms if connected
+      const intervalId = setInterval(() => {
+        if (socketInstance.connected) {
+          if (env.NODE_ENV === "development") {
+            console.log("[EMIT INTERVAL]", ev, processedArgs);
+          }
+          socketInstance.emit(ev, ...processedArgs);
+          clearInterval(intervalId); // clear interval after successful emit
+        }
+      }, 100);
     },
-    // eslint-disable-next-line react-compiler/react-compiler
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [socketInstance, socketInstance?.connected],
+    [socketInstance],
   );
 
   return {
