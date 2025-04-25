@@ -152,16 +152,6 @@ export default async function Home() {
             <TableBody>
               {matchesPlayed.map((match) => {
                 const { id, startedAt, whitePlayerId, blackPlayerId, stats } = match;
-                // determine display for winner
-                let winnerDisplay: string;
-                if (stats!.winner === "PLAYING") {
-                  winnerDisplay = "In Progress";
-                } else if (stats!.winner === "DRAW") {
-                  winnerDisplay = "Draw";
-                } else {
-                  const winnerId = stats!.winner === "WHITE" ? whitePlayerId : blackPlayerId;
-                  winnerDisplay = `${stats!.winner} (${winnerId})`;
-                }
 
                 return (
                   <TableRow key={id}>
@@ -176,7 +166,7 @@ export default async function Home() {
                     <TableCell>
                       <UserCard minimal userId={blackPlayerId} />
                     </TableCell>
-                    <TableCell>{winnerDisplay}</TableCell>
+                    <TableCell>{stats?.winner}</TableCell>
                     <TableCell>
                       <Link href={`/play/live/${id}`} className="text-sm font-medium underline">
                         View
