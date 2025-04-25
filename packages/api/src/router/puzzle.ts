@@ -22,6 +22,13 @@ export const puzzleRouter = createTRPCRouter({
 
     return selectedPuzzles;
   }),
+  getUser: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    return await ctx.db.user.findUnique({
+      where: {
+        id: input,
+      },
+    });
+  }),
   getMatch: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     const data = await ctx.db.match.findUnique({
       where: {

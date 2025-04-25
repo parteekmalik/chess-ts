@@ -30,7 +30,7 @@ export default function Footer() {
         <div className="flex flex-col space-y-6 md:flex-row md:justify-between md:space-y-0">
           <div className="flex justify-center md:justify-start">
             <Link href="/" className="relative flex text-foreground">
-              <a
+              <p
                 style={{
                   backgroundPosition: "-2.3em -3.7em",
                 }}

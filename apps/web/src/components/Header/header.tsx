@@ -40,7 +40,7 @@ export function Header() {
             </DialogContent>
           </Dialog>
           <Link href="/" className="relative flex text-foreground">
-            <a
+            <p
               style={{
                 backgroundPosition: "-2.3em -3.7em",
               }}
@@ -72,7 +72,7 @@ function VerticalHeader({ className }: { className?: string }) {
       <nav className="border-gray flex h-full w-fit flex-col justify-between border-r bg-white/5 px-4 py-3">
         <div className="mx-auto flex max-w-screen-xl flex-col items-center">
           <Link href="/" className="flex items-center text-foreground">
-            <a
+            <p
               style={{
                 backgroundPosition: "-2.3em -3.7em",
               }}

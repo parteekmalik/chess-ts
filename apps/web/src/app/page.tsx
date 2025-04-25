@@ -1,8 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
+import { formatDistance } from "date-fns";
 
 import { db } from "@acme/db";
 import { Card, CardContent } from "@acme/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@acme/ui/table";
+
+import { UserCard } from "~/components/userCard";
 
 const text = {
   hero: {
@@ -37,6 +41,7 @@ const text = {
 export default async function Home() {
   const gamesToday = await db.match.count({ where: { startedAt: { gte: new Date(new Date().setDate(new Date().getDate() - 1)) } } });
   const playingNow = await db.matchResult.count({ where: { winner: "PLAYING" } });
+  const matchesPlayed = await db.match.findMany({ take: 10, orderBy: { startedAt: "desc" }, include: { stats: true } });
   return (
     <main className="m-auto flex grow flex-col items-center justify-center space-y-10 px-1 text-foreground">
       <div className="flex flex-col items-center justify-center lg:flex-row">
@@ -129,6 +134,59 @@ export default async function Home() {
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center gap-4 lg:flex-row lg:gap-10">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Started At</TableHead>
+                <TableHead>White Player</TableHead>
+                <TableHead>Black Player</TableHead>
+                <TableHead>Winner</TableHead>
+                <TableHead>Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {matchesPlayed.map((match) => {
+                const { id, startedAt, whitePlayerId, blackPlayerId, stats } = match;
+                // determine display for winner
+                let winnerDisplay: string;
+                if (stats!.winner === "PLAYING") {
+                  winnerDisplay = "In Progress";
+                } else if (stats!.winner === "DRAW") {
+                  winnerDisplay = "Draw";
+                } else {
+                  const winnerId = stats!.winner === "WHITE" ? whitePlayerId : blackPlayerId;
+                  winnerDisplay = `${stats!.winner} (${winnerId})`;
+                }
+
+                return (
+                  <TableRow key={id}>
+                    <TableCell>
+                      {formatDistance(new Date(startedAt), new Date(), {
+                        addSuffix: true,
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      <UserCard minimal userId={whitePlayerId} />
+                    </TableCell>
+                    <TableCell>
+                      <UserCard minimal userId={blackPlayerId} />
+                    </TableCell>
+                    <TableCell>{winnerDisplay}</TableCell>
+                    <TableCell>
+                      <Link href={`/play/live/${id}`} className="text-sm font-medium underline">
+                        View
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </main>

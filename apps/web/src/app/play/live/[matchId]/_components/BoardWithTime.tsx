@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import moment from "moment";
 import { twMerge } from "tailwind-merge";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Card, CardContent } from "@acme/ui/card";
 
 import type { BoardProps } from "~/components/board/board";
 import Board from "~/components/board/board";
+import { UserCard } from "~/components/userCard";
 import SidebarTabs from "./SidebarTabs";
 
 interface BoardWithTimeProps extends BoardProps {
-  whitePlayerTime: number;
-  blackPlayerTime: number;
+  whitePlayerData: { time: number; id?: string };
+  blackPlayerData: { time: number; id?: string };
   isWhiteTurn: boolean;
   disabled?: boolean;
 }
@@ -27,15 +26,15 @@ function BoardWithTime(props: BoardWithTimeProps) {
   const [chatMessages, setchatMessages] = useState<ChatMessageType[]>([]);
 
   useEffect(() => {
-    setWhiteTime(Math.max(props.whitePlayerTime, 0));
-    setBlackTime(Math.max(props.blackPlayerTime, 0));
+    setWhiteTime(Math.max(props.whitePlayerData.time, 0));
+    setBlackTime(Math.max(props.blackPlayerData.time, 0));
 
     const worker = new Worker(new URL("~/workers/timer.worker.ts", import.meta.url));
 
     worker.postMessage({
       isWhiteTurn: props.isWhiteTurn,
-      whiteTime: props.whitePlayerTime,
-      blackTime: props.blackPlayerTime,
+      whiteTime: props.whitePlayerData.time,
+      blackTime: props.blackPlayerData.time,
     });
 
     worker.onmessage = (e) => {
@@ -45,7 +44,7 @@ function BoardWithTime(props: BoardWithTimeProps) {
     };
 
     return () => worker.terminate(); // Cleanup on unmount
-  }, [props.whitePlayerTime, props.blackPlayerTime, props.isWhiteTurn]);
+  }, [props.whitePlayerData.time, props.blackPlayerData.time, props.isWhiteTurn]);
 
   return (
     <div className="flex grow flex-col justify-between gap-4 px-4 lg:flex-row">
@@ -54,44 +53,19 @@ function BoardWithTime(props: BoardWithTimeProps) {
           initalFlip={props.initalFlip}
           handleMove={props.handleMove}
           gameState={props.gameState}
-          whiteBar={<TimerContainer variant="white" time={whiteTime} userDetails={defaultUserDetails} />}
-          blackBar={<TimerContainer variant="black" time={blackTime} userDetails={defaultUserDetails} />}
+          whiteBar={<TimerContainer variant="white" time={whiteTime} userId={props.whitePlayerData.id} />}
+          blackBar={<TimerContainer variant="black" time={blackTime} userId={props.blackPlayerData.id} />}
         />
       </div>
       <SidebarTabs disabled={props.disabled} />
     </div>
   );
 }
-const defaultUserDetails = {
-  name: "Junior Garcia",
-  description: (
-    <Link href="https://twitter.com/jrgarciadev" target="_blank">
-      @jrgarciadev
-    </Link>
-  ),
-  avatarProps: {
-    radius: "sm" as const,
-    src: "https://avatars.githubusercontent.com/u/30373425?v=4",
-  },
-};
-const TimerContainer = ({ variant, time, userDetails }: { variant: "white" | "black"; time: number; userDetails: typeof defaultUserDetails }) => {
-  const imageSrc = userDetails.avatarProps.src;
-  const initials = userDetails.name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
-
+const TimerContainer = ({ variant, time, userId }: { variant: "white" | "black"; time: number; userId?: string }) => {
   return (
     <Card>
       <CardContent className="flex w-full justify-between p-3">
-        <div className="flex w-fit items-center gap-4 p-0">
-          <Avatar>{imageSrc ? <AvatarImage src={imageSrc} alt={userDetails.name} /> : <AvatarFallback>{initials}</AvatarFallback>}</Avatar>
-          <div>
-            <p className="text-sm font-medium">{userDetails.name}</p>
-            {userDetails.description}
-          </div>
-        </div>
+        <UserCard userId={userId} />
         <TimerComponent time={time} variant={variant} />
       </CardContent>
     </Card>

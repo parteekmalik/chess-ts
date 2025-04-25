@@ -97,8 +97,8 @@ const LiveBoard: React.FunctionComponent = () => {
         gameState={gameState}
         initalFlip={iAmPlayer ?? "w"}
         isWhiteTurn={match.moves.length % 2 === 0}
-        whitePlayerTime={playerTimes.w}
-        blackPlayerTime={playerTimes.b}
+        whitePlayerData={{ time: playerTimes.w, id: match.whitePlayerId }}
+        blackPlayerData={{ time: playerTimes.b, id: match.blackPlayerId }}
         handleMove={handleMove}
       />
       {openResult && <Result playerTurn={iAmPlayer} matchId={params.matchId as string} />}

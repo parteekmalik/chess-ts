@@ -8,8 +8,8 @@ function Online() {
   return (
     <div className="flex h-full justify-center p-2">
       <BoardWithTime
-        whitePlayerTime={1000}
-        blackPlayerTime={1000}
+        whitePlayerData={{ time: 0 }}
+        blackPlayerData={{ time: 0 }}
         isWhiteTurn={true}
         gameState={new Chess()}
         handleMove={() => {
