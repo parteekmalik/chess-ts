@@ -137,9 +137,9 @@ export default async function Home() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="w-full">
         <CardContent className="flex flex-col items-center justify-center gap-4 lg:flex-row lg:gap-10">
-          <Table>
+          <Table className="grow">
             <TableHeader>
               <TableRow>
                 <TableHead>Started At</TableHead>

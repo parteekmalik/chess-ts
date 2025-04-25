@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { Chess } from "chess.js";
 
+import { cn } from "@acme/ui";
 import { Card, CardContent, CardHeader } from "@acme/ui/card";
 import { Dialog, DialogContent } from "@acme/ui/dialog";
 
@@ -34,9 +35,12 @@ function Puzzle() {
         <Board gameState={gameState} initalFlip={gameState.turn()} handleMove={handleMove} className="" />
         <Card className="max-w-[540px] grow gap-5 overflow-hidden p-0 text-foreground">
           <CardHeader className="flex h-fit w-full flex-col items-center bg-primary">
+            <h1 className={cn("rounded-lg p-2 px-4 text-3xl font-semibold", gameState.turn() === "w" ? "text-white" : "text-black")}>
+              {gameState.turn() === "w" ? "White" : "Black"} to play
+            </h1>
             <div className="flex gap-2">
               {[0, 1, 2].map((index) => (
-                <div className="h-10 w-10 overflow-hidden rounded-sm">
+                <div key={index} className="h-10 w-10 overflow-hidden rounded-sm">
                   {3 - PuzzleState.livesLeft > index ? (
                     <img key={index} className="h-full w-full" src="https://www.chess.com/bundles/web/images/svg/wrong.svg" alt="" />
                   ) : (

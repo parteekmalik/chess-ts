@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 
+import { cn } from "@acme/ui";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 
 import { useTRPC } from "~/trpc/react";
@@ -24,16 +24,16 @@ export function UserCard({ userId, minimal }: { userId?: string; minimal?: boole
     .map((n) => n[0])
     .join("")
     .toUpperCase();
-  if (minimal) {
-    return <div>{user?.name}</div>;
-  }
   return (
-    <div className="flex w-fit items-center gap-4 p-0">
-      <Avatar>{imageSrc ? <AvatarImage src={imageSrc} alt={user.name!} /> : <AvatarFallback>{initials}</AvatarFallback>}</Avatar>
-      <div>
-        <p className="text-sm font-medium">{user?.name}</p>
-        <Link href={"#"}>{user?.email}</Link>
+    <>
+      <div className={cn(minimal && "lg:hidden")}>{user?.name}</div>
+      <div className={cn("flex w-fit items-center gap-4 p-0", minimal && "hidden lg:block")}>
+        <Avatar>{imageSrc ? <AvatarImage src={imageSrc} alt={user.name!} /> : <AvatarFallback>{initials}</AvatarFallback>}</Avatar>
+        <div>
+          <p className="text-sm font-medium">{user?.name}</p>
+          <Link href={"#"}>{user?.email}</Link>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

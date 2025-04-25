@@ -13,7 +13,7 @@ function usePuzzle() {
   const [PuzzleState, PuzzleDispatch] = useReducer(PuzzleReducer, defaultPuzzleContextState);
 
   useEffect(() => {
-    if (puzzleList.length > 0 && PuzzleState.livesLeft === 0) {
+    if (puzzleList.length > 0 && (PuzzleState.livesLeft === 0 || PuzzleState.puzzleList.length === 0)) {
       PuzzleDispatch({ type: "update_puzzle_list", payload: puzzleList });
     }
   }, [puzzleList, PuzzleState.livesLeft]);
