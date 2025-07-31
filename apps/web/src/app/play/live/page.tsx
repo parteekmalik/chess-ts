@@ -2,7 +2,7 @@
 
 import { Chess } from "chess.js";
 
-import BoardWithTime from "./[matchId]/_components/BoardWithTime";
+import { BoardWithTime } from "./[matchId]/_components/BoardWithTime";
 
 function Online() {
   return (

@@ -1,23 +1,11 @@
-// Import necessary types
 interface TimerMessage {
-  isWhiteTurn: boolean;
-  whiteTime: number;
-  blackTime: number;
+  time: number;
 }
 
 // Listen for messages from the main thread
 self.onmessage = (event: MessageEvent<TimerMessage>) => {
-  let { whiteTime, blackTime } = event.data;
-
-  // Timer logic (simplified)
   setInterval(() => {
-    if (event.data.isWhiteTurn) {
-      whiteTime -= 100; // Decrease white time
-    } else {
-      blackTime -= 100; // Decrease black time
-    }
-
-    // Post updated times back to the main thread
-    self.postMessage({ whiteTime, blackTime });
-  }, 100); // Update every 100ms
+    event.data.time -= 100;
+    self.postMessage(event.data.time);
+  }, 100); 
 };
