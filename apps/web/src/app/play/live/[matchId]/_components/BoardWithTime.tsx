@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { BoardProps } from "~/components/board/board";
 import { ChessBoardWrapper } from "~/components/board/board";
 import SidebarTabs from "./SidebarTabs";
@@ -15,8 +14,7 @@ export interface ChatMessageType {
   messgae: string;
 }
 export function BoardWithTime(props: BoardWithTimeProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [chatMessages, setchatMessages] = useState<ChatMessageType[]>([]);
+  // const [chatMessages, setchatMessages] = useState<ChatMessageType[]>([]);
 
   return (
     <div className="flex grow flex-col justify-between gap-4 px-4 lg:flex-row">

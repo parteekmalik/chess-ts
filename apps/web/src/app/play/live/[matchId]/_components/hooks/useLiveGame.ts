@@ -11,7 +11,6 @@ import { useBackend } from "~/components/contexts/socket/SocketContextComponent"
 import { useTRPC } from "~/trpc/react";
 
 export const useLiveGame = () => {
-
   const params = useParams();
   const trpc = useTRPC();
   const router = useRouter();

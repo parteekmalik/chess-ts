@@ -1,16 +1,13 @@
 "use client";
 
+import { cn } from "@acme/ui";
 import type { Chess, Color, Square } from "chess.js";
 import React, { useEffect, useState } from "react";
-import _ from "lodash";
 import { twMerge } from "tailwind-merge";
-
-import { cn } from "@acme/ui";
-import { Button } from "@acme/ui/button";
-
-import type { ChessMoveType } from "./boardMain";
 import { env } from "~/env";
 import { checkForValidClick } from "../Utils";
+import type { ChessMoveType } from "./boardMain";
+import { BoardSettings } from "./BoardSettings";
 import Coordinates from "./coordinates/coordinates";
 import ChessBoard from "./piece and hints/ChessBoard";
 import ChessBoardHints from "./piece and hints/ChessBoardHints";
@@ -68,90 +65,51 @@ export const ChessBoardWrapper: React.FC<BoardProps> = ({ handleMove, gameState,
   const lastMove = game.history({ verbose: true })[game.history({ verbose: true }).length - 1];
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn("flex flex-col gap-2", className)}>
       {flip === "w" ? blackBar : whiteBar}
-      <div className={cn("flex flex-col", className)}>
-        <div
-          className={twMerge(`relative aspect-square w-full lg:h-[70vh]`)}
-          style={{
-            backgroundImage: `url('/images/blank_board_img.png')`,
-            backgroundSize: "100% 100%",
-            backgroundRepeat: "no-repeat",
-          }}
-          onClick={PieceLogic}
-        >
-          <Coordinates flip={flip} />
-          <Highlight selectedPiece={selectedPiece} flip={flip} lastMove={lastMove} />
-          <ChessBoard game={flip === "w" ? game.board() : game.board().reverse()} />
-          {playerTurn === game.turn() && selectedPiece && !movesUndone.length && (
-            <ChessBoardHints game={game} selectedPiece={selectedPiece} flip={flip} />
-          )}
-        </div>
-        {flip === "w" ? whiteBar : blackBar}
-        <div className="flex w-full gap-1 p-2 px-0">
-          <Button
-            className="flex-1 text-xl text-foreground"
-            onClick={() => {
-              setSelectedPiece(null);
-              if (game.history().length > 0) {
-                const move = game.history()[game.history().length - 1]!;
-                setMovesUndone((moves) => [...moves, move]);
-                game.undo();
-                setGame(_.cloneDeep(game));
-              }
-            }}
-          >
-            Back
-          </Button>
-          <Button
-            className="flex-1 text-xl text-foreground"
-            onClick={() => {
-              setSelectedPiece(null);
-              if (movesUndone.length) {
-                const move = movesUndone.pop()!;
-                game.move(move);
-                setMovesUndone(movesUndone);
-                setGame(_.cloneDeep(game));
-              }
-            }}
-          >
-            Next
-          </Button>
-          <Button
-            className="text-xl text-foreground"
-            onClick={() => {
-              setFlip((flip) => (flip === "w" ? "b" : "w"));
-            }}
-          >
-            Flip
-          </Button>
-        </div>
-        {env.NODE_ENV === "development" && (
-          <details>
-            <summary className="hover:cursor-pointer">Debug Information</summary>
-            <pre>
-              <code className="json">
-                {JSON.stringify(
-                  {
-                    selectedPiece,
-                    moves: {
-                      History: game.history(),
-                      movesUndone,
-                    },
-                    TurnandFlip: {
-                      CurrentTurn: game.turn(),
-                      BoardOrientation: flip,
-                    },
-                    // "Last Move": lastMove, // Uncomment if needed
-                  },
-                  null,
-                  2,
-                )}
-              </code>
-            </pre>
-          </details>
+      <div
+        className={twMerge(`relative aspect-square w-full lg:h-[70vh]`)}
+        style={{
+          backgroundImage: `url('/images/blank_board_img.png')`,
+          backgroundSize: "100% 100%",
+          backgroundRepeat: "no-repeat",
+        }}
+        onClick={PieceLogic}
+      >
+        <Coordinates flip={flip} />
+        <Highlight selectedPiece={selectedPiece} flip={flip} lastMove={lastMove} />
+        <ChessBoard game={flip === "w" ? game.board() : game.board().reverse()} />
+        {playerTurn === game.turn() && selectedPiece && !movesUndone.length && (
+          <ChessBoardHints game={game} selectedPiece={selectedPiece} flip={flip} />
         )}
       </div>
+      {flip === "w" ? whiteBar : blackBar}
+      <BoardSettings {...{setSelectedPiece, game, setMovesUndone, setGame, movesUndone, setFlip}} />
+      {env.NODE_ENV === "development" && (
+        <details>
+          <summary className="hover:cursor-pointer">Debug Information</summary>
+          <pre>
+            <code className="json">
+              {JSON.stringify(
+                {
+                  selectedPiece,
+                  moves: {
+                    History: game.history(),
+                    movesUndone,
+                  },
+                  TurnandFlip: {
+                    CurrentTurn: game.turn(),
+                    BoardOrientation: flip,
+                  },
+                  // "Last Move": lastMove, // Uncomment if needed
+                },
+                null,
+                2,
+              )}
+            </code>
+          </pre>
+        </details>
+      )}
     </div>
   );
 };
