@@ -25,15 +25,12 @@ export function UserCard({ userId, minimal }: { userId?: string; minimal?: boole
     .join("")
     .toUpperCase();
   return (
-    <>
-      <div className={cn(minimal && "lg:hidden")}>{user?.name}</div>
-      <div className={cn("flex w-fit items-center gap-4 p-0", minimal && "hidden lg:block")}>
-        <Avatar>{imageSrc ? <AvatarImage src={imageSrc} alt={user.name!} /> : <AvatarFallback>{initials}</AvatarFallback>}</Avatar>
-        <div>
-          <p className="text-sm font-medium">{user?.name}</p>
-          <Link href={"#"}>{user?.email}</Link>
-        </div>
+    <div className={cn("flex w-fit items-center gap-4 p-0", minimal && "hidden lg:block")}>
+      <Avatar>{imageSrc ? <AvatarImage src={imageSrc} alt={user.name!} /> : <AvatarFallback>{initials}</AvatarFallback>}</Avatar>
+      <div>
+        <p className="text-sm font-medium">{user?.name}</p>
+        <Link href={"#"}>{user?.email}</Link>
       </div>
-    </>
+    </div>
   );
 }
