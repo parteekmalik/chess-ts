@@ -17,7 +17,7 @@ import ChessBoardHints from "./piece and hints/ChessBoardHints";
 import Highlight from "./piece and hints/highlight";
 
 export interface BoardProps {
-  handleMove: (move: ChessMoveType) => void;
+  handleMove?: (move: ChessMoveType) => void;
   initalFlip?: Color;
   className?: string;
   blackBar?: React.ReactNode;
@@ -25,7 +25,7 @@ export interface BoardProps {
   gameState: Chess;
 }
 
-const ComBoard: React.FC<BoardProps> = ({ handleMove, gameState, initalFlip, whiteBar, blackBar, className }) => {
+export const ChessBoardWrapper: React.FC<BoardProps> = ({ handleMove, gameState, initalFlip, whiteBar, blackBar, className }) => {
   const [game, setGame] = useState(gameState);
   const [selectedPiece, setSelectedPiece] = useState<Square | null>(null);
   const [flip, setFlip] = useState(gameState.turn());
@@ -43,7 +43,7 @@ const ComBoard: React.FC<BoardProps> = ({ handleMove, gameState, initalFlip, whi
   const PieceLogic = (event: React.MouseEvent) => {
     if (movesUndone.length) return;
     const { isValid, square } = checkForValidClick(event, flip);
-    if (!isValid) return;
+    if (!isValid || !handleMove) return;
     console.log("valid", square, game.get(square), initalFlip);
     if (selectedPiece && initalFlip === game.turn() && movesUndone.length === 0) {
       try {
@@ -68,7 +68,7 @@ const ComBoard: React.FC<BoardProps> = ({ handleMove, gameState, initalFlip, whi
   const lastMove = game.history({ verbose: true })[game.history({ verbose: true }).length - 1];
 
   return (
-    <>
+    <div className="flex flex-col gap-2">
       {flip === "w" ? blackBar : whiteBar}
       <div className={cn("flex flex-col", className)}>
         <div
@@ -152,8 +152,6 @@ const ComBoard: React.FC<BoardProps> = ({ handleMove, gameState, initalFlip, whi
           </details>
         )}
       </div>
-    </>
+    </div>
   );
 };
-
-export default ComBoard;

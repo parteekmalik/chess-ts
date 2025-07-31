@@ -1,8 +1,6 @@
 import { useState } from "react";
-
-
 import type { BoardProps } from "~/components/board/board";
-import Board from "~/components/board/board";
+import { ChessBoardWrapper } from "~/components/board/board";
 import SidebarTabs from "./SidebarTabs";
 import { TimerContainer } from "./TimeContainerBar";
 
@@ -22,15 +20,13 @@ export function BoardWithTime(props: BoardWithTimeProps) {
 
   return (
     <div className="flex grow flex-col justify-between gap-4 px-4 lg:flex-row">
-      <div className="flex flex-col gap-2">
-        <Board
-          initalFlip={props.initalFlip}
-          handleMove={props.handleMove}
-          gameState={props.gameState}
-          whiteBar={<TimerContainer variant="white" isTurn={props.isWhiteTurn} time={props.whitePlayerData.time} userId={props.whitePlayerData.id} />}
-          blackBar={<TimerContainer variant="black" isTurn={!props.isWhiteTurn} time={props.blackPlayerData.time} userId={props.blackPlayerData.id} />}
-        />
-      </div>
+      <ChessBoardWrapper
+        initalFlip={props.initalFlip}
+        handleMove={props.handleMove}
+        gameState={props.gameState}
+        whiteBar={<TimerContainer variant="white" isTurn={props.isWhiteTurn} time={props.whitePlayerData.time} userId={props.whitePlayerData.id} />}
+        blackBar={<TimerContainer variant="black" isTurn={!props.isWhiteTurn} time={props.blackPlayerData.time} userId={props.blackPlayerData.id} />}
+      />
       <SidebarTabs disabled={props.disabled} />
     </div>
   );

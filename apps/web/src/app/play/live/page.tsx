@@ -12,9 +12,6 @@ function Online() {
         blackPlayerData={{ time: 0 }}
         isWhiteTurn={true}
         gameState={new Chess()}
-        handleMove={() => {
-          console.log("move");
-        }}
       />
     </div>
   );

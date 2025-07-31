@@ -1,14 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
-import { Chess } from "chess.js";
-
 import { cn } from "@acme/ui";
 import { Card, CardContent, CardHeader } from "@acme/ui/card";
 import { Dialog, DialogContent } from "@acme/ui/dialog";
-
+import { Chess } from "chess.js";
+import Image from "next/image";
+import { useMemo } from "react";
+import { ChessBoardWrapper } from "~/components/board/board";
 import type { ChessMoveType } from "~/components/board/boardMain";
-import Board from "~/components/board/board";
 import { env } from "~/env";
 import usePuzzle from "./_components/usePuzzle";
 
@@ -32,7 +31,7 @@ function Puzzle() {
   return (
     <div className="flex h-full w-full flex-col p-4">
       <div className="flex flex-col gap-4 lg:flex-row">
-        <Board gameState={gameState} initalFlip={gameState.turn()} handleMove={handleMove} className="" />
+        <ChessBoardWrapper gameState={gameState} initalFlip={gameState.turn()} handleMove={handleMove} className="" />
         <Card className="max-w-[540px] grow gap-5 overflow-hidden p-0 text-foreground">
           <CardHeader className="flex h-fit w-full flex-col items-center bg-primary">
             <h1 className={cn("rounded-lg p-2 px-4 text-3xl font-semibold", gameState.turn() === "w" ? "text-white" : "text-black")}>
@@ -40,9 +39,10 @@ function Puzzle() {
             </h1>
             <div className="flex gap-2">
               {[0, 1, 2].map((index) => (
-                <div key={index} className="h-10 w-10 overflow-hidden rounded-sm">
+                <div key={index} className="h-10 w-10 overflow-hidden rounded-sm relative">
                   {3 - PuzzleState.livesLeft > index ? (
-                    <img key={index} className="h-full w-full" src="https://www.chess.com/bundles/web/images/svg/wrong.svg" alt="" />
+                    <Image src="https://www.chess.com/bundles/web/images/svg/wrong.svg" alt="Wrong move" fill sizes="100vw" className="object-cover"
+                    />
                   ) : (
                     <div key={index} className="h-full w-full bg-gray-200"></div>
                   )}
@@ -57,9 +57,11 @@ function Puzzle() {
             {attempltedPuzzles.map((puz, index) => {
               return (
                 <div className="bg-background-500 flex flex-col items-center gap-2 rounded-md p-2" key={index} style={{ width: "60px" }}>
-                  <img
+                  <Image
                     className={`flex h-[18px] w-[18px] text-[${PuzzleState.passedPuzzleList[index] ? "green" : "red"}]`}
                     src={`${PuzzleState.passedPuzzleList[index] ? "https://www.chess.com/bundles/web/images/svg/solved.svg" : "https://www.chess.com/bundles/web/images/svg/wrong.svg"}`}
+                    height={18}
+                    width={18}
                     alt="puzzle status"
                   />
                   <p>{puz.rating}</p>
