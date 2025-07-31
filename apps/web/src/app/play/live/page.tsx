@@ -7,12 +7,7 @@ import { BoardWithTime } from "./[matchId]/_components/BoardWithTime";
 function Online() {
   return (
     <div className="flex h-full justify-center p-2">
-      <BoardWithTime
-        whitePlayerData={{ time: 0 }}
-        blackPlayerData={{ time: 0 }}
-        isWhiteTurn={true}
-        gameState={new Chess()}
-      />
+      <BoardWithTime whitePlayerData={{ time: 0 }} blackPlayerData={{ time: 0 }} isWhiteTurn={true} gameState={new Chess()} />
     </div>
   );
 }

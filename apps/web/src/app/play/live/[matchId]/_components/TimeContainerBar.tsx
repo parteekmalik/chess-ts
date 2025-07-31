@@ -1,11 +1,14 @@
 "use client";
-import { Card, CardContent } from '@acme/ui/card';
-import React, { useEffect } from 'react'
-import { twMerge } from "tailwind-merge";
-import moment from 'moment';
-import { UserCard } from '~/components/userCard';
 
-export const TimerContainer = ({ variant, isTurn, time, userId }: { variant: "white" | "black"; time: number; userId?: string, isTurn: boolean }) => {
+import React, { useEffect } from "react";
+import moment from "moment";
+import { twMerge } from "tailwind-merge";
+
+import { Card, CardContent } from "@acme/ui/card";
+
+import { UserCard } from "~/components/userCard";
+
+export const TimerContainer = ({ variant, isTurn, time, userId }: { variant: "white" | "black"; time: number; userId?: string; isTurn: boolean }) => {
   const [liveTimeLeft, setLiveTimeLeft] = React.useState(0);
 
   useEffect(() => {
@@ -20,7 +23,7 @@ export const TimerContainer = ({ variant, isTurn, time, userId }: { variant: "wh
     }
   }, [time, isTurn]);
   return (
-    <Card className='border-0'>
+    <Card className="border-0">
       <CardContent className="flex w-full justify-between p-3">
         <UserCard userId={userId} />
         <TimerComponent time={liveTimeLeft} variant={variant} />

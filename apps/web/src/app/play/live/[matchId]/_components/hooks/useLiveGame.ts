@@ -1,11 +1,13 @@
-import { calculateTimeLeft } from "@acme/lib";
-import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import { useCallback, useEffect, useMemo } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Chess } from "chess.js";
 import moment from "moment";
-import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
+
+import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import { calculateTimeLeft } from "@acme/lib";
+
 import type { ChessMoveType } from "~/components/board/boardMain";
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 import { useTRPC } from "~/trpc/react";
@@ -67,14 +69,14 @@ export const useLiveGame = () => {
   const playerTimes = useMemo(() => {
     const timeData = match
       ? calculateTimeLeft(
-        { baseTime: match.baseTime, incrementTime: match.incrementTime },
-        [match.startedAt].concat(match.moves.map((move) => move.timestamps)),
-      )
+          { baseTime: match.baseTime, incrementTime: match.incrementTime },
+          [match.startedAt].concat(match.moves.map((move) => move.timestamps)),
+        )
       : { w: 0, b: 0 };
     return timeData;
   }, [match?.moves]);
 
   const openResult = useMemo(() => match?.stats?.winner !== "PLAYING", [match?.stats?.winner]);
-  
+
   return { match, isLoading, gameState, playerTimes, handleMove, openResult, params };
-}
+};

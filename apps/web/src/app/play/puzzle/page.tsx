@@ -1,13 +1,15 @@
 "use client";
 
+import { useMemo } from "react";
+import Image from "next/image";
+import { Chess } from "chess.js";
+
 import { cn } from "@acme/ui";
 import { Card, CardContent, CardHeader } from "@acme/ui/card";
 import { Dialog, DialogContent } from "@acme/ui/dialog";
-import { Chess } from "chess.js";
-import Image from "next/image";
-import { useMemo } from "react";
-import { ChessBoardWrapper } from "~/components/board/board";
+
 import type { ChessMoveType } from "~/components/board/boardMain";
+import { ChessBoardWrapper } from "~/components/board/board";
 import { env } from "~/env";
 import usePuzzle from "./_components/usePuzzle";
 
@@ -39,9 +41,14 @@ function Puzzle() {
             </h1>
             <div className="flex gap-2">
               {[0, 1, 2].map((index) => (
-                <div key={index} className="h-10 w-10 overflow-hidden rounded-sm relative">
+                <div key={index} className="relative h-10 w-10 overflow-hidden rounded-sm">
                   {3 - PuzzleState.livesLeft > index ? (
-                    <Image src="https://www.chess.com/bundles/web/images/svg/wrong.svg" alt="Wrong move" fill sizes="100vw" className="object-cover"
+                    <Image
+                      src="https://www.chess.com/bundles/web/images/svg/wrong.svg"
+                      alt="Wrong move"
+                      fill
+                      sizes="100vw"
+                      className="object-cover"
                     />
                   ) : (
                     <div key={index} className="h-full w-full bg-gray-200"></div>

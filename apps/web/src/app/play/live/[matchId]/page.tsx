@@ -2,10 +2,11 @@
 
 import React from "react";
 import { useSession } from "next-auth/react";
+
 import { env } from "~/env";
 import { BoardWithTime } from "./_components/BoardWithTime";
-import Result from "./_components/result";
 import { useLiveGame } from "./_components/hooks/useLiveGame";
+import Result from "./_components/result";
 
 const LiveBoard: React.FunctionComponent = () => {
   const { match, isLoading, gameState, playerTimes, handleMove, openResult, params } = useLiveGame();

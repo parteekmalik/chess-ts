@@ -1,12 +1,14 @@
 "use client";
 
-import { cn } from "@acme/ui";
 import type { Chess, Color, Square } from "chess.js";
 import React, { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
+
+import { cn } from "@acme/ui";
+
+import type { ChessMoveType } from "./boardMain";
 import { env } from "~/env";
 import { checkForValidClick } from "../Utils";
-import type { ChessMoveType } from "./boardMain";
 import { BoardSettings } from "./BoardSettings";
 import Coordinates from "./coordinates/coordinates";
 import ChessBoard from "./piece and hints/ChessBoard";
@@ -84,7 +86,7 @@ export const ChessBoardWrapper: React.FC<BoardProps> = ({ handleMove, gameState,
         )}
       </div>
       {flip === "w" ? whiteBar : blackBar}
-      <BoardSettings {...{setSelectedPiece, game, setMovesUndone, setGame, movesUndone, setFlip}} />
+      <BoardSettings {...{ setSelectedPiece, game, setMovesUndone, setGame, movesUndone, setFlip }} />
       {env.NODE_ENV === "development" && (
         <details>
           <summary className="hover:cursor-pointer">Debug Information</summary>
