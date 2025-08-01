@@ -45,15 +45,16 @@ export default async function Home() {
       <div className="flex flex-col items-center justify-center lg:flex-row">
         <Image className="m-4 hidden lg:m-10 lg:block" src="/images/board_img.png" alt="chess_board" width={400} height={400} />
         <div className="m-4 flex max-h-full min-w-[50%] grow flex-col items-center justify-center lg:m-10">
-          <p className="mb-4 text-center decoration-solid text-5xl font-bold">
-            {text.hero.title}
-          </p>
+          <p className="mb-4 text-center text-5xl font-bold decoration-solid">{text.hero.title}</p>
           <div className="my-4 flex justify-center text-base sm:text-lg">
             <div className="ml-5 mr-5">{gamesToday} Games Today</div>
             <div className="ml-5 mr-5">{playingNow} Playing Now</div>
           </div>
           <div className="flex w-full flex-col gap-4 lg:gap-8">
-            <Link href="/play/live" className="flex w-fit mx-auto px-0 min-w-[400px] cursor-pointer items-center rounded-2xl bg-primary/80 p-4 text-foreground">
+            <Link
+              href="/play/live"
+              className="mx-auto flex w-fit min-w-[400px] cursor-pointer items-center rounded-2xl bg-primary/80 p-4 px-0 text-foreground"
+            >
               <Image
                 className="mx-6 h-auto w-8 text-xs lg:w-12"
                 src="https://www.chess.com/bundles/web/images/color-icons/playwhite.cea685ba.svg"
@@ -61,12 +62,15 @@ export default async function Home() {
                 width={48}
                 height={48}
               />
-              <div className="text-white grow">
+              <div className="grow text-white">
                 <p className="mb-2 text-2xl font-bold">{text.playOnline.title}</p>
                 <div className="mt-1 text-sm">{text.playOnline.description}</div>
               </div>
             </Link>
-            <Link href="/play/computer" className="flex w-fit mx-auto px-0 min-w-[400px] cursor-pointer items-center rounded-2xl bg-foreground/10 dark:bg-white/10 p-4">
+            <Link
+              href="/play/computer"
+              className="mx-auto flex w-fit min-w-[400px] cursor-pointer items-center rounded-2xl bg-foreground/10 p-4 px-0 dark:bg-white/10"
+            >
               <Image
                 className="mx-6 h-auto w-8 text-xs lg:w-12"
                 src="https://www.chess.com/bundles/web/images/color-icons/cute-bot.32735490.svg"
@@ -85,10 +89,13 @@ export default async function Home() {
 
       <Card>
         <CardContent className="flex lg:grid lg:grid-cols-2">
-          <div className="flex flex-col items-center h-full">
-            <div className="flex-1 flex flex-col justify-center gap-5">
+          <div className="flex h-full flex-col items-center">
+            <div className="flex flex-1 flex-col justify-center gap-5">
               <p className="text-xl lg:text-4xl">{text.lessons.title}</p>
-              <Link href="/lessons" className="bg-foreground/10 dark:bg-white/10 text-background-foreground rounded-2xl p-4 text-center text-base sm:text-lg">
+              <Link
+                href="/lessons"
+                className="text-background-foreground rounded-2xl bg-foreground/10 p-4 text-center text-base dark:bg-white/10 sm:text-lg"
+              >
                 <p>{text.lessons.cta}</p>
               </Link>
             </div>
@@ -106,17 +113,20 @@ export default async function Home() {
               </div>
             </div>
           </div>
-          <Image className="hidden lg:block ml-auto" src="/images/board_img.png" alt="sample_puzzle_img" width={400} height={400} />
+          <Image className="ml-auto hidden lg:block" src="/images/board_img.png" alt="sample_puzzle_img" width={400} height={400} />
         </CardContent>
       </Card>
 
       <Card>
         <CardContent className="flex lg:grid lg:grid-cols-2">
           <Image className="hidden lg:block" src="/images/board_img.png" alt="sample_puzzle_img" width={400} height={400} />
-          <div className="flex flex-col items-center h-full">
-            <div className="flex-1 flex flex-col justify-center gap-5">
+          <div className="flex h-full flex-col items-center">
+            <div className="flex flex-1 flex-col justify-center gap-5">
               <p className="text-xl lg:text-4xl">{text.lessons.title}</p>
-              <Link href="/lessons" className="bg-foreground/10 dark:bg-white/10 text-background-foreground rounded-2xl p-4 text-center text-base sm:text-lg">
+              <Link
+                href="/lessons"
+                className="text-background-foreground rounded-2xl bg-foreground/10 p-4 text-center text-base dark:bg-white/10 sm:text-lg"
+              >
                 <p>{text.lessons.cta}</p>
               </Link>
             </div>

@@ -1,9 +1,11 @@
 "use client";
 
+import React, { useEffect } from "react";
+import moment from "moment";
+
 import { cn } from "@acme/ui";
 import { Card, CardContent } from "@acme/ui/card";
-import moment from "moment";
-import React, { useEffect } from "react";
+
 import { UserCard } from "~/components/userCard";
 
 export const TimerContainer = ({ variant, isTurn, time, userId }: { variant: "white" | "black"; time: number; userId?: string; isTurn: boolean }) => {
@@ -39,18 +41,8 @@ const TimerComponent = ({ time, variant, isTurn }: { time: number; variant: "whi
   const isHour = time > 3600000;
   const isMicroSec = time < 30000;
   return (
-    <div
-      className={cn(
-        "w-[160px] rounded-md px-4 py-1 flex items-center",
-        variant === "white" ? "bg-white text-black" : "bg-black text-white",
-      )}
-    >
-      <p
-        className={cn("ml-auto text-2xl",
-          isTurn && isMicroSec && "text-red-400"
-        )}
-        style={{ letterSpacing: "0.0.8rem" }}
-      >
+    <div className={cn("flex w-[160px] items-center rounded-md px-4 py-1", variant === "white" ? "bg-white text-black" : "bg-black text-white")}>
+      <p className={cn("ml-auto text-2xl", isTurn && isMicroSec && "text-red-400")} style={{ letterSpacing: "0.0.8rem" }}>
         {isHour && String(moment.duration(time).hours()).padStart(2, "0") + ":"}
         {String(moment.duration(time).minutes()).padStart(2, "0")}:{String(moment.duration(time).seconds()).padStart(2, "0")}
         {isMicroSec && "." + String(moment.duration(time).milliseconds()).padStart(3, "0")}

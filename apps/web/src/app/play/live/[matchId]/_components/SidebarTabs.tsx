@@ -1,13 +1,14 @@
+import { usePathname } from "next/navigation";
+
 import { Card, CardContent } from "@acme/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
 import MovesDisplay from "./MovesDisplay";
 import NewMatch from "./NewMatch";
-import { usePathname } from "next/navigation";
 
 function SidebarTabs() {
   const path = usePathname();
-  const disabled = path.startsWith("/play/live") && path.split("/").length > 3; 
+  const disabled = path.startsWith("/play/live") && path.split("/").length > 3;
   return (
     <Card className="w-full lg:max-w-[450px]">
       <CardContent className="p-0">
@@ -16,7 +17,11 @@ function SidebarTabs() {
             <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="play">
               Play
             </TabsTrigger>
-            {!disabled && <TabsTrigger className="dark:data-[state=active]:text-white" value="new_game">New Game</TabsTrigger>}
+            {!disabled && (
+              <TabsTrigger className="dark:data-[state=active]:text-white" value="new_game">
+                New Game
+              </TabsTrigger>
+            )}
             <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="games">
               Games
             </TabsTrigger>

@@ -1,8 +1,9 @@
+import type { Color } from "chess.js";
+
 import type { BoardProps } from "~/components/board/board";
 import { ChessBoardWrapper } from "~/components/board/board";
 import SidebarTabs from "./SidebarTabs";
 import { TimerContainer } from "./TimeContainerBar";
-import { Color } from "chess.js";
 
 interface BoardWithTimeProps extends BoardProps {
   whitePlayerData: { time: number; id?: string };
@@ -17,7 +18,7 @@ export function BoardWithTime(props: BoardWithTimeProps) {
   // const [chatMessages, setchatMessages] = useState<ChatMessageType[]>([]);
 
   return (
-    <div className="flex grow flex-col justify-between gap-4 lg:p-4 lg:flex-row">
+    <div className="flex grow flex-col justify-between gap-4 lg:flex-row lg:p-4">
       <ChessBoardWrapper
         initalFlip={props.initalFlip}
         handleMove={props.handleMove}

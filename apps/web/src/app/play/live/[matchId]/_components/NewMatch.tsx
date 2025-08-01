@@ -1,11 +1,13 @@
-import { gameTypes } from "@acme/lib";
+import React, { useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import { gameTypes } from "@acme/lib";
 import { cn } from "@acme/ui";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@acme/ui/accordion";
 import { Button } from "@acme/ui/button";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 
 function NewMatch() {
@@ -14,7 +16,7 @@ function NewMatch() {
   const [selectedGameType, setSelectedGameType] = useState<{
     baseTime: number;
     incrementTime: number;
-    name: string
+    name: string;
   }>({ baseTime: 10, incrementTime: 0, name: "Rapid" });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -34,20 +36,13 @@ function NewMatch() {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-2 ">
-
-        <Accordion
-          type="single"
-          collapsible
-          className="w-full"
-          defaultValue="item-1"
-        >
+      <div className="space-y-2">
+        <Accordion type="single" collapsible className="w-full" defaultValue="item-1">
           <AccordionItem value="item-1">
-            <AccordionTrigger className="bg-white/10 rounded-md px-4 hover:text-accent-foreground hover:no-underline py-3 text-lg">
+            <AccordionTrigger className="rounded-md bg-white/10 px-4 py-3 text-lg hover:text-accent-foreground hover:no-underline">
               <span className="mx-auto">
                 {selectedGameType.baseTime}
-                {selectedGameType.incrementTime > 0 ? " | " + selectedGameType.incrementTime : " min"}{" "}
-                ({selectedGameType.name})
+                {selectedGameType.incrementTime > 0 ? " | " + selectedGameType.incrementTime : " min"} ({selectedGameType.name})
               </span>
             </AccordionTrigger>
             <AccordionContent className="flex flex-col gap-4 text-balance text-base">
@@ -60,11 +55,15 @@ function NewMatch() {
                       {games.map((game, index) => (
                         <Button
                           key={index}
-                          className={cn("flex-1 bg-white/10 p-3 h-auto",
-                            game.baseTime === selectedGameType.baseTime && game.incrementTime === selectedGameType.incrementTime && "border-2 border-primary")}
+                          className={cn(
+                            "h-auto flex-1 bg-white/10 p-3",
+                            game.baseTime === selectedGameType.baseTime &&
+                              game.incrementTime === selectedGameType.incrementTime &&
+                              "border-2 border-primary",
+                          )}
                           variant="outline"
                           onClick={() => {
-                            setSelectedGameType({ ...game, name: gameTypeName.charAt(0).toUpperCase() + gameTypeName.slice(1), });
+                            setSelectedGameType({ ...game, name: gameTypeName.charAt(0).toUpperCase() + gameTypeName.slice(1) });
                           }}
                         >
                           {game.baseTime}
@@ -79,13 +78,13 @@ function NewMatch() {
           </AccordionItem>
         </Accordion>
 
-        <Button disabled={isLoading} color="success" onClick={handleSubmit} className="w-full h-auto text-white text-bold text-xl py-3">
+        <Button disabled={isLoading} color="success" onClick={handleSubmit} className="text-bold h-auto w-full py-3 text-xl text-white">
           Start Game
         </Button>
       </div>
 
       <div className="space-y-2">
-        <Button variant="outline" className="w-full py-1 bg-white/10 h-auto">
+        <Button variant="outline" className="h-auto w-full bg-white/10 py-1">
           <Image
             className="h-8 w-8"
             src="https://www.chess.com/bundles/web/images/color-icons/handshake.svg"
@@ -96,7 +95,7 @@ function NewMatch() {
           Play a Friend
         </Button>
 
-        <Button variant="outline" className="w-full bg-white/10 py-1 h-auto">
+        <Button variant="outline" className="h-auto w-full bg-white/10 py-1">
           <Image
             className="h-8 w-8"
             src="https://www.chess.com/bundles/web/images/color-icons/tournaments.svg"
