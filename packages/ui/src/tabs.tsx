@@ -8,8 +8,8 @@ import { cn } from ".";
 
 const Tabs = TabsPrimitive.Root;
 
-const TabsList = React.forwardRef<React.ElementRef<typeof TabsPrimitive.List>, React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>>(
-  ({ className, ...props }, ref) => {
+const TabsList = React.forwardRef<React.ElementRef<typeof TabsPrimitive.List>, React.ComponentPropsWithoutRef<typeof TabsPrimitive.List> & { indicatorClassName?: string }>(
+  ({ className, indicatorClassName, ...props }, ref) => {
     const [indicatorStyle, setIndicatorStyle] = useState({
       posiotion: {
         left: 0,
@@ -77,6 +77,7 @@ const TabsList = React.forwardRef<React.ElementRef<typeof TabsPrimitive.List>, R
           className={cn(
             "absolute rounded-md bg-background shadow-sm transition-[top,_left,_right,_bottom,_background-color,_color] duration-300 ease-in-out",
             indicatorStyle.color,
+            indicatorClassName,
           )}
           style={indicatorStyle.posiotion}
         />

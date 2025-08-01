@@ -67,7 +67,6 @@ model VerificationToken {
 
 model Match {
   id            String       @id @default(cuid())
-  position      String       @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
   startedAt     DateTime     @default(now())
   stats         MatchResult?
   baseTime      Int

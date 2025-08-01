@@ -27,7 +27,7 @@ function MovesDisplay({ chatMessages }: { chatMessages?: ChatMessageType[] }) {
     <div>
       <div>
         {result.map((move, index) => (
-          <div key={index} className={cn("flex w-full px-2 text-muted-foreground even:bg-white/5")}>
+          <div key={index} className={cn("flex w-full px-2 text-muted-foreground even:bg-foreground")}>
             <span className="flex-[0_0_20%]">{index + 1}.</span>
             <span className="flex-[0_0_40%] space-x-2">
               {move[0] && (

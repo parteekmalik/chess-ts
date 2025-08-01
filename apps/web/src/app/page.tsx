@@ -10,9 +10,7 @@ import { UserCard } from "~/components/userCard";
 
 const text = {
   hero: {
-    title: "Play Chess",
-    subtitle: "Online",
-    tagline: "on the #1 Site!",
+    title: "Play Chess Online on the #1 Site!",
   },
   playOnline: {
     title: "Play Online",
@@ -43,36 +41,34 @@ export default async function Home() {
   const playingNow = await db.matchResult.count({ where: { winner: "PLAYING" } });
   const matchesPlayed = await db.match.findMany({ take: 10, orderBy: { startedAt: "desc" }, include: { stats: true } });
   return (
-    <main className="m-auto flex grow flex-col items-center justify-center space-y-10 px-1 text-foreground">
+    <main className="m-auto flex grow flex-col items-center justify-center space-y-10 px-1 dark:text-white">
       <div className="flex flex-col items-center justify-center lg:flex-row">
         <Image className="m-4 hidden lg:m-10 lg:block" src="/images/board_img.png" alt="chess_board" width={400} height={400} />
         <div className="m-4 flex max-h-full min-w-[50%] grow flex-col items-center justify-center lg:m-10">
-          <p className="mb-4 flex flex-col gap-2 text-center decoration-solid">
-            <span className="text-4xl font-bold">{text.hero.title}</span>
-            <span className="text-3xl">{text.hero.subtitle}</span>
-            <span className="text-2xl">{text.hero.tagline}</span>
+          <p className="mb-4 text-center decoration-solid text-5xl font-bold">
+            {text.hero.title}
           </p>
           <div className="my-4 flex justify-center text-base sm:text-lg">
             <div className="ml-5 mr-5">{gamesToday} Games Today</div>
             <div className="ml-5 mr-5">{playingNow} Playing Now</div>
           </div>
           <div className="flex w-full flex-col gap-4 lg:gap-8">
-            <Link href="/play/live" className="flex cursor-pointer items-center rounded-2xl bg-primary/80 p-4 text-foreground">
+            <Link href="/play/live" className="flex w-fit mx-auto px-0 min-w-[400px] cursor-pointer items-center rounded-2xl bg-primary/80 p-4 text-foreground">
               <Image
-                className="mx-4 h-auto w-8 text-xs lg:mx-10 lg:w-12"
+                className="mx-6 h-auto w-8 text-xs lg:w-12"
                 src="https://www.chess.com/bundles/web/images/color-icons/playwhite.cea685ba.svg"
                 alt="chess_comp_img"
                 width={48}
                 height={48}
               />
-              <div className="text-background-foreground grow">
+              <div className="text-white grow">
                 <p className="mb-2 text-2xl font-bold">{text.playOnline.title}</p>
                 <div className="mt-1 text-sm">{text.playOnline.description}</div>
               </div>
             </Link>
-            <Link href="/play/computer" className="flex cursor-pointer items-center rounded-2xl bg-white/10 p-4">
+            <Link href="/play/computer" className="flex w-fit mx-auto px-0 min-w-[400px] cursor-pointer items-center rounded-2xl bg-foreground/10 dark:bg-white/10 p-4">
               <Image
-                className="mx-4 h-auto w-8 text-xs lg:mx-10 lg:w-12"
+                className="mx-6 h-auto w-8 text-xs lg:w-12"
                 src="https://www.chess.com/bundles/web/images/color-icons/cute-bot.32735490.svg"
                 alt="chess_comp_img"
                 width={48}
@@ -88,12 +84,14 @@ export default async function Home() {
       </div>
 
       <Card>
-        <CardContent className="flex flex-col items-center justify-center gap-4 lg:flex-row lg:gap-10">
-          <div className="flex flex-col items-center justify-center">
-            <p className="mt-10 text-xl lg:mt-20 lg:text-4xl">{text.lessons.title}</p>
-            <Link href="/lessons" className="bg-background-500 text-background-foreground m-auto rounded-2xl p-4 text-base sm:text-lg">
-              <p>{text.lessons.cta}</p>
-            </Link>
+        <CardContent className="flex lg:grid lg:grid-cols-2">
+          <div className="flex flex-col items-center h-full">
+            <div className="flex-1 flex flex-col justify-center gap-5">
+              <p className="text-xl lg:text-4xl">{text.lessons.title}</p>
+              <Link href="/lessons" className="bg-foreground/10 dark:bg-white/10 text-background-foreground rounded-2xl p-4 text-center text-base sm:text-lg">
+                <p>{text.lessons.cta}</p>
+              </Link>
+            </div>
             <div className="mt-4 flex flex-col gap-4 sm:flex-row lg:gap-10">
               <Image
                 className="mx-auto aspect-square rounded-xl"
@@ -108,18 +106,20 @@ export default async function Home() {
               </div>
             </div>
           </div>
-          <Image className="hidden lg:block" src="/images/board_img.png" alt="sample_puzzle_img" width={400} height={400} />
+          <Image className="hidden lg:block ml-auto" src="/images/board_img.png" alt="sample_puzzle_img" width={400} height={400} />
         </CardContent>
       </Card>
 
       <Card>
-        <CardContent className="flex flex-col items-center justify-center gap-4 lg:flex-row lg:gap-10">
+        <CardContent className="flex lg:grid lg:grid-cols-2">
           <Image className="hidden lg:block" src="/images/board_img.png" alt="sample_puzzle_img" width={400} height={400} />
-          <div className="flex flex-col items-center justify-center">
-            <p className="mt-10 text-base sm:text-lg lg:mt-20 lg:text-lg">{text.lessons.title}</p>
-            <Link href="/lessons" className="bg-background-500 text-background-foreground m-auto rounded-2xl p-4 text-base sm:text-lg">
-              <p>{text.lessons.cta}</p>
-            </Link>
+          <div className="flex flex-col items-center h-full">
+            <div className="flex-1 flex flex-col justify-center gap-5">
+              <p className="text-xl lg:text-4xl">{text.lessons.title}</p>
+              <Link href="/lessons" className="bg-foreground/10 dark:bg-white/10 text-background-foreground rounded-2xl p-4 text-center text-base sm:text-lg">
+                <p>{text.lessons.cta}</p>
+              </Link>
+            </div>
             <div className="mt-4 flex flex-col gap-4 sm:flex-row lg:gap-10">
               <Image
                 className="mx-auto aspect-square rounded-xl"

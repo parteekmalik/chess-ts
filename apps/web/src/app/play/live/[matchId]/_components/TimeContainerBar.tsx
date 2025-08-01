@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
-import moment from "moment";
-import { twMerge } from "tailwind-merge";
-
+import { cn } from "@acme/ui";
 import { Card, CardContent } from "@acme/ui/card";
-
+import moment from "moment";
+import React, { useEffect } from "react";
 import { UserCard } from "~/components/userCard";
 
 export const TimerContainer = ({ variant, isTurn, time, userId }: { variant: "white" | "black"; time: number; userId?: string; isTurn: boolean }) => {
@@ -22,26 +20,41 @@ export const TimerContainer = ({ variant, isTurn, time, userId }: { variant: "wh
       return () => worker.terminate();
     }
   }, [time, isTurn]);
+
+  useEffect(() => {
+    setLiveTimeLeft(time);
+  }, [time]);
+
   return (
-    <Card className="border-0">
-      <CardContent className="flex w-full justify-between p-3">
+    <Card className="border-0 bg-inherit">
+      <CardContent className="flex w-full justify-between p-0">
         <UserCard userId={userId} />
-        <TimerComponent time={liveTimeLeft} variant={variant} />
+        <TimerComponent time={liveTimeLeft} variant={variant} isTurn={isTurn} />
       </CardContent>
     </Card>
   );
 };
 
-const TimerComponent = ({ time, variant }: { time: number; variant: "white" | "black" }) => {
+const TimerComponent = ({ time, variant, isTurn }: { time: number; variant: "white" | "black"; isTurn: boolean }) => {
+  const isHour = time > 3600000;
+  const isMicroSec = time < 30000;
   return (
     <div
-      className={twMerge(
-        "flex w-fit items-center justify-center rounded-md px-2 py-1 text-center font-mono",
-        variant === "white" ? "bg-white text-black" : "bg-slate-600 text-white",
+      className={cn(
+        "w-[160px] rounded-md px-4 py-1 flex items-center",
+        variant === "white" ? "bg-white text-black" : "bg-black text-white",
       )}
     >
-      {String(moment.duration(time).hours()).padStart(2, "0")}:{String(moment.duration(time).minutes()).padStart(2, "0")}:
-      {String(moment.duration(time).seconds()).padStart(2, "0")}.{String(moment.duration(time).milliseconds()).padStart(3, "0")}
+      <p
+        className={cn("ml-auto text-2xl",
+          isTurn && isMicroSec && "text-red-400"
+        )}
+        style={{ letterSpacing: "0.0.8rem" }}
+      >
+        {isHour && String(moment.duration(time).hours()).padStart(2, "0") + ":"}
+        {String(moment.duration(time).minutes()).padStart(2, "0")}:{String(moment.duration(time).seconds()).padStart(2, "0")}
+        {isMicroSec && "." + String(moment.duration(time).milliseconds()).padStart(3, "0")}
+      </p>
     </div>
   );
 };

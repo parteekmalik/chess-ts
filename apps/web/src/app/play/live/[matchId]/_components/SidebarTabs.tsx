@@ -3,21 +3,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
 import MovesDisplay from "./MovesDisplay";
 import NewMatch from "./NewMatch";
+import { usePathname } from "next/navigation";
 
-function SidebarTabs({ disabled = false }: { disabled?: boolean }) {
+function SidebarTabs() {
+  const path = usePathname();
+  const disabled = path.startsWith("/play/live") && path.split("/").length > 3; 
   return (
-    <Card className="w-full max-w-[450px]">
+    <Card className="w-full lg:max-w-[450px]">
       <CardContent className="p-0">
         <Tabs className="w-full" defaultValue={disabled ? "play" : "new_game"}>
-          <TabsList className="mx-2 mb-4 mt-4 w-[calc(100%-1rem)]">
-            <TabsTrigger className="flex-1" value="play">
+          <TabsList indicatorClassName="bg-primary/70" className="mx-2 mb-4 mt-4 w-[calc(100%-1rem)]">
+            <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="play">
               Play
             </TabsTrigger>
-            {!disabled && <TabsTrigger value="new_game">New Game</TabsTrigger>}
-            <TabsTrigger className="flex-1" value="games">
+            {!disabled && <TabsTrigger className="dark:data-[state=active]:text-white" value="new_game">New Game</TabsTrigger>}
+            <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="games">
               Games
             </TabsTrigger>
-            <TabsTrigger className="flex-1" value="players">
+            <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="players">
               Players
             </TabsTrigger>
           </TabsList>

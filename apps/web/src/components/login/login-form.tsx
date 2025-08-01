@@ -32,7 +32,7 @@ function LoginFormContent({ className }: React.ComponentPropsWithoutRef<"div">) 
   // Now wrapped within a Suspense boundary in the parent component,
   // this hook call will be handled correctly.
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/spot";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
 
   return (
     <div className={cn("flex flex-col gap-6", className)}>

@@ -20,10 +20,9 @@ const LiveBoard: React.FunctionComponent = () => {
   return (
     <div className="text-background-foreground flex w-full flex-col">
       <BoardWithTime
-        disabled
         gameState={gameState}
         initalFlip={iAmPlayer ?? "w"}
-        isWhiteTurn={match.moves.length % 2 === 0}
+        turn={match.moves.length % 2 === 0 ? "w" : "b"}
         whitePlayerData={{ time: playerTimes.w, id: match.whitePlayerId }}
         blackPlayerData={{ time: playerTimes.b, id: match.blackPlayerId }}
         handleMove={handleMove}
