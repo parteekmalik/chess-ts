@@ -18,6 +18,10 @@ export async function middleware(request: NextRequest) {
   const publicPaths: string[] = ["/"];
   const isPublicPath = publicPaths.includes(path) || path.startsWith("/api/auth/");
 
+  if(path === "/api/auth/signin" && session) {
+    return NextResponse.redirect(new URL("/", request.nextUrl));
+  }
+
   if (!isPublicPath && !session) {
     // If user is not authenticated, store the requested page and redirect to login
     const redirectUrl = new URL("/api/auth/signin", request.nextUrl);
@@ -29,12 +33,5 @@ export async function middleware(request: NextRequest) {
 
 // Apply middleware to all paths except those starting with "/_next"
 export const config = {
-  matcher: [
-    "/:path*",         // everything
-    "!/_next/:path*",  // except next internals
-    "!/api/auth/:path*",
-    "!/signin",
-    "!/images/:path*", // except public/images/*
-    "!/favicon.ico",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
