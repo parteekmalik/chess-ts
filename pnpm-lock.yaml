@@ -644,6 +644,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.8.2
+      zod:
+        specifier: 'catalog:'
+        version: 3.24.2
 
   packages/ui:
     dependencies:

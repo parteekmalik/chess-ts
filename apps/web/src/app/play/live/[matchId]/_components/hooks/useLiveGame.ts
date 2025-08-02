@@ -1,14 +1,11 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Chess } from "chess.js";
 import moment from "moment";
 import toast from "react-hot-toast";
-
 import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
-import { calculateTimeLeft } from "@acme/lib";
-
-import type { ChessMoveType } from "~/components/board/boardMain";
+import { calculateTimeLeft, ChessMoveType } from "@acme/lib";
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 import { useTRPC } from "~/trpc/react";
 
@@ -20,7 +17,7 @@ export const useLiveGame = () => {
 
   const { SocketEmiter, lastMessage, backendServerConnection } = useBackend();
 
-  const { data: match, isLoading } = useQuery(trpc.puzzle.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
+  const { data: match, isLoading } = useQuery(trpc.liveGame.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
 
   useEffect(() => {
     SocketEmiter("join_match", params.matchId, (responce: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {
@@ -43,7 +40,7 @@ export const useLiveGame = () => {
         };
         console.log("match update -> ", lastMessage.payload);
 
-        queryClient.setQueryData(trpc.puzzle.getMatch.queryKey(params.matchId), payload);
+        queryClient.setQueryData(trpc.liveGame.getMatch.queryKey(params.matchId), payload);
       }
     }
   }, [lastMessage]);
@@ -58,20 +55,24 @@ export const useLiveGame = () => {
     return game;
   }, [match?.moves]);
 
+  const moveAPI = useMutation(trpc.liveGame.makeMove.mutationOptions());
   const handleMove = useCallback(
     (move: ChessMoveType) => {
       console.log("move in live board -> ", move, moment().format("HH:mm:ss"));
-      SocketEmiter("make_move_match", { move, matchId: params.matchId });
+      moveAPI.mutate({
+        move,
+        matchId: params.matchId as string,
+      })
     },
-    [params.matchId, SocketEmiter],
+    [params.matchId, moveAPI],
   );
 
   const playerTimes = useMemo(() => {
     const timeData = match
       ? calculateTimeLeft(
-          { baseTime: match.baseTime, incrementTime: match.incrementTime },
-          [match.startedAt].concat(match.moves.map((move) => move.timestamps)),
-        )
+        { baseTime: match.baseTime, incrementTime: match.incrementTime },
+        [match.startedAt].concat(match.moves.map((move) => move.timestamps)),
+      )
       : { w: 0, b: 0 };
     return timeData;
   }, [match?.moves]);

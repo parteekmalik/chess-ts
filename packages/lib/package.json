@@ -24,7 +24,8 @@
     "@types/decimal.js": "^7.4.3",
     "eslint": "catalog:",
     "prettier": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "zod": "catalog:"
   },
   "prettier": "@acme/prettier-config",
   "dependencies": {
