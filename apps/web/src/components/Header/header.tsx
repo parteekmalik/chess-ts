@@ -35,7 +35,7 @@ export function Header() {
         <div className="flex">
           <Drawer direction="left">
             <DrawerTrigger asChild>
-              <div className={"font-chess text-2xl dark:text-white/70"}>t</div>
+              <div className={"font-chess text-2xl dark:text-white/70 hover:cursor-pointer"}>t</div>
             </DrawerTrigger>
             <DrawerContent isDragLine={false} className="left-0 top-0 m-0 w-fit translate-x-0 translate-y-0 p-0">
               <VerticalHeader />
@@ -75,7 +75,7 @@ export function Header() {
 
 function VerticalHeader({ className }: { className?: string }) {
   const { data: session } = useSession();
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <header className={cn("h-screen w-fit bg-background shadow-md dark:text-card-foreground dark:text-white", className)}>
