@@ -80,7 +80,7 @@
 
 @font-face {
   font-family: "chess";
-  src: url("/custom_font.woff2") format("woff2");
+  src: url("https://www.chess.com/bundles/web/fonts/chessglyph-v3/chessglyph-v3.3e78f81f.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
