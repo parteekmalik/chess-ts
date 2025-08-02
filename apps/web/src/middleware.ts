@@ -14,6 +14,7 @@ export async function middleware(request: NextRequest) {
     },
   });
   const session = (await response.json()) as unknown;
+
   const publicPaths: string[] = ["/"];
   const isPublicPath = publicPaths.includes(path) || path.startsWith("/api/auth/");
 
@@ -28,5 +29,12 @@ export async function middleware(request: NextRequest) {
 
 // Apply middleware to all paths except those starting with "/_next"
 export const config = {
-  matcher: ["/((?!api/auth|signin|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/:path*",         // everything
+    "!/_next/:path*",  // except next internals
+    "!/api/auth/:path*",
+    "!/signin",
+    "!/images/:path*", // except public/images/*
+    "!/favicon.ico",
+  ],
 };
