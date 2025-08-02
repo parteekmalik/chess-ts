@@ -33,5 +33,5 @@ export async function middleware(request: NextRequest) {
 
 // Apply middleware to all paths except those starting with "/_next"
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|images).*)"],
 };
