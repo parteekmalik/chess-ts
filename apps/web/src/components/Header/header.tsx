@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { FaChevronLeft, FaChevronRight, FaHome, FaLinkedin, FaSignInAlt, FaSignOutAlt, FaUser } from "react-icons/fa";
 import { twMerge } from "tailwind-merge";
@@ -28,16 +29,26 @@ const navLinks = [
 
 export function Header() {
   const { data: session } = useSession();
+  const path = usePathname();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    setOpen(false);
+  }, [path]);
 
   return (
     <>
       <header className={cn("flex h-fit min-w-full justify-between p-1 lg:hidden")}>
         <div className="flex">
-          <Drawer direction="left">
+          <Drawer open={open} onOpenChange={setOpen} direction="left">
             <DrawerTrigger asChild>
-              <div className={"font-chess text-2xl dark:text-white/70 hover:cursor-pointer"}>t</div>
+              <div className={"font-chess text-2xl hover:cursor-pointer dark:text-white/70"}>t</div>
             </DrawerTrigger>
-            <DrawerContent isDragLine={false} className="left-0 top-0 m-0 w-fit translate-x-0 translate-y-0 p-0">
+            <DrawerContent
+              isDragLine={false}
+              className="left-0 top-0 m-0 w-fit translate-x-0 translate-y-0 rounded-r-[10px] rounded-t-none p-0"
+              autoFocus={false}
+            >
               <VerticalHeader />
             </DrawerContent>
           </Drawer>

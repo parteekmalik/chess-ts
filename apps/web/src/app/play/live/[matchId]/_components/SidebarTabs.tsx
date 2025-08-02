@@ -1,14 +1,20 @@
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 import { Card, CardContent } from "@acme/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
+import { useTRPC } from "~/trpc/react";
 import MovesDisplay from "./MovesDisplay";
 import NewMatch from "./NewMatch";
 
 function SidebarTabs() {
   const path = usePathname();
-  const disabled = path.startsWith("/play/live") && path.split("/").length > 3;
+  const params = useParams();
+  const trpc = useTRPC();
+  const { data: match } = useQuery(trpc.puzzle.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
+  const disabled = (path.startsWith("/play/live") && path.split("/").length > 3) || (match?.stats?.winner && match.stats.winner !== "PLAYING");
+
   return (
     <Card className="w-full lg:max-w-[450px]">
       <CardContent className="p-0">
@@ -17,11 +23,9 @@ function SidebarTabs() {
             <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="play">
               Play
             </TabsTrigger>
-            {!disabled && (
-              <TabsTrigger className="dark:data-[state=active]:text-white" value="new_game">
-                New Game
-              </TabsTrigger>
-            )}
+            <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="new_game" disabled={!!disabled}>
+              New Game
+            </TabsTrigger>
             <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="games">
               Games
             </TabsTrigger>

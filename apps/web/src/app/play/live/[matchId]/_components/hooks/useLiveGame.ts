@@ -20,7 +20,7 @@ export const useLiveGame = () => {
 
   const { SocketEmiter, lastMessage, backendServerConnection } = useBackend();
 
-  const { data: match, isLoading } = useQuery(trpc.puzzle.getMatch.queryOptions(params.matchId as string));
+  const { data: match, isLoading } = useQuery(trpc.puzzle.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
 
   useEffect(() => {
     SocketEmiter("join_match", params.matchId, (responce: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {

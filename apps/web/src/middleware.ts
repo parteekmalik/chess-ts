@@ -7,22 +7,21 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   const cookies = request.headers.get("Cookie") ?? "";
-  const response = await fetch(env.AUTH_URL + "/api/auth/session", {
+  const session = await fetch(env.AUTH_URL + "/api/auth/session", {
     method: "GET",
     headers: {
       Cookie: cookies,
     },
-  });
-  const session = (await response.json()) as unknown;
+  }).then((response) => response.json() as Promise<{ user?: unknown }>);
 
   const publicPaths: string[] = ["/"];
   const isPublicPath = publicPaths.includes(path) || path.startsWith("/api/auth/");
 
-  if(path === "/api/auth/signin" && session) {
+  if (path === "/api/auth/signin" && session.user) {
     return NextResponse.redirect(new URL("/", request.nextUrl));
   }
 
-  if (!isPublicPath && !session) {
+  if (!isPublicPath && !session.user) {
     // If user is not authenticated, store the requested page and redirect to login
     const redirectUrl = new URL("/api/auth/signin", request.nextUrl);
     redirectUrl.searchParams.set("next", path); // Store the originally requested path

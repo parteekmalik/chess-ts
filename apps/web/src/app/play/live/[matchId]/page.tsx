@@ -18,7 +18,7 @@ const LiveBoard: React.FunctionComponent = () => {
   const iAmPlayer = match.whitePlayerId === session?.user.id ? "w" : match.blackPlayerId === session?.user.id ? "b" : null;
 
   return (
-    <div className="text-background-foreground flex w-full flex-col">
+    <div className="text-background-foreground flex w-full flex-col p-2">
       <BoardWithTime
         gameState={gameState}
         initalFlip={iAmPlayer ?? "w"}
@@ -30,10 +30,10 @@ const LiveBoard: React.FunctionComponent = () => {
       {openResult && <Result playerTurn={iAmPlayer} matchId={params.matchId as string} />}
 
       {env.NODE_ENV === "development" && (
-        <details className="flex w-[50%] flex-col">
-          <summary className="hover:cursor-pointer">Socket IO Information:</summary>
+        <details>
+          <summary className="text-white hover:cursor-pointer">Socket IO Information:</summary>
           <pre>
-            <div className="flex flex-col">
+            <div className="flex flex-col text-white">
               <pre>{JSON.stringify([iAmPlayer, match.stats])}</pre>
               <div>{JSON.stringify(params)}</div>
               <div className="flex flex-col gap-2">

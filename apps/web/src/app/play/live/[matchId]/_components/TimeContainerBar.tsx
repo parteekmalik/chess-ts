@@ -38,15 +38,26 @@ export const TimerContainer = ({ variant, isTurn, time, userId }: { variant: "wh
 };
 
 const TimerComponent = ({ time, variant, isTurn }: { time: number; variant: "white" | "black"; isTurn: boolean }) => {
+  time = Math.max(time, 0);
   const isHour = time > 3600000;
   const isMicroSec = time < 30000;
+  const hour = isHour && <span>{String(moment.duration(time).hours())}:</span>;
+  const minute = isHour ? (
+    <span>{String(moment.duration(time).minutes()).padStart(2, "0")}</span>
+  ) : (
+    <span>{String(moment.duration(time).minutes())}</span>
+  );
+  const seconds = <span>{String(moment.duration(time).seconds()).padStart(2, "0")}</span>;
+  const milliseconds = isMicroSec && <span>.{String(moment.duration(time).milliseconds()).padStart(3, "0")}</span>;
   return (
-    <div className={cn("flex w-[160px] items-center rounded-md px-4 py-1", variant === "white" ? "bg-white text-black" : "bg-black text-white")}>
-      <p className={cn("ml-auto text-2xl", isTurn && isMicroSec && "text-red-400")} style={{ letterSpacing: "0.0.8rem" }}>
-        {isHour && String(moment.duration(time).hours()).padStart(2, "0") + ":"}
-        {String(moment.duration(time).minutes()).padStart(2, "0")}:{String(moment.duration(time).seconds()).padStart(2, "0")}
-        {isMicroSec && "." + String(moment.duration(time).milliseconds()).padStart(3, "0")}
-      </p>
+    <div className={!isTurn ? "opacity-80" : ""}>
+      <div className={cn("flex w-[160px] items-center rounded-md px-4 py-1", variant === "white" ? "bg-white text-black" : "bg-black text-white")}>
+        <p className={cn("ml-auto text-2xl", isTurn && isMicroSec && "text-red-400")} style={{ fontFamily: "monospace" }}>
+          {hour}
+          {minute}:{seconds}
+          {milliseconds}
+        </p>
+      </div>
     </div>
   );
 };

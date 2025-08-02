@@ -2,6 +2,7 @@
 
 import type { Chess, Color, Square } from "chess.js";
 import React, { useEffect, useState } from "react";
+import _ from "lodash";
 import { twMerge } from "tailwind-merge";
 
 import { cn } from "@acme/ui";
@@ -63,6 +64,35 @@ export const ChessBoardWrapper: React.FC<BoardProps> = ({ handleMove, gameState,
       setSelectedPiece(square);
     }
   };
+  const doMove = () => {
+    setSelectedPiece(null);
+    if (movesUndone.length) {
+      const move = movesUndone.pop()!;
+      game.move(move);
+      setMovesUndone(movesUndone);
+      setGame(_.cloneDeep(game));
+    }
+  };
+  const undoMove = () => {
+    setSelectedPiece(null);
+    if (game.history().length > 0) {
+      const move = game.history()[game.history().length - 1]!;
+      setMovesUndone((moves) => [...moves, move]);
+      game.undo();
+      setGame(_.cloneDeep(game));
+    }
+  };
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") undoMove();
+      else if (event.key === "ArrowRight") doMove();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [game, movesUndone]);
 
   const lastMove = game.history({ verbose: true })[game.history({ verbose: true }).length - 1];
 
@@ -86,12 +116,12 @@ export const ChessBoardWrapper: React.FC<BoardProps> = ({ handleMove, gameState,
         )}
       </div>
       {flip === "w" ? whiteBar : blackBar}
-      <BoardSettings {...{ setSelectedPiece, game, setMovesUndone, setGame, movesUndone, setFlip }} />
+      <BoardSettings setFlip={setFlip} undoMove={undoMove} doMove={doMove} />
       {env.NODE_ENV === "development" && (
         <details>
-          <summary className="hover:cursor-pointer">Debug Information</summary>
+          <summary className="text-white hover:cursor-pointer">Debug Information</summary>
           <pre>
-            <code className="json">
+            <code className="json text-white">
               {JSON.stringify(
                 {
                   selectedPiece,

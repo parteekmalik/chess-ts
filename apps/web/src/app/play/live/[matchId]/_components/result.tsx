@@ -1,5 +1,6 @@
 import type { Color } from "chess.js";
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
@@ -25,14 +26,21 @@ function Result({ playerTurn, matchId }: { playerTurn: Color | null; matchId: st
 
   return (
     <Dialog defaultOpen>
-      <DialogContent className="text-background-foreground min-h-[30rem] w-fit min-w-[20rem]">
+      <DialogContent className="min-h-[30rem] w-fit min-w-[20rem] dark:text-white">
         <DialogHeader>
           <h1 className="text-xl font-semibold">Result</h1>
         </DialogHeader>
         <div className="mb-auto flex flex-col items-center gap-10 bg-background">
-          <div className="flex flex-col items-center gap-5">
+          <div className="relative flex flex-col items-center gap-5">
             {match?.stats?.winner === (playerTurn === "w" ? "WHITE" : "BLACK") && (
-              <img src="https://www.chess.com/bundles/web/images/color-icons/cup.svg" alt="" />
+              <Image
+                src="https://www.chess.com/bundles/web/images/color-icons/cup.svg"
+                alt="Cup Icon"
+                width={0}
+                height={0}
+                style={{ height: "auto", width: "auto" }}
+                unoptimized
+              />
             )}
             <div className="font-semiBold flex flex-col items-center text-2xl">
               <h1>{match?.stats?.winner === "DRAW" ? "Match Draw" : winnerId === session?.user.id ? "You Won" : "You Lost"}</h1>
@@ -40,7 +48,7 @@ function Result({ playerTurn, matchId }: { playerTurn: Color | null; matchId: st
             </div>
           </div>
           <Button
-            className="text-xl text-foreground"
+            className="text-xl text-white"
             disabled={isLoading}
             onClick={() => {
               setIsLoading(true);

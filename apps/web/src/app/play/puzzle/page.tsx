@@ -34,7 +34,7 @@ function Puzzle() {
     <div className="flex h-full w-full flex-col p-4">
       <div className="flex flex-col gap-4 lg:flex-row">
         <ChessBoardWrapper gameState={gameState} initalFlip={gameState.turn()} handleMove={handleMove} className="" />
-        <Card className="max-w-[540px] grow gap-5 overflow-hidden p-0 text-foreground">
+        <Card className="grow gap-5 overflow-hidden p-0 text-foreground lg:max-w-[540px]">
           <CardHeader className="flex h-fit w-full flex-col items-center bg-primary">
             <h1 className={cn("rounded-lg p-2 px-4 text-3xl font-semibold", gameState.turn() === "w" ? "text-white" : "text-black")}>
               {gameState.turn() === "w" ? "White" : "Black"} to play
@@ -56,22 +56,22 @@ function Puzzle() {
                 </div>
               ))}
             </div>
-            <h1 className="rounded-lg bg-slate-600 p-2 px-4 text-3xl font-semibold">
+            <h1 className="bg-forground rounded-lg p-2 px-4 text-3xl font-semibold text-white">
               Score {attempltedPuzzles.reduce((count, puz, index) => count + Number(PuzzleState.passedPuzzleList[index]), 0)}
             </h1>
           </CardHeader>
-          <CardContent className="flex flex-wrap p-5">
+          <CardContent className="grid grid-cols-5 bg-background p-1 md:p-5">
             {attempltedPuzzles.map((puz, index) => {
               return (
-                <div className="bg-background-500 flex flex-col items-center gap-2 rounded-md p-2" key={index} style={{ width: "60px" }}>
+                <div className="flex flex-col items-center gap-2 rounded-md" key={index}>
                   <Image
-                    className={`flex h-[18px] w-[18px] text-[${PuzzleState.passedPuzzleList[index] ? "green" : "red"}]`}
+                    className={`flex h-[18px] w-[18px] ${PuzzleState.passedPuzzleList[index] ? "text-green" : "text-red"}`}
                     src={`${PuzzleState.passedPuzzleList[index] ? "https://www.chess.com/bundles/web/images/svg/solved.svg" : "https://www.chess.com/bundles/web/images/svg/wrong.svg"}`}
                     height={18}
                     width={18}
                     alt="puzzle status"
                   />
-                  <p>{puz.rating}</p>
+                  <p className="text-white">{puz.rating}</p>
                 </div>
               );
             })}
