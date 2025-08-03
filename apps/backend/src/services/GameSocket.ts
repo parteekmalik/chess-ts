@@ -92,6 +92,7 @@ export class GameSocket {
 
     this.fillMatches().catch((err) => console.log(err));
   }
+  
   private fillMatches = async () => {
     const matches = await db.match.findMany({
       where: {
@@ -133,9 +134,7 @@ export class GameSocket {
       this.joinMatch(socket, matchId, ank),
     );
   };
-  private deleteMatch = (id: string) => {
-    delete this.matchRooms[id];
-  }
+  
   emitUpdate = (matchId: string, match?: NOTIFICATION_PAYLOAD) => {
     const matchRoom = this.matchRooms[matchId];
     if (matchRoom) {
@@ -146,12 +145,14 @@ export class GameSocket {
       logger.error("Match room not found", { matchId }, "MatchRoom");
     }
   };
+
   emitMatchCreated = (match: NOTIFICATION_PAYLOAD) => {
     this.matchRooms[match.id] = new MatchRoom(this.io, this.matchRooms, match.id, match)
     const [socketIdWhite, socketIdBlack] = [this.usersToSocketID[match.whitePlayerId], this.usersToSocketID[match.blackPlayerId]];
     if (socketIdWhite) this.io.to(socketIdWhite).emit("found_match", match.id);
     if (socketIdBlack) this.io.to(socketIdBlack).emit("found_match", match.id);
   };
+
   private joinMatch = async (socket: SocketWithContextType, matchId: string, ank: (mg: { data?: NOTIFICATION_PAYLOAD; error?: string }) => void) => {
     const matchRoom = this.matchRooms[matchId];
     if (!matchRoom) {

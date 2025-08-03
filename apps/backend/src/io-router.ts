@@ -26,10 +26,6 @@ function getRouter(mySocket: GameSocket) {
     res.status(200).send();
   });
 
-  ioRouter.use((req, res) => {
-    res.status(404).send("Not Found");
-  });
-
   return ioRouter;
 }
 
