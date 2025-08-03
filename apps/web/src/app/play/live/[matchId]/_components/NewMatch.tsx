@@ -1,57 +1,25 @@
-import React, { useCallback, useLayoutEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { gameTypes } from "@acme/lib";
 import { cn } from "@acme/ui";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@acme/ui/accordion";
 import { Button } from "@acme/ui/button";
 
-import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
-import { useTRPC } from "~/trpc/react";
+import { useFindMatch } from "./hooks/useFindMatch";
 
 function NewMatch() {
-  const trpc = useTRPC();
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const { addSocketListener } = useBackend();
-
   const [selectedGameType, setSelectedGameType] = useState<{
     baseTime: number;
     incrementTime: number;
     name: string;
   }>({ baseTime: 10, incrementTime: 0, name: "Rapid" });
-  const { data: isLoading } = useQuery(trpc.liveGame.isWaitingForMatch.queryOptions());
 
-  const redirectMatch = useCallback(
-    () =>
-      addSocketListener(
-        "found_match",
-        (response: unknown) => {
-          const match = response as string;
-          router.push(`/play/live/${match}`);
-          queryClient.setQueryData(trpc.liveGame.isWaitingForMatch.queryKey(), false);
-        },
-        true,
-      ),
-    [addSocketListener, router, queryClient, trpc],
-  );
-  const findMatchAPI = useMutation(
-    trpc.liveGame.findMatch.mutationOptions({
-      onMutate() {
-        queryClient.setQueryData(trpc.liveGame.isWaitingForMatch.queryKey(), true);
-        redirectMatch();
-      },
-    }),
-  );
+  const { findMatchAPI, isLoading } = useFindMatch();
 
   const handleSubmit = () => {
     findMatchAPI.mutate({ baseTime: selectedGameType.baseTime * 60000, incrementTime: selectedGameType.incrementTime * 1000 });
   };
-  useLayoutEffect(() => {
-    if (isLoading) redirectMatch();
-  }, [redirectMatch, isLoading]);
 
   return (
     <div className="space-y-4">

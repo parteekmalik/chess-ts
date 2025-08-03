@@ -35,6 +35,9 @@ app.use((req, res, next) => {
 // 📦 Mount API routes
 app.use(apiRouter);
 app.use(getRouter(mySocket));
+app.use((req, res) => {
+  res.status(404).send("Not Found");
+});
 
 // 🚀 Start server
 const PORT = env.PORT || 3000;

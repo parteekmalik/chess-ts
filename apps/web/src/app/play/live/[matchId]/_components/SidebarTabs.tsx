@@ -13,7 +13,7 @@ function SidebarTabs() {
   const params = useParams();
   const trpc = useTRPC();
   const { data: match } = useQuery(trpc.liveGame.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
-  const disabled = (path.startsWith("/play/live") && path.split("/").length > 3) || (match?.stats?.winner && match.stats.winner !== "PLAYING");
+  const disabled = !match?.stats?.winner || (path.startsWith("/play/live") && path.split("/").length > 3 && match.stats.winner === "PLAYING");
 
   return (
     <Card className="w-full lg:max-w-[450px]">
@@ -23,7 +23,7 @@ function SidebarTabs() {
             <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="play">
               Play
             </TabsTrigger>
-            <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="new_game" disabled={!!disabled}>
+            <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="new_game" disabled={disabled}>
               New Game
             </TabsTrigger>
             <TabsTrigger className="flex-1 dark:data-[state=active]:text-white" value="games">

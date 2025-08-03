@@ -27,9 +27,7 @@ export const useLiveGame = () => {
   useEffect(() => {
     console.log(params);
     SocketEmiter("join_match", params.matchId, (responce: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {
-      console.log("joined match -> ", responce);
       if (responce.data) console.info("joined match: ", responce.data.id);
-      else router.push("/play/live");
     });
   }, [params.matchId, SocketEmiter, backendServerConnection, router]);
 
