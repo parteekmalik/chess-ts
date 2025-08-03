@@ -20,12 +20,13 @@ export const useLiveGame = () => {
   const { data: match, isLoading } = useQuery(trpc.liveGame.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
 
   useEffect(() => {
+    console.log(params)
     SocketEmiter("join_match", params.matchId, (responce: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {
       console.log("joined match -> ", responce);
       if (responce.data) console.info("joined match: ", responce.data.id);
       else router.push("/play/live");
     });
-  }, [params.matchId, SocketEmiter, backendServerConnection]);
+  }, [params.matchId, SocketEmiter, backendServerConnection, router]);
 
   useEffect(() => {
     if (lastMessage.type === "joined_match") {
@@ -38,7 +39,6 @@ export const useLiveGame = () => {
           startedAt: new Date(lastMessage.payload.startedAt),
           moves: lastMessage.payload.moves.map((move) => ({ ...move, timestamps: new Date(move.timestamps) })),
         };
-        console.log("match update -> ", lastMessage.payload);
 
         queryClient.setQueryData(trpc.liveGame.getMatch.queryKey(params.matchId), payload);
       }

@@ -14,7 +14,7 @@ import { useTRPC } from "~/trpc/react";
 
 function Result({ playerTurn, matchId }: { playerTurn: Color | null; matchId: string }) {
   const trpc = useTRPC();
-  const { data: match } = useQuery(trpc.puzzle.getMatch.queryOptions(matchId));
+  const { data: match } = useQuery(trpc.liveGame.getMatch.queryOptions(matchId));
   const gameDetails = { baseTime: match?.baseTime, incrementTime: match?.incrementTime };
 
   const [isLoading, setIsLoading] = useState(false);

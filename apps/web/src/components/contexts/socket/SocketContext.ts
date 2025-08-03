@@ -7,6 +7,7 @@ export interface ISocketContextState {
   SocketEmiter: Socket["emit"] | (() => void);
   backendServerConnection: "connected" | "disconneted";
   lastMessage: { type: string; payload: NOTIFICATION_PAYLOAD };
+  addSocketListener: <Ev extends string>(ev: Ev, callback: (payload: unknown) => void, once?: boolean) => void;
 }
 
 export interface ISocketContextProps {

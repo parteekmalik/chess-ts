@@ -6,12 +6,3 @@ export interface Puzzle {
   rating: number;
   ratingDeviation: number;
 }
-
-export declare type Color = "w" | "b";
-export type ChessMoveType =
-  | string
-  | {
-      from: string;
-      to: string;
-      promotion?: string;
-    };

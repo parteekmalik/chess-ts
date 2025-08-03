@@ -1,10 +1,10 @@
-import type { ManagerOptions, Socket, SocketOptions } from "socket.io-client";
-import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import type { ManagerOptions, Socket, SocketOptions } from "socket.io-client";
 import io from "socket.io-client";
 
-import type {} from "@acme/lib/WStypes/typeForBackendAndSocket";
+import type { } from "@acme/lib/WStypes/typeForBackendAndSocket";
 
 import type { BACKEND_SERVER_UPDATE_PAYLOAD, NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import { BACKEND_SERVER_UPDATE } from "@acme/lib/WStypes/typeForFrontendToSocket";
@@ -26,6 +26,7 @@ const useSocket = () => {
   const [backendServerConnection, setBackendServerConnection] = useState<BACKEND_SERVER_UPDATE_PAYLOAD>("disconneted");
 
   const { data: session } = useSession();
+  const lisners = useRef<Record<string, { callback: (payload: unknown) => void; once: boolean }>>({});
 
   useEffect(() => {
     // Only create the socket if it doesn't already exist.
@@ -54,10 +55,23 @@ const useSocket = () => {
     newSocket.onAny((type: string, payload: NOTIFICATION_PAYLOAD) => {
       console.log("[RECIEVED]", type, payload);
       setLastMessage({ type, payload });
+      const listener = lisners.current[type];
+      if (listener) {
+        try {
+          listener.callback(payload);
+          delete lisners.current[type];
+        } catch (error) {
+          console.error(`Error in listener for event ${type}:`, error);
+        }
+      }
     });
 
     setSocketInstance(newSocket);
   }, [socketInstance, session]);
+
+  const addSocketListener = <Ev extends string>(ev: Ev, callback: (payload: unknown) => void, once = false) => {
+    lisners.current[ev] = {callback, once};
+  }
 
   const SocketEmiter = useCallback(
     <Ev extends string>(ev: Ev, ...args: unknown[]) => {
@@ -70,10 +84,10 @@ const useSocket = () => {
       const processedArgs = args.map((arg) =>
         typeof arg === "function"
           ? (props: acknoledgementResponce) => {
-              console.log("[ACKNOWLEDGEMENT]", ev, args, props);
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-              arg(props);
-            }
+            console.log("[ACKNOWLEDGEMENT]", ev, args, props);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            arg(props);
+          }
           : arg,
       );
 
@@ -96,6 +110,7 @@ const useSocket = () => {
     SocketEmiter: SocketEmiter,
     backendServerConnection,
     lastMessage,
+    addSocketListener,
   };
 };
 

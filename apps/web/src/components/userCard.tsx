@@ -16,7 +16,7 @@ const defaultUserDetails = {
 
 export function UserCard({ userId, minimal }: { userId?: string; minimal?: boolean }) {
   const trpc = useTRPC();
-  const { data: actualUser } = useQuery(trpc.puzzle.getUser.queryOptions(userId!, { enabled: !!userId }));
+  const { data: actualUser } = useQuery(trpc.liveGame.getUser.queryOptions(userId!, { enabled: !!userId }));
   const user = userId ? actualUser : defaultUserDetails;
   const imageSrc = user?.image;
   const initials = user?.name

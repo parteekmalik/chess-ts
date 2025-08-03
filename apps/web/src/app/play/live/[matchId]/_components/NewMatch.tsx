@@ -1,38 +1,50 @@
-import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import React, { useCallback, useLayoutEffect, useState } from "react";
 
-import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import { gameTypes } from "@acme/lib";
 import { cn } from "@acme/ui";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@acme/ui/accordion";
 import { Button } from "@acme/ui/button";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
+import { useTRPC } from "~/trpc/react";
 
 function NewMatch() {
-  const { SocketEmiter } = useBackend();
+  const trpc = useTRPC();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { addSocketListener, } = useBackend();
+
   const [selectedGameType, setSelectedGameType] = useState<{
     baseTime: number;
     incrementTime: number;
     name: string;
   }>({ baseTime: 10, incrementTime: 0, name: "Rapid" });
-  const [isLoading, setIsLoading] = useState(false);
+  const { data: isLoading } = useQuery(trpc.liveGame.isWaitingForMatch.queryOptions());
+
+  const redirectMatch = useCallback(() => addSocketListener("found_match", (response: unknown) => {
+    const match = response as string;
+    router.push(`/play/live/${match}`);
+    queryClient.setQueryData(trpc.liveGame.isWaitingForMatch.queryKey(), false);
+  }, true), [addSocketListener, router, queryClient, trpc]);
+  const findMatchAPI = useMutation(trpc.liveGame.findMatch.mutationOptions({
+    onMutate() {
+      queryClient.setQueryData(trpc.liveGame.isWaitingForMatch.queryKey(), true);
+      redirectMatch();
+    }
+  }));
 
   const handleSubmit = () => {
-    setIsLoading(true);
-    SocketEmiter(
-      "find_match",
+    findMatchAPI.mutate(
       { baseTime: selectedGameType.baseTime * 60000, incrementTime: selectedGameType.incrementTime * 1000 },
-      (response: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {
-        if (response.data) {
-          router.push(`/play/live/${response.data.id}`);
-        } else router.push("/play/live");
-        setIsLoading(false);
-      },
     );
   };
+  useLayoutEffect(() => {
+    if (isLoading)
+      redirectMatch();
+  }, [redirectMatch, isLoading]);
 
   return (
     <div className="space-y-4">
@@ -58,8 +70,8 @@ function NewMatch() {
                           className={cn(
                             "h-auto flex-1 bg-white/10 p-3",
                             game.baseTime === selectedGameType.baseTime &&
-                              game.incrementTime === selectedGameType.incrementTime &&
-                              "border-2 border-primary",
+                            game.incrementTime === selectedGameType.incrementTime &&
+                            "border-2 border-primary",
                           )}
                           variant="outline"
                           onClick={() => {
