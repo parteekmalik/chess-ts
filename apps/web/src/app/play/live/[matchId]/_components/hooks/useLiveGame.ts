@@ -3,6 +3,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Chess } from "chess.js";
 import moment from "moment";
+import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
 import type { ChessMoveType } from "@acme/lib";
@@ -16,6 +17,7 @@ export const useLiveGame = () => {
   const params = useParams();
   const trpc = useTRPC();
   const router = useRouter();
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   const { SocketEmiter, lastMessage, backendServerConnection } = useBackend();
@@ -80,7 +82,10 @@ export const useLiveGame = () => {
     return timeData;
   }, [match?.moves]);
 
-  const openResult = useMemo(() => match?.stats?.winner !== "PLAYING", [match?.stats?.winner]);
+  const openResult = useMemo(
+    () => match?.stats?.winner !== "PLAYING" && session && (session.user.id === match?.blackPlayerId || session.user.id === match?.whitePlayerId),
+    [match?.stats?.winner],
+  );
 
   return { match, isLoading, gameState, playerTimes, handleMove, openResult, params };
 };

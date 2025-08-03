@@ -5,7 +5,7 @@ import moment from "moment";
 import { z } from "zod";
 
 import type { MatchWinner } from "@acme/db";
-import { calculateTimeLeft, MoveSchema } from "@acme/lib";
+import { MoveSchema } from "@acme/lib";
 
 import { env } from "../env";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
@@ -28,32 +28,6 @@ export const liveGameRouter = createTRPCRouter({
         stats: true,
       },
     });
-    if (data) {
-      const timeData = calculateTimeLeft(
-        { baseTime: data.baseTime, incrementTime: data.incrementTime },
-        [data.startedAt].concat(data.moves.map((i) => i.timestamps)),
-      );
-      if (timeData.w < 0) {
-        void ctx.db.matchResult.update({
-          where: { id: data.stats!.id },
-          data: {
-            winner: "BLACK",
-            reason: "time",
-          },
-        });
-        return { ...data, stats: { ...data.stats, winner: "BLACK", reason: "time" } };
-      }
-      if (timeData.b < 0) {
-        void ctx.db.matchResult.update({
-          where: { id: data.stats!.id },
-          data: {
-            winner: "WHITE",
-            reason: "time",
-          },
-        });
-        return { ...data, stats: { ...data.stats, winner: "WHITE", reason: "time" } };
-      }
-    }
     return data;
   }),
   cancelWaiting: protectedProcedure.mutation(async ({ ctx }) => {

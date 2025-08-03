@@ -1,5 +1,6 @@
 import { useParams, usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 
 import { Card, CardContent } from "@acme/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
@@ -12,8 +13,14 @@ function SidebarTabs() {
   const path = usePathname();
   const params = useParams();
   const trpc = useTRPC();
+  const { data: session } = useSession();
   const { data: match } = useQuery(trpc.liveGame.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
-  const disabled = !match?.stats?.winner || (path.startsWith("/play/live") && path.split("/").length > 3 && match.stats.winner === "PLAYING");
+  const disabled =
+    session == null ||
+    (((match != null && match.stats?.winner == null) ||
+      (path.startsWith("/play/live") && path.split("/").length > 3 && match?.stats?.winner === "PLAYING")) &&
+      !(path.split("/").length === 3) &&
+      (session.user.id === match.whitePlayerId || session.user.id === match.blackPlayerId));
 
   return (
     <Card className="w-full lg:max-w-[450px]">
