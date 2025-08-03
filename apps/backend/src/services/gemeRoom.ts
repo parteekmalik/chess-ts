@@ -37,6 +37,10 @@ export class MatchRoom {
     if (!data) return;
 
     const { reason, timeLeft, winner } = data;
+    if( this.finishMatchTimeout) {
+      clearTimeout(this.finishMatchTimeout);
+      this.finishMatchTimeout = undefined;
+    }
     this.finishMatchTimeout = setTimeout(() => {
       db.matchResult.update({
         where: {
