@@ -7,6 +7,7 @@ import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSo
 import { AUTHENTICATION } from "@acme/lib/WStypes/typeForFrontendToSocket";
 
 import { db } from "@acme/db";
+import type { ChessMoveType } from "@acme/lib/live";
 import { env } from "~/env";
 import { MatchRoom } from "./gemeRoom";
 import { logger } from "./Logger";
@@ -92,7 +93,7 @@ export class GameSocket {
 
     this.fillMatches().catch((err) => console.log(err));
   }
-  
+
   private fillMatches = async () => {
     const matches = await db.match.findMany({
       where: {
@@ -133,8 +134,12 @@ export class GameSocket {
     socket.on("join_match", (matchId: string, ank: (mg: { data?: NOTIFICATION_PAYLOAD; error?: string }) => void) =>
       this.joinMatch(socket, matchId, ank),
     );
+    socket.on("make_move", ({ move, matchId }: { matchId: string, move: ChessMoveType }) => {
+      const matchRoom = this.matchRooms[matchId];
+      matchRoom?.makeMove({ userId: socket.data.userData.id, matchId, move }).catch(() => logger.error("Error making move", { matchId }, "GameSocket"));
+    });
   };
-  
+
   emitUpdate = (matchId: string, match?: NOTIFICATION_PAYLOAD) => {
     const matchRoom = this.matchRooms[matchId];
     if (matchRoom) {

@@ -4,7 +4,7 @@ import express from "express";
 import http from "http";
 import { env } from "./env";
 import { apiRouter } from "./router";
-import { getRouter } from "./io-router";
+import { getRouter, getSecretRouter } from "./io-router";
 import { GameSocket } from "./services/GameSocket";
 
 const app = express();
@@ -35,6 +35,7 @@ app.use((req, res, next) => {
 // 📦 Mount API routes
 app.use(apiRouter);
 app.use(getRouter(mySocket));
+app.use(getSecretRouter(mySocket));
 app.use((req, res) => {
   res.status(404).send("Not Found");
 });

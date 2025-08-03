@@ -1,5 +1,8 @@
+import { Chess } from "chess.js";
 import moment from "moment";
 import { z } from "zod";
+
+import type { MatchWinner, PrismaClient } from "@acme/db/client";
 
 export const gameTypes = {
   bullet: [
@@ -48,3 +51,70 @@ export const MoveSchema = z.union([
   z.object({ from: z.string().min(1), to: z.string().min(1), promotion: z.string().optional() }),
 ]);
 export type ChessMoveType = z.infer<typeof MoveSchema>;
+
+export interface makeMoveInput {
+  userId: string;
+  matchId: string;
+  move: ChessMoveType;
+}
+export async function makeMove(db: PrismaClient, input: makeMoveInput) {
+  let match = await db.match.findUnique({
+    where: {
+      id: input.matchId,
+    },
+    include: {
+      moves: true,
+      stats: true,
+    },
+  });
+  if (!match) throw new Error("Match not found");
+  if (match.stats?.winner !== "PLAYING") throw new Error("Math is already over");
+  const game = new Chess();
+  match.moves.forEach((move) => game.move(move.move));
+
+  if ((game.turn() === "w" ? match.whitePlayerId : match.blackPlayerId) !== input.userId) {
+    throw new Error("You cannot make a move on your opponent's turn");
+  }
+  try {
+    game.move(input.move);
+  } catch {
+    throw new Error("Invalid move");
+  }
+  const move = game.history().slice(-1)[0]!;
+
+  match.moves.push({
+    matchId: input.matchId,
+    move,
+    timestamps: moment().toDate(),
+    id: "",
+  });
+
+  const winner: MatchWinner = game.isDraw() ? "DRAW" : game.turn() === "w" ? "BLACK" : "WHITE";
+  const reason = game.isDraw() ? "repetition" : "checkmate";
+
+  match = await db.match.update({
+    where: {
+      id: input.matchId,
+    },
+    data: {
+      moves: {
+        create: {
+          move,
+        },
+      },
+      stats: game.isGameOver()
+        ? {
+            upsert: {
+              create: { winner, reason },
+              update: { winner, reason },
+            },
+          }
+        : undefined,
+    },
+    include: {
+      moves: true,
+      stats: true,
+    },
+  });
+  return match;
+}

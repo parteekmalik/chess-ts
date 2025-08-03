@@ -1,6 +1,7 @@
 import type { MatchWinner } from "@acme/db";
 import { db } from "@acme/db";
-import { calculateTimeLeft } from "@acme/lib/live";
+import type { makeMoveInput } from "@acme/lib/live";
+import { calculateTimeLeft, makeMove } from "@acme/lib/live";
 import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import type { Socket, Server as SocketServer } from "socket.io";
 import type { UserDataType } from "./GameSocket";
@@ -79,6 +80,15 @@ export class MatchRoom {
     else this.match = match;
     this.io.to(this.match!.id).emit("match_update", this.match);
     if (this.match?.stats.winner === "PLAYING") this.addTimer();
+  }
+
+  async makeMove(inputs: makeMoveInput) {
+    try {
+      const move = await makeMove(db, inputs);
+      await this.emitMatchUpdate(move as NOTIFICATION_PAYLOAD);
+    } catch (error) {
+      logger.error("Error making move", { error });
+    }
   }
 
   private calulateTimeToFinish() {

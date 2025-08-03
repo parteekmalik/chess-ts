@@ -1,11 +1,9 @@
 import { TRPCError } from "@trpc/server";
 import axios from "axios";
-import { Chess } from "chess.js";
 import moment from "moment";
 import { z } from "zod";
 
-import type { MatchWinner } from "@acme/db";
-import { MoveSchema } from "@acme/lib";
+import { makeMove, MoveSchema } from "@acme/lib";
 
 import { env } from "../env";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
@@ -123,76 +121,23 @@ export const liveGameRouter = createTRPCRouter({
       }
     }),
   makeMove: protectedProcedure.input(z.object({ move: MoveSchema, matchId: z.string().min(1) })).mutation(async ({ ctx, input }) => {
-    let match = await ctx.db.match.findUnique({
-      where: {
-        id: input.matchId,
-      },
-      include: {
-        moves: true,
-        stats: true,
-      },
-    });
-    if (!match) throw new TRPCError({ message: "Match not found", code: "NOT_FOUND" });
-    if (match.stats?.winner !== "PLAYING") throw new TRPCError({ message: "Math is already over", code: "BAD_REQUEST" });
-    const game = new Chess();
-    match.moves.forEach((move) => game.move(move.move));
-
-    if ((game.turn() === "w" ? match.whitePlayerId : match.blackPlayerId) !== ctx.session.user.id) {
-      throw new TRPCError({
-        message: "You cannot make a move on your opponent's turn",
-        code: "FORBIDDEN",
-      });
-    }
     try {
-      game.move(input.move);
-    } catch {
-      throw new TRPCError({ message: "Invalid move", code: "BAD_REQUEST" });
-    }
-    const move = game.history().slice(-1)[0]!;
-
-    match.moves.push({
-      matchId: input.matchId,
-      move,
-      timestamps: moment().toDate(),
-      id: "",
-    });
-
-    const winner: MatchWinner = game.isDraw() ? "DRAW" : game.turn() === "w" ? "BLACK" : "WHITE";
-    const reason = game.isDraw() ? "repetition" : "checkmate";
-
-    match = await ctx.db.match.update({
-      where: {
-        id: input.matchId,
-      },
-      data: {
-        moves: {
-          create: {
-            move,
+      const match = await makeMove(ctx.db, { userId: ctx.session.user.id, matchId: input.matchId, move: input.move });
+      await axios.post(
+        `${env.BACKEND_WS}/emit_update`,
+        { matchId: input.matchId, match },
+        {
+          headers: {
+            "x-auth-secret": env.AUTH_SECRET,
           },
         },
-        stats: game.isGameOver()
-          ? {
-              upsert: {
-                create: { winner, reason },
-                update: { winner, reason },
-              },
-            }
-          : undefined,
-      },
-      include: {
-        moves: true,
-        stats: true,
-      },
-    });
-    await axios.post(
-      `${env.BACKEND_WS}/emit_update`,
-      { matchId: input.matchId, match },
-      {
-        headers: {
-          "x-auth-secret": env.AUTH_SECRET,
-        },
-      },
-    );
+      );
+    } catch (error) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: (error as Error).message,
+      });
+    }
     return "sucess";
   }),
 });

@@ -63,11 +63,14 @@ export const useLiveGame = () => {
   const moveAPI = useMutation(trpc.liveGame.makeMove.mutationOptions());
   const handleMove = useCallback(
     (move: ChessMoveType) => {
+      if (!match) return;
       console.log("move in live board -> ", move, moment().format("HH:mm:ss"));
-      moveAPI.mutate({
-        move,
-        matchId: params.matchId as string,
-      });
+      if (match.baseTime > 3600000)
+        moveAPI.mutate({
+          move,
+          matchId: params.matchId as string,
+        });
+      else SocketEmiter("make_move", { move, matchId: params.matchId });
     },
     [params.matchId, moveAPI],
   );

@@ -4,7 +4,7 @@ import { env } from "./env";
 import type { GameSocket } from "./services/GameSocket";
 
 
-function getRouter(mySocket: GameSocket) {
+function getSecretRouter(mySocket: GameSocket) {
   const ioRouter = express.Router();
   ioRouter.use((req, res, next) => {
     const secret = req.header("x-auth-secret");
@@ -29,4 +29,23 @@ function getRouter(mySocket: GameSocket) {
   return ioRouter;
 }
 
-export { getRouter };
+function getRouter(mySocket: GameSocket) {
+  const ioRouter = express.Router();
+  ioRouter.use((req, res, next) => {
+    const secret = req.header("x-auth-secret");
+    if (secret !== env.AUTH_SECRET) {
+      res.status(401).send();
+    } else next();
+  });
+
+  ioRouter.post("/make_move", (req, res) => {
+    const { matchId, match } = req.body as { matchId: string, match: NOTIFICATION_PAYLOAD };
+
+    mySocket.emitUpdate(matchId, match);
+    res.status(200).send();
+  });
+
+  return ioRouter;
+}
+
+export { getSecretRouter, getRouter };
