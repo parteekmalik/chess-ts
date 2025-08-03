@@ -22,11 +22,11 @@ app.use(cookieParser());
 
 // 🔍 Simple request response logger logger
 app.use((req, res, next) => {
-  console.log(`[${req.method}] ${req.url}`, "Data: ", env.NODE_ENV === "development" && req.body);
+  console.log(`[${req.method}] ${req.url}`, "Data: ", req.body);
   const oldSend = res.send;
 
   res.send = function (data) {
-    console.log(`[${req.method}] ${req.url}`, 'Response:', env.NODE_ENV === "development" && data);
+    console.log(`[${req.method}] ${req.url}`, 'Response:', data);
     return oldSend.call(this, data);
   };
   next();
