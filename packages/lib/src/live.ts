@@ -43,5 +43,8 @@ export function getLastElement<T>(arr: T[]): T {
   return arr[arr.length - 1]!;
 }
 
-export const MoveSchema = z.union([z.string().min(2), z.object({ from: z.string().min(1), to: z.string().min(1), promotion: z.string().optional() })])
+export const MoveSchema = z.union([
+  z.string().min(2),
+  z.object({ from: z.string().min(1), to: z.string().min(1), promotion: z.string().optional() }),
+]);
 export type ChessMoveType = z.infer<typeof MoveSchema>;

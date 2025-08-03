@@ -1,10 +1,10 @@
-import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
 import type { ManagerOptions, Socket, SocketOptions } from "socket.io-client";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 import io from "socket.io-client";
 
-import type { } from "@acme/lib/WStypes/typeForBackendAndSocket";
+import type {} from "@acme/lib/WStypes/typeForBackendAndSocket";
 
 import type { BACKEND_SERVER_UPDATE_PAYLOAD, NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import { BACKEND_SERVER_UPDATE } from "@acme/lib/WStypes/typeForFrontendToSocket";
@@ -70,8 +70,8 @@ const useSocket = () => {
   }, [socketInstance, session]);
 
   const addSocketListener = <Ev extends string>(ev: Ev, callback: (payload: unknown) => void, once = false) => {
-    lisners.current[ev] = {callback, once};
-  }
+    lisners.current[ev] = { callback, once };
+  };
 
   const SocketEmiter = useCallback(
     <Ev extends string>(ev: Ev, ...args: unknown[]) => {
@@ -84,10 +84,10 @@ const useSocket = () => {
       const processedArgs = args.map((arg) =>
         typeof arg === "function"
           ? (props: acknoledgementResponce) => {
-            console.log("[ACKNOWLEDGEMENT]", ev, args, props);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            arg(props);
-          }
+              console.log("[ACKNOWLEDGEMENT]", ev, args, props);
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+              arg(props);
+            }
           : arg,
       );
 

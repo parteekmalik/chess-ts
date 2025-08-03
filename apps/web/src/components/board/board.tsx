@@ -5,9 +5,9 @@ import React, { useEffect, useState } from "react";
 import _ from "lodash";
 import { twMerge } from "tailwind-merge";
 
+import type { ChessMoveType } from "@acme/lib";
 import { cn } from "@acme/ui";
 
-import type { ChessMoveType } from "./boardMain";
 import { env } from "~/env";
 import { checkForValidClick } from "../Utils";
 import { BoardSettings } from "./BoardSettings";

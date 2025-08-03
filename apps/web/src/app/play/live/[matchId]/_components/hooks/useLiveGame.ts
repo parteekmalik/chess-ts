@@ -4,8 +4,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Chess } from "chess.js";
 import moment from "moment";
 import toast from "react-hot-toast";
+
+import type { ChessMoveType } from "@acme/lib";
 import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
-import { calculateTimeLeft, ChessMoveType } from "@acme/lib";
+import { calculateTimeLeft } from "@acme/lib";
+
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 import { useTRPC } from "~/trpc/react";
 
@@ -17,10 +20,12 @@ export const useLiveGame = () => {
 
   const { SocketEmiter, lastMessage, backendServerConnection } = useBackend();
 
-  const { data: match, isLoading } = useQuery(trpc.liveGame.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
+  const { data: match, isLoading } = useQuery(
+    trpc.liveGame.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }),
+  );
 
   useEffect(() => {
-    console.log(params)
+    console.log(params);
     SocketEmiter("join_match", params.matchId, (responce: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {
       console.log("joined match -> ", responce);
       if (responce.data) console.info("joined match: ", responce.data.id);
@@ -62,7 +67,7 @@ export const useLiveGame = () => {
       moveAPI.mutate({
         move,
         matchId: params.matchId as string,
-      })
+      });
     },
     [params.matchId, moveAPI],
   );
@@ -70,9 +75,9 @@ export const useLiveGame = () => {
   const playerTimes = useMemo(() => {
     const timeData = match
       ? calculateTimeLeft(
-        { baseTime: match.baseTime, incrementTime: match.incrementTime },
-        [match.startedAt].concat(match.moves.map((move) => move.timestamps)),
-      )
+          { baseTime: match.baseTime, incrementTime: match.incrementTime },
+          [match.startedAt].concat(match.moves.map((move) => move.timestamps)),
+        )
       : { w: 0, b: 0 };
     return timeData;
   }, [match?.moves]);

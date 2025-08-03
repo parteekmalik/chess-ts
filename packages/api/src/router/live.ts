@@ -1,10 +1,12 @@
-import type { MatchWinner } from "@acme/db";
-import { calculateTimeLeft, MoveSchema } from "@acme/lib";
 import { TRPCError } from "@trpc/server";
 import axios from "axios";
 import { Chess } from "chess.js";
 import moment from "moment";
 import { z } from "zod";
+
+import type { MatchWinner } from "@acme/db";
+import { calculateTimeLeft, MoveSchema } from "@acme/lib";
+
 import { env } from "../env";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
@@ -81,61 +83,71 @@ export const liveGameRouter = createTRPCRouter({
       return true;
     } else return false;
   }),
-  findMatch: publicProcedure.input(z.object({
-    baseTime: z.number().min(1),
-    incrementTime: z.number().min(0),
-  })).mutation(async ({ ctx, input }) => {
-    const toFillSlot = await ctx.db.watingPlayer.findFirst({
-      where: {
-        NOT: {
-          id: ctx.session?.user.id
-        }
-      },
-    });
-    const isWaiting = await ctx.db.watingPlayer.findFirst({ where: { userId: ctx.session?.user.id } })
-    if (isWaiting || !ctx.session) return;
-    if (toFillSlot) {
-      const match = await ctx.db.match.create({
-        data: {
-          baseTime: input.baseTime,
-          incrementTime: input.incrementTime,
-          whitePlayerId: toFillSlot.userId,
-          blackPlayerId: ctx.session.user.id,
-          startedAt: moment().toDate(),
-          stats: {
-            create: {}
-          }
-        },
-        include: {
-          moves: true,
-          stats: true
-        }
-      });
-      await ctx.db.watingPlayer.delete({
+  findMatch: publicProcedure
+    .input(
+      z.object({
+        baseTime: z.number().min(1),
+        incrementTime: z.number().min(0),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const toFillSlot = await ctx.db.watingPlayer.findFirst({
         where: {
-          id: toFillSlot.id,
+          NOT: {
+            id: ctx.session?.user.id,
+          },
         },
       });
-      axios.post(`${env.BACKEND_WS}/emit_match_created`, {
-        match,
-      }, {
-        headers: {
-          'x-auth-secret': env.AUTH_SECRET,
-        },
-      }).catch((err) => {
-        console.error("Error while sending match request", err);
-      })
-    } else if (ctx.session.user.id) {
-      await ctx.db.watingPlayer.create({
-        data: {
-          baseTime: input.baseTime,
-          incrementTime: input.incrementTime,
-          userId: ctx.session.user.id,
-          expiry: moment().add(5, "minutes").toDate(),
-        },
-      });
-    }
-  }),
+      const isWaiting = await ctx.db.watingPlayer.findFirst({ where: { userId: ctx.session?.user.id } });
+      if (isWaiting || !ctx.session) return;
+      if (toFillSlot) {
+        const match = await ctx.db.match.create({
+          data: {
+            baseTime: input.baseTime,
+            incrementTime: input.incrementTime,
+            whitePlayerId: toFillSlot.userId,
+            blackPlayerId: ctx.session.user.id,
+            startedAt: moment().toDate(),
+            stats: {
+              create: {},
+            },
+          },
+          include: {
+            moves: true,
+            stats: true,
+          },
+        });
+        await ctx.db.watingPlayer.delete({
+          where: {
+            id: toFillSlot.id,
+          },
+        });
+        axios
+          .post(
+            `${env.BACKEND_WS}/emit_match_created`,
+            {
+              match,
+            },
+            {
+              headers: {
+                "x-auth-secret": env.AUTH_SECRET,
+              },
+            },
+          )
+          .catch((err) => {
+            console.error("Error while sending match request", err);
+          });
+      } else if (ctx.session.user.id) {
+        await ctx.db.watingPlayer.create({
+          data: {
+            baseTime: input.baseTime,
+            incrementTime: input.incrementTime,
+            userId: ctx.session.user.id,
+            expiry: moment().add(5, "minutes").toDate(),
+          },
+        });
+      }
+    }),
   makeMove: protectedProcedure.input(z.object({ move: MoveSchema, matchId: z.string().min(1) })).mutation(async ({ ctx, input }) => {
     let match = await ctx.db.match.findUnique({
       where: {
@@ -147,7 +159,7 @@ export const liveGameRouter = createTRPCRouter({
       },
     });
     if (!match) throw new TRPCError({ message: "Match not found", code: "NOT_FOUND" });
-    if (match.stats?.winner !== "PLAYING") throw new TRPCError({ message: "Math is already over", code: "BAD_REQUEST" })
+    if (match.stats?.winner !== "PLAYING") throw new TRPCError({ message: "Math is already over", code: "BAD_REQUEST" });
     const game = new Chess();
     match.moves.forEach((move) => game.move(move.move));
 
@@ -171,38 +183,42 @@ export const liveGameRouter = createTRPCRouter({
       id: "",
     });
 
-    const winner: MatchWinner = game.isDraw() ? 'DRAW' : game.turn() === 'w' ? 'BLACK' : 'WHITE';
-    const reason = game.isDraw() ? 'repetition' : 'checkmate';
+    const winner: MatchWinner = game.isDraw() ? "DRAW" : game.turn() === "w" ? "BLACK" : "WHITE";
+    const reason = game.isDraw() ? "repetition" : "checkmate";
 
     match = await ctx.db.match.update({
       where: {
-        id: input.matchId
+        id: input.matchId,
       },
       data: {
         moves: {
           create: {
-            move
-          }
+            move,
+          },
         },
         stats: game.isGameOver()
           ? {
-            upsert: {
-              create: { winner, reason },
-              update: { winner, reason },
-            },
-          }
+              upsert: {
+                create: { winner, reason },
+                update: { winner, reason },
+              },
+            }
           : undefined,
       },
       include: {
         moves: true,
-        stats: true
-      }
-    })
-    await axios.post(`${env.BACKEND_WS}/emit_update`, { matchId: input.matchId, match }, {
-      headers: {
-        'x-auth-secret': env.AUTH_SECRET,
+        stats: true,
       },
-    })
+    });
+    await axios.post(
+      `${env.BACKEND_WS}/emit_update`,
+      { matchId: input.matchId, match },
+      {
+        headers: {
+          "x-auth-secret": env.AUTH_SECRET,
+        },
+      },
+    );
     return "sucess";
   }),
 });

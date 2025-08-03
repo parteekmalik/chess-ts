@@ -1,4 +1,5 @@
-import { db, MatchWinner } from "@acme/db";
+import type { MatchWinner } from "@acme/db";
+import { db } from "@acme/db";
 import { calculateTimeLeft } from "@acme/lib/live";
 import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import type { Socket, Server as SocketServer } from "socket.io";

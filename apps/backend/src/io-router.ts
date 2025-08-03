@@ -1,4 +1,4 @@
-import { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import express from "express";
 import { env } from "./env";
 import type { GameSocket } from "./services/GameSocket";
