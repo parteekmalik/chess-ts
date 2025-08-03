@@ -1,8 +1,7 @@
+import type { Color } from "chess.js";
 import { Chess } from "chess.js";
 
-import type { Color, Puzzle } from "@acme/lib";
-
-import type { ChessMoveType } from "~/components/board/boardMain";
+import type { ChessMoveType, Puzzle } from "@acme/lib";
 
 export interface IPuzzleContextState {
   puzzleList: Puzzle[];

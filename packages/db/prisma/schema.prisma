@@ -51,8 +51,9 @@ model User {
   accounts      Account[]
   sessions      Session[]
 
-  rating  Int     @default(1200)
-  matches Match[]
+  rating       Int            @default(1200)
+  matches      Match[]
+  WatingPlayer WatingPlayer[]
 }
 
 model VerificationToken {
@@ -76,6 +77,16 @@ model Match {
   whitePlayerId String
   blackPlayerId String
   users         User[]
+}
+
+model WatingPlayer {
+  id            String   @id @default(cuid())
+  baseTime      Int
+  incrementTime Int
+  expiry        DateTime
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model MatchResult {

@@ -4,11 +4,11 @@ import { useMemo } from "react";
 import Image from "next/image";
 import { Chess } from "chess.js";
 
+import type { ChessMoveType } from "@acme/lib";
 import { cn } from "@acme/ui";
 import { Card, CardContent, CardHeader } from "@acme/ui/card";
 import { Dialog, DialogContent } from "@acme/ui/dialog";
 
-import type { ChessMoveType } from "~/components/board/boardMain";
 import { ChessBoardWrapper } from "~/components/board/board";
 import { env } from "~/env";
 import usePuzzle from "./_components/usePuzzle";

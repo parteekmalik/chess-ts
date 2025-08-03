@@ -1,4 +1,5 @@
 import moment from "moment";
+import { z } from "zod";
 
 export const gameTypes = {
   bullet: [
@@ -41,3 +42,9 @@ export function calculateTimeLeft(config: { baseTime: number; incrementTime: num
 export function getLastElement<T>(arr: T[]): T {
   return arr[arr.length - 1]!;
 }
+
+export const MoveSchema = z.union([
+  z.string().min(2),
+  z.object({ from: z.string().min(1), to: z.string().min(1), promotion: z.string().optional() }),
+]);
+export type ChessMoveType = z.infer<typeof MoveSchema>;

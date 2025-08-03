@@ -12,7 +12,7 @@ import { useTRPC } from "~/trpc/react";
 function MovesDisplay({ chatMessages }: { chatMessages?: ChatMessageType[] }) {
   const trpc = useTRPC();
   const params = useParams();
-  const { data: match } = useQuery(trpc.puzzle.getMatch.queryOptions(params.matchId as string, { enabled: !!params.matchId }));
+  const { data: match } = useQuery(trpc.liveGame.getMatch.queryOptions(params.matchId as string, { enabled: !!params.matchId }));
 
   const result = match?.moves.reduce((acc, curr, index) => {
     if (index % 2 === 0) {

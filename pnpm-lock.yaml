@@ -496,6 +496,9 @@ importers:
       '@trpc/server':
         specifier: 'catalog:'
         version: 11.0.0(typescript@5.8.2)
+      axios:
+        specifier: ^1.8.4
+        version: 1.8.4
       superjson:
         specifier: 2.2.2
         version: 2.2.2
@@ -644,6 +647,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.8.2
+      zod:
+        specifier: 'catalog:'
+        version: 3.24.2
 
   packages/ui:
     dependencies:

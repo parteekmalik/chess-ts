@@ -12,7 +12,7 @@ function SidebarTabs() {
   const path = usePathname();
   const params = useParams();
   const trpc = useTRPC();
-  const { data: match } = useQuery(trpc.puzzle.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
+  const { data: match } = useQuery(trpc.liveGame.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
   const disabled = (path.startsWith("/play/live") && path.split("/").length > 3) || (match?.stats?.winner && match.stats.winner !== "PLAYING");
 
   return (

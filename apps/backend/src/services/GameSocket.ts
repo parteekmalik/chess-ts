@@ -1,13 +1,12 @@
+import axios from "axios";
 import type { Server as HttpServer } from "http";
 import type { Socket } from "socket.io";
-import axios from "axios";
-import { Chess } from "chess.js";
 import { Server as SocketServer } from "socket.io";
 
 import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
-import { db } from "@acme/db";
 import { AUTHENTICATION } from "@acme/lib/WStypes/typeForFrontendToSocket";
 
+import { db } from "@acme/db";
 import { env } from "~/env";
 import { MatchRoom } from "./gemeRoom";
 import { logger } from "./Logger";
@@ -35,10 +34,6 @@ export class GameSocket {
   private usersToSocketID: Record<string, string> = {};
 
   private matchRooms: Record<string, MatchRoom> = {};
-
-  private waitingplayers: Record<string, { data: UserDataType; socketId: string }[]> = {};
-
-  private playerCallbacks: Record<string, (msg: { data: NOTIFICATION_PAYLOAD }) => void> = {};
 
   private overrideRoomEmit() {
     const originalTo = this.io.to.bind(this.io);
@@ -94,6 +89,23 @@ export class GameSocket {
     });
 
     this.io.on("connect", this.handleConnection);
+
+    this.fillMatches().catch((err) => console.log(err));
+  }
+  private fillMatches = async () => {
+    const matches = await db.match.findMany({
+      where: {
+        stats: { is: { winner: "PLAYING" } }
+      },
+      include: {
+        moves: true,
+        stats: true
+      }
+    })
+    matches.forEach((match) => {
+      this.matchRooms[match.id] = new MatchRoom(this.io, this.matchRooms, match.id, match as NOTIFICATION_PAYLOAD)
+    })
+    logger.info(`added ${matches.length} from DB`)
   }
 
   private handleConnection = (socket: SocketWithContextType) => {
@@ -117,22 +129,29 @@ export class GameSocket {
     }
 
     socket.on("disconnect", () => delete this.usersToSocketID[socket.data.userData.id]);
-    socket.on("find_match", (msg: { baseTime: number; incrementTime: number }, ank: (msg: { data: NOTIFICATION_PAYLOAD }) => void) =>
-      this.handleFindMatch(socket, msg, ank),
-    );
     socket.on("join_match", (matchId: string, ank: (mg: { data?: NOTIFICATION_PAYLOAD; error?: string }) => void) =>
       this.joinMatch(socket, matchId, ank),
     );
-    socket.on("make_move_match", (props: { matchId: string; move: string }) => {
-      const matchRoom = this.matchRooms[props.matchId];
-      if (matchRoom) {
-        matchRoom.handleRoomMessage(socket, "match_update", props.move);
-      } else {
-        logger.error("Match room not found", { matchId: props.matchId }, "MatchRoom");
-      }
-    });
   };
-
+  private deleteMatch = (id: string) => {
+    delete this.matchRooms[id];
+  }
+  emitUpdate = (matchId: string, match?: NOTIFICATION_PAYLOAD) => {
+    const matchRoom = this.matchRooms[matchId];
+    if (matchRoom) {
+      matchRoom.emitMatchUpdate(match).catch(() => {
+        logger.error("Error emitting match update", { matchId }, "MatchRoom");
+      });
+    } else {
+      logger.error("Match room not found", { matchId }, "MatchRoom");
+    }
+  };
+  emitMatchCreated = (match: NOTIFICATION_PAYLOAD) => {
+    this.matchRooms[match.id] = new MatchRoom(this.io, this.matchRooms, match.id, match)
+    const [socketIdWhite, socketIdBlack] = [this.usersToSocketID[match.whitePlayerId], this.usersToSocketID[match.blackPlayerId]];
+    if (socketIdWhite) this.io.to(socketIdWhite).emit("found_match", match.id);
+    if (socketIdBlack) this.io.to(socketIdBlack).emit("found_match", match.id);
+  };
   private joinMatch = async (socket: SocketWithContextType, matchId: string, ank: (mg: { data?: NOTIFICATION_PAYLOAD; error?: string }) => void) => {
     const matchRoom = this.matchRooms[matchId];
     if (!matchRoom) {
@@ -146,60 +165,4 @@ export class GameSocket {
       this.io.to(matchId).emit("joined_match", { count: userCount, id: socket.data.userData.id });
     }
   };
-
-  private handleFindMatch = async (
-    socket: SocketWithContextType,
-    msg: { baseTime: number; incrementTime: number },
-    ank: (msg: { data: NOTIFICATION_PAYLOAD }) => void,
-  ) => {
-    const userid = socket.data.userData.id;
-    const key = `${msg.baseTime}|${msg.incrementTime}`;
-    const waitingPlayers = this.waitingplayers[key]?.filter((player) => player.data.id !== userid);
-
-    if (waitingPlayers?.length && userid) {
-      const compatiblePlayer = findBestMatch(waitingPlayers, socket.data.userData);
-
-      const match = await db.match.create({
-        data: {
-          whitePlayerId: userid,
-          blackPlayerId: compatiblePlayer.data.id,
-          baseTime: msg.baseTime,
-          incrementTime: msg.incrementTime,
-          stats: {
-            create: {},
-          },
-          users: {
-            connect: [{ id: userid }, { id: compatiblePlayer.data.id }],
-          },
-        },
-        include: {
-          moves: true,
-          stats: true,
-        },
-      });
-
-      // Create new match room
-      this.matchRooms[match.id] = new MatchRoom(match.whitePlayerId, match.blackPlayerId, new Chess(), this.io, { ...match, stats: match.stats! });
-
-      this.playerCallbacks[match.blackPlayerId]!({ data: { ...match, stats: match.stats! } });
-      ank({ data: { ...match, stats: match.stats! } });
-
-      this.waitingplayers[key] = waitingPlayers.filter((player) => player.data.id !== match.whitePlayerId && player.data.id !== match.blackPlayerId);
-    } else {
-      this.playerCallbacks[userid] = ank;
-      if (this.waitingplayers[key]) {
-        this.waitingplayers[key].push({ data: socket.data.userData, socketId: socket.id });
-      } else this.waitingplayers[key] = [{ data: socket.data.userData, socketId: socket.id }];
-    }
-  };
-}
-
-function findBestMatch(
-  waitingPlayers: {
-    data: UserDataType;
-    socketId: string;
-  }[],
-  currentPlayer: UserDataType,
-) {
-  return waitingPlayers.sort((a, b) => Math.abs(a.data.rating - currentPlayer.rating) - Math.abs(b.data.rating - currentPlayer.rating))[0]!;
 }

@@ -9,3 +9,5 @@ self.onmessage = (event: MessageEvent<TimerMessage>) => {
     self.postMessage(event.data.time);
   }, 100);
 };
+
+export {};

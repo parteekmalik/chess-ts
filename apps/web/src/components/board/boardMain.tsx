@@ -1,12 +1,6 @@
-import type { IPuzzleContextState } from "~/app/play/puzzle/_components/PuzzleReducer";
+import type { ChessMoveType } from "@acme/lib";
 
-export type ChessMoveType =
-  | string
-  | {
-      from: string;
-      to: string;
-      promotion?: string;
-    };
+import type { IPuzzleContextState } from "~/app/play/puzzle/_components/PuzzleReducer";
 
 export interface BoardProps {
   State: IPuzzleContextState;

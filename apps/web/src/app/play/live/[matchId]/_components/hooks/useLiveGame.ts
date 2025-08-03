@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Chess } from "chess.js";
 import moment from "moment";
 import toast from "react-hot-toast";
 
+import type { ChessMoveType } from "@acme/lib";
 import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import { calculateTimeLeft } from "@acme/lib";
 
-import type { ChessMoveType } from "~/components/board/boardMain";
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 import { useTRPC } from "~/trpc/react";
 
@@ -20,15 +20,18 @@ export const useLiveGame = () => {
 
   const { SocketEmiter, lastMessage, backendServerConnection } = useBackend();
 
-  const { data: match, isLoading } = useQuery(trpc.puzzle.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
+  const { data: match, isLoading } = useQuery(
+    trpc.liveGame.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }),
+  );
 
   useEffect(() => {
+    console.log(params);
     SocketEmiter("join_match", params.matchId, (responce: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {
       console.log("joined match -> ", responce);
       if (responce.data) console.info("joined match: ", responce.data.id);
       else router.push("/play/live");
     });
-  }, [params.matchId, SocketEmiter, backendServerConnection]);
+  }, [params.matchId, SocketEmiter, backendServerConnection, router]);
 
   useEffect(() => {
     if (lastMessage.type === "joined_match") {
@@ -41,9 +44,8 @@ export const useLiveGame = () => {
           startedAt: new Date(lastMessage.payload.startedAt),
           moves: lastMessage.payload.moves.map((move) => ({ ...move, timestamps: new Date(move.timestamps) })),
         };
-        console.log("match update -> ", lastMessage.payload);
 
-        queryClient.setQueryData(trpc.puzzle.getMatch.queryKey(params.matchId), payload);
+        queryClient.setQueryData(trpc.liveGame.getMatch.queryKey(params.matchId), payload);
       }
     }
   }, [lastMessage]);
@@ -58,12 +60,16 @@ export const useLiveGame = () => {
     return game;
   }, [match?.moves]);
 
+  const moveAPI = useMutation(trpc.liveGame.makeMove.mutationOptions());
   const handleMove = useCallback(
     (move: ChessMoveType) => {
       console.log("move in live board -> ", move, moment().format("HH:mm:ss"));
-      SocketEmiter("make_move_match", { move, matchId: params.matchId });
+      moveAPI.mutate({
+        move,
+        matchId: params.matchId as string,
+      });
     },
-    [params.matchId, SocketEmiter],
+    [params.matchId, moveAPI],
   );
 
   const playerTimes = useMemo(() => {

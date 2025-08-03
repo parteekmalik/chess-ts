@@ -1,14 +1,10 @@
-import type { Chess, Color } from "chess.js";
-import type { Socket, Server as SocketServer } from "socket.io";
-import moment from "moment";
-
-import type { Prisma } from "@acme/db";
-import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import type { MatchWinner } from "@acme/db";
 import { db } from "@acme/db";
-
+import { calculateTimeLeft } from "@acme/lib/live";
+import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
+import type { Socket, Server as SocketServer } from "socket.io";
 import type { UserDataType } from "./GameSocket";
 import { logger } from "./Logger";
-
 interface SocketWithContextType extends Socket {
   data: {
     userData: UserDataType;
@@ -16,37 +12,53 @@ interface SocketWithContextType extends Socket {
 }
 
 export class MatchRoom {
-  private players: Record<string, string>;
-
-  private game: Chess; // chess.js game instance
-
   private io: SocketServer;
+  private finishMatchTimeout?: NodeJS.Timeout;
+  private matchRooms: Record<string, MatchRoom>
+  public match?: NOTIFICATION_PAYLOAD;
+  public matchId: string;
 
-  public match: NOTIFICATION_PAYLOAD;
-
-  constructor(whitePlayer: string, blackPlayer: string, game: Chess, io: SocketServer, match: NOTIFICATION_PAYLOAD) {
-    this.players = {
-      w: whitePlayer,
-      b: blackPlayer,
-    };
-    this.game = game;
+  constructor(io: SocketServer, matchRooms: Record<string, MatchRoom>, matchId: string, match?: NOTIFICATION_PAYLOAD) {
     this.io = io;
+    this.matchId = matchId;
+    this.matchRooms = matchRooms;
     this.match = match;
+    this.addTimer();
+    this.refreshAndGetMatch().catch((error) => console.error("Error refreshing match:", error));
   }
 
-  public oppositeTurn(turn: Color): Color {
-    return turn === "w" ? "b" : "w";
+  private destroy() {
+    delete this.matchRooms[this.matchId];
   }
 
-  private isPlayersTurn(userId: string): boolean {
-    return this.players[this.game.turn()] === userId;
+  private addTimer() {
+    const data = this.calulateTimeToFinish();
+    if (!data) return;
+
+    const { reason, timeLeft, winner } = data;
+    this.finishMatchTimeout = setTimeout(() => {
+      db.matchResult.update({
+        where: {
+          id: this.match?.stats.id
+        },
+        data: {
+          winner,
+          reason
+        }
+      })
+        .then(async () => {
+          await this.emitMatchUpdate();
+          this.destroy()
+        })
+        .catch((err) => console.log(err))
+    }, timeLeft)
   }
 
-  private refreshMatch() {
-    db.match
+  private async refreshAndGetMatch() {
+    const match = await db.match
       .findUnique({
         where: {
-          id: this.match.id,
+          id: this.matchId,
         },
         include: {
           moves: true,
@@ -57,77 +69,33 @@ export class MatchRoom {
         if (data) {
           this.match = { ...data, stats: data.stats! };
         }
+        return this.match;
       })
-      .catch((error) => console.log(error));
+    return match;
   }
 
-  private async handleMove(socket: SocketWithContextType, move: string) {
-    try {
-      this.game.move(move);
-      const matchId = this.match.id;
-
-      this.match.moves.push({
-        matchId,
-        move,
-        timestamps: moment().toDate(),
-        id: "",
-      });
-
-      this.updateGameStatus();
-      this.io.to(matchId).emit("match_update", this.match);
-
-      await db.move.create({
-        data: {
-          move,
-          matchId,
-        },
-      });
-      this.refreshMatch();
-    } catch {
-      socket.emit("error", "Invalid move");
-    }
+  async emitMatchUpdate(match?: NOTIFICATION_PAYLOAD) {
+    if (!match) await this.refreshAndGetMatch();
+    else this.match = match;
+    this.io.to(this.match!.id).emit("match_update", this.match);
+    if (this.match?.stats.winner === "PLAYING") this.addTimer();
   }
 
-  private updateGameStatus() {
-    if (!this.game.isGameOver()) return;
-    const data = {
-      winner: this.game.isDraw() ? "DRAW" : this.oppositeTurn(this.game.turn()) === "w" ? "WHITE" : "BLACK",
-      reason: this.game.isDraw() ? "repetition" : "checkmate",
-    } satisfies Prisma.MatchResultUpdateArgs["data"];
-    db.matchResult
-      .update({
-        where: {
-          matchId: this.match.id,
-        },
-        data: {
-          winner: data.winner,
-          reason: data.reason,
-        },
-      })
-      .catch((error) => console.log(error))
-      .finally(() => this.refreshMatch());
-    this.match.stats = { ...this.match.stats, ...data };
+  private calulateTimeToFinish() {
+    if (!this.match) return null;
+    const times = calculateTimeLeft(
+      { baseTime: this.match.baseTime, incrementTime: this.match.incrementTime },
+      [this.match.startedAt].concat(this.match.moves.map((move) => move.timestamps)),
+    )
+    const turn = this.match.moves.length % 2 ? "b" : "w";
+    const winner: MatchWinner = turn === 'w' ? 'BLACK' : 'WHITE';
+    return { timeLeft: times[turn], winner, reason: 'timeout' };
   }
-
   public handleRoomMessage(socket: SocketWithContextType, type: string, payload: unknown) {
-    const authMap: Record<string, string> = {
-      match_update: "playerTurn",
-    };
-
-    const isPlayerTurn = this.isPlayersTurn(socket.data.userData.id);
-
-    if (!isPlayerTurn && authMap[type] === "playerTurn") {
-      socket.emit("dockt", { message: "Unauthorized access not your turn. type:" + type });
-    } else {
-      switch (type) {
-        case "match_update": {
-          if (isPlayerTurn) this.handleMove(socket, payload as string).catch((error) => logger.error("handleMove", error));
-          break;
-        }
-        case "default": {
-          logger.info("default", { type, payload });
-          break;
-        }
+    switch (type) {
+      case "default": {
+        logger.info("default", { type, payload });
+        break;
       }
     }
   }

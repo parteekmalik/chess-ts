@@ -44,11 +44,7 @@ export function Header() {
             <DrawerTrigger asChild>
               <div className={"font-chess text-2xl hover:cursor-pointer dark:text-white/70"}>t</div>
             </DrawerTrigger>
-            <DrawerContent
-              isDragLine={false}
-              className="left-0 top-0 m-0 w-fit translate-x-0 translate-y-0 rounded-r-[10px] rounded-t-none p-0"
-              autoFocus={false}
-            >
+            <DrawerContent isDragLine={false} className="left-0 top-0 m-0 w-fit translate-x-0 translate-y-0 rounded-r-[10px] rounded-t-none p-0">
               <VerticalHeader />
             </DrawerContent>
           </Drawer>
