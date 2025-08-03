@@ -15,8 +15,6 @@ export const env = createEnv({
     AUTH_URL: z.string().url(),
     BACKEND_WS: z.string().url(),
   },
-  experimental__runtimeEnv: {
-    BACKEND_WS: process.env.NEXT_PUBLIC_BACKEND_WS,
-  },
+  experimental__runtimeEnv: {},
   skipValidation: !!process.env.CI || process.env.npm_lifecycle_event === "lint",
 });
