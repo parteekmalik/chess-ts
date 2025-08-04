@@ -7,7 +7,8 @@ import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSo
 import { AUTHENTICATION } from "@acme/lib/WStypes/typeForFrontendToSocket";
 
 import { db } from "@acme/db";
-import type { ChessMoveType } from "@acme/lib/live";
+import { findMatch  } from "@acme/lib/live";
+import type {ChessMoveType} from "@acme/lib/live";
 import { env } from "~/env";
 import { MatchRoom } from "./gemeRoom";
 import { logger } from "./Logger";
@@ -137,6 +138,14 @@ export class GameSocket {
     socket.on("make_move", ({ move, matchId }: { matchId: string, move: ChessMoveType }) => {
       const matchRoom = this.matchRooms[matchId];
       matchRoom?.makeMove({ userId: socket.data.userData.id, matchId, move }).catch(() => logger.error("Error making move", { matchId }, "GameSocket"));
+    });
+    socket.on("find_match", async (data: { baseTime: number; incrementTime: number }) => {
+      try {
+        const match = await findMatch({ db, input: data, userId: socket.data.userData.id });
+        if (match) this.emitMatchCreated(match as NOTIFICATION_PAYLOAD);
+      } catch (error) {
+        logger.error("Error creating match", { error }, "GameSocket");
+      }
     });
   };
 

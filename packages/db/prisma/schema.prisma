@@ -93,7 +93,7 @@ model MatchResult {
   id        String      @id @default(cuid())
   winner    MatchWinner @default(PLAYING)
   reason    String      @default("")
-  timestamp DateTime    @updatedAt @default(now())
+  timestamp DateTime    @default(now()) @updatedAt
 
   match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
   matchId String @unique
@@ -107,9 +107,9 @@ enum MatchWinner {
 }
 
 model Move {
-  id         String   @id @default(cuid())
-  timestamps DateTime @default(now())
-  move       String
+  id        String   @id @default(cuid())
+  timestamp DateTime @default(now())
+  move      String
 
   matchId String
   match   Match  @relation(fields: [matchId], references: [id])

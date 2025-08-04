@@ -99,7 +99,7 @@ export class MatchRoom {
     if (!this.match) return null;
     const times = calculateTimeLeft(
       { baseTime: this.match.baseTime, incrementTime: this.match.incrementTime },
-      [this.match.startedAt].concat(this.match.moves.map((move) => move.timestamps)),
+      [this.match.startedAt].concat(this.match.moves.map((move) => move.timestamp)),
     )
     const turn = this.match.moves.length % 2 ? "b" : "w";
     const winner: MatchWinner = turn === 'w' ? 'BLACK' : 'WHITE';

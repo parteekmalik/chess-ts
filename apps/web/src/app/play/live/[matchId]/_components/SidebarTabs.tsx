@@ -6,7 +6,7 @@ import { Card, CardContent } from "@acme/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
 import { useTRPC } from "~/trpc/react";
-import MovesDisplay from "./MovesDisplay";
+import { MovesDisplay } from "./MovesDisplay";
 import NewMatch from "./NewMatch";
 
 function SidebarTabs() {

@@ -9,7 +9,7 @@ export function useFindMatch() {
   const trpc = useTRPC();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { addSocketListener } = useBackend();
+  const { addSocketListener, SocketEmiter } = useBackend();
   const redirectMatch = useCallback(
     () =>
       addSocketListener(
@@ -31,10 +31,18 @@ export function useFindMatch() {
       },
     }),
   );
+  const findMatchViaSocket = useCallback(
+    (baseTime: number, incrementTime: number) => {
+      SocketEmiter("find_match", { baseTime, incrementTime });
+      queryClient.setQueryData(trpc.liveGame.isWaitingForMatch.queryKey(), true);
+      redirectMatch();
+    },
+    [SocketEmiter, redirectMatch, queryClient, trpc.liveGame.isWaitingForMatch],
+  );
   const { data: isLoading } = useQuery(trpc.liveGame.isWaitingForMatch.queryOptions());
   useLayoutEffect(() => {
     if (isLoading) redirectMatch();
   }, [redirectMatch, isLoading]);
 
-  return { findMatchAPI, redirectMatch, isLoading };
+  return { findMatchAPI, redirectMatch, isLoading, findMatchViaSocket };
 }

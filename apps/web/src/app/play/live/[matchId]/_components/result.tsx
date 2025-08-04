@@ -14,7 +14,7 @@ function Result({ playerTurn, matchId }: { playerTurn: Color | null; matchId: st
   const { data: match } = useQuery(trpc.liveGame.getMatch.queryOptions(matchId));
 
   const { data: session } = useSession();
-  const { findMatchAPI, isLoading } = useFindMatch();
+  const { findMatchViaSocket, isLoading } = useFindMatch();
 
   const winnerId = match?.[match.stats?.winner === "BLACK" ? "blackPlayerId" : "whitePlayerId"];
 
@@ -45,11 +45,7 @@ function Result({ playerTurn, matchId }: { playerTurn: Color | null; matchId: st
             className="text-xl text-white"
             disabled={isLoading}
             onClick={() => {
-              if (match)
-                findMatchAPI.mutate({
-                  baseTime: match.baseTime,
-                  incrementTime: match.incrementTime,
-                });
+              if (match) findMatchViaSocket(match.baseTime * 60000, match.incrementTime * 1000);
             }}
           >
             Play Again

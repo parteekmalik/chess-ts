@@ -6,6 +6,7 @@ import moment from "moment";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
+import type { Move } from "@acme/db";
 import type { ChessMoveType } from "@acme/lib";
 import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
 import { calculateTimeLeft } from "@acme/lib";
@@ -42,7 +43,7 @@ export const useLiveGame = () => {
         const payload = {
           ...lastMessage.payload,
           startedAt: new Date(lastMessage.payload.startedAt),
-          moves: lastMessage.payload.moves.map((move) => ({ ...move, timestamps: new Date(move.timestamps) })),
+          moves: lastMessage.payload.moves.map((move) => ({ ...move, timestamp: new Date(move.timestamp) }) satisfies Move),
         };
 
         queryClient.setQueryData(trpc.liveGame.getMatch.queryKey(params.matchId), payload);
@@ -79,7 +80,7 @@ export const useLiveGame = () => {
     const timeData = match
       ? calculateTimeLeft(
           { baseTime: match.baseTime, incrementTime: match.incrementTime },
-          [match.startedAt].concat(match.moves.map((move) => move.timestamps)),
+          [match.startedAt].concat(match.moves.map((move) => move.timestamp)),
         )
       : { w: 0, b: 0 };
     return timeData;
@@ -87,7 +88,7 @@ export const useLiveGame = () => {
 
   const openResult = useMemo(
     () => match?.stats?.winner !== "PLAYING" && session && (session.user.id === match?.blackPlayerId || session.user.id === match?.whitePlayerId),
-    [match?.stats?.winner],
+    [match, session],
   );
 
   return { match, isLoading, gameState, playerTimes, handleMove, openResult, params };

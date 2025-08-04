@@ -15,10 +15,10 @@ function NewMatch() {
     name: string;
   }>({ baseTime: 10, incrementTime: 0, name: "Rapid" });
 
-  const { findMatchAPI, isLoading } = useFindMatch();
+  const { findMatchViaSocket, isLoading } = useFindMatch();
 
   const handleSubmit = () => {
-    findMatchAPI.mutate({ baseTime: selectedGameType.baseTime * 60000, incrementTime: selectedGameType.incrementTime * 1000 });
+    findMatchViaSocket(selectedGameType.baseTime * 60000, selectedGameType.incrementTime * 1000);
   };
 
   return (

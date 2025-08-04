@@ -52,6 +52,61 @@ export const MoveSchema = z.union([
 ]);
 export type ChessMoveType = z.infer<typeof MoveSchema>;
 
+export const findMatchSchema = z.object({
+  baseTime: z.number().min(1),
+  incrementTime: z.number().min(0),
+});
+
+export interface findMatchInput {
+  input: z.infer<typeof findMatchSchema>;
+  userId?: string;
+  db: PrismaClient;
+}
+
+export async function findMatch({ db, input, userId }: findMatchInput) {
+  const toFillSlot = await db.watingPlayer.findFirst({
+    where: {
+      NOT: {
+        id: userId,
+      },
+    },
+  });
+  const isWaiting = await db.watingPlayer.findFirst({ where: { userId } });
+  if (isWaiting || !userId) throw new Error("You are already waiting for a match or not logged in");
+  if (toFillSlot) {
+    const match = await db.match.create({
+      data: {
+        baseTime: input.baseTime,
+        incrementTime: input.incrementTime,
+        whitePlayerId: toFillSlot.userId,
+        blackPlayerId: userId,
+        startedAt: moment().toDate(),
+        stats: {
+          create: {},
+        },
+      },
+      include: {
+        moves: true,
+        stats: true,
+      },
+    });
+    await db.watingPlayer.delete({
+      where: {
+        id: toFillSlot.id,
+      },
+    });
+    return match;
+  } else if (userId) {
+    await db.watingPlayer.create({
+      data: {
+        baseTime: input.baseTime,
+        incrementTime: input.incrementTime,
+        userId,
+        expiry: moment().add(5, "minutes").toDate(),
+      },
+    });
+  }
+}
 export interface makeMoveInput {
   userId: string;
   matchId: string;
@@ -85,7 +140,7 @@ export async function makeMove(db: PrismaClient, input: makeMoveInput) {
   match.moves.push({
     matchId: input.matchId,
     move,
-    timestamps: moment().toDate(),
+    timestamp: moment().toDate(),
     id: "",
   });
 
