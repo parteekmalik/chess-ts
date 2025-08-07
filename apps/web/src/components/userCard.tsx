@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 
 import { cn } from "@acme/ui";
@@ -29,7 +28,8 @@ export function UserCard({ userId, minimal }: { userId?: string; minimal?: boole
       <Avatar>{imageSrc ? <AvatarImage src={imageSrc} alt={user.name!} /> : <AvatarFallback>{initials}</AvatarFallback>}</Avatar>
       <div>
         <p className="text-sm font-medium">{user?.name}</p>
-        <Link href={"#"}>{user?.email}</Link>
+        {/* TODO: Implement Pieces capured */}
+        <div className="invisible">1</div>
       </div>
     </div>
   );

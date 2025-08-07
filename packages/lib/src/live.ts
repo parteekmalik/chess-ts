@@ -20,6 +20,11 @@ export const gameTypes = {
     { baseTime: 15, incrementTime: 10 },
     { baseTime: 30, incrementTime: 0 },
   ],
+  daily: [
+    { baseTime: 1 * 24 * 60, incrementTime: 0 },
+    { baseTime: 3 * 24 * 60, incrementTime: 0 },
+    { baseTime: 7 * 24 * 60, incrementTime: 0 },
+  ],
 };
 
 // make sure to provie staring time on first moveTimes
@@ -62,8 +67,17 @@ export interface findMatchInput {
   userId?: string;
   db: PrismaClient;
 }
-
+async function expireWating(db: PrismaClient) {
+  await db.watingPlayer.deleteMany({
+    where: {
+      expiry: {
+        lt: new Date(),
+      },
+    },
+  });
+}
 export async function findMatch({ db, input, userId }: findMatchInput) {
+  await expireWating(db);
   const toFillSlot = await db.watingPlayer.findFirst({
     where: {
       NOT: {

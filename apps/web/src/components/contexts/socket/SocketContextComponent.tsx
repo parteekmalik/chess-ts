@@ -4,7 +4,7 @@ import React, { useContext } from "react";
 import useSocket from "./hook/useSocket";
 import SocketContext, { SocketContextProvider } from "./SocketContext";
 
-const SocketContextComponent: React.FunctionComponent<PropsWithChildren> = (props) => {
+export const SocketContextComponent: React.FunctionComponent<PropsWithChildren> = (props) => {
   const { children } = props;
   const { SocketEmiter, backendServerConnection, lastMessage, addSocketListener } = useSocket();
 
@@ -20,5 +20,3 @@ export const useBackend = () => {
   }
   return context;
 };
-
-export default SocketContextComponent;

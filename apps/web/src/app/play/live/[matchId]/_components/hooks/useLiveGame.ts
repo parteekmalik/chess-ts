@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Chess } from "chess.js";
 import moment from "moment";
@@ -14,8 +14,7 @@ import { calculateTimeLeft } from "@acme/lib";
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 import { useTRPC } from "~/trpc/react";
 
-export const useLiveGame = () => {
-  const params = useParams();
+export const useLiveGame = (matchId?: string) => {
   const trpc = useTRPC();
   const router = useRouter();
   const { data: session } = useSession();
@@ -23,30 +22,35 @@ export const useLiveGame = () => {
 
   const { SocketEmiter, lastMessage, backendServerConnection } = useBackend();
 
-  const { data: match, isLoading } = useQuery(
-    trpc.liveGame.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }),
-  );
+  const { data: match, isLoading } = useQuery(trpc.liveGame.getMatch.queryOptions(matchId!, { enabled: matchId !== undefined }));
+  const reload = () => {
+    if (matchId) queryClient.invalidateQueries({ queryKey: trpc.liveGame.getMatch.queryKey(matchId) }).catch((err) => console.log(err));
+  };
+  useEffect(() => {
+    if (matchId && !isLoading && !match) {
+      router.push("/404");
+    }
+  }, [router, match, isLoading, matchId]);
 
   useEffect(() => {
-    console.log(params);
-    SocketEmiter("join_match", params.matchId, (responce: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {
+    SocketEmiter("join_match", matchId, (responce: { data?: NOTIFICATION_PAYLOAD; error?: string }) => {
       if (responce.data) console.info("joined match: ", responce.data.id);
     });
-  }, [params.matchId, SocketEmiter, backendServerConnection, router]);
+  }, [matchId, SocketEmiter, backendServerConnection, router]);
 
   useEffect(() => {
     if (lastMessage.type === "joined_match") {
       const payload = lastMessage.payload as unknown as { id: string; count: number };
       toast.success(`user ${payload.id} joined match. Total count is ${payload.count} now`);
     } else if (lastMessage.type === "match_update") {
-      if (lastMessage.payload.id === params.matchId) {
+      if (lastMessage.payload.id === matchId) {
         const payload = {
           ...lastMessage.payload,
           startedAt: new Date(lastMessage.payload.startedAt),
           moves: lastMessage.payload.moves.map((move) => ({ ...move, timestamp: new Date(move.timestamp) }) satisfies Move),
         };
 
-        queryClient.setQueryData(trpc.liveGame.getMatch.queryKey(params.matchId), payload);
+        queryClient.setQueryData(trpc.liveGame.getMatch.queryKey(matchId), payload);
       }
     }
   }, [lastMessage]);
@@ -69,11 +73,11 @@ export const useLiveGame = () => {
       if (match.baseTime > 3600000)
         moveAPI.mutate({
           move,
-          matchId: params.matchId as string,
+          matchId: matchId!,
         });
-      else SocketEmiter("make_move", { move, matchId: params.matchId });
+      else SocketEmiter("make_move", { move, matchId: matchId });
     },
-    [params.matchId, moveAPI],
+    [matchId, moveAPI],
   );
 
   const playerTimes = useMemo(() => {
@@ -91,5 +95,5 @@ export const useLiveGame = () => {
     [match, session],
   );
 
-  return { match, isLoading, gameState, playerTimes, handleMove, openResult, params };
+  return { match, isLoading, gameState, playerTimes, handleMove, openResult, reload };
 };

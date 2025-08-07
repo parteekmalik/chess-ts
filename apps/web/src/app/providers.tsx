@@ -8,7 +8,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Toaster } from "react-hot-toast";
 import { Provider } from "react-redux";
 
-import SocketContextComponent from "~/components/contexts/socket/SocketContextComponent";
+import { SocketContextComponent } from "~/components/contexts/socket/SocketContextComponent";
 import Footer from "~/components/Footer";
 import { Header } from "~/components/Header/header";
 import { store } from "~/components/redux/store";

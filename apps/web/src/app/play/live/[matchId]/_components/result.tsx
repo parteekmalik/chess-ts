@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 
 import { Button } from "@acme/ui/button";
-import { Dialog, DialogContent, DialogHeader } from "@acme/ui/dialog"; // Adjust the import path as necessary
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@acme/ui/dialog"; // Adjust the import path as necessary
 
 import { useTRPC } from "~/trpc/react";
 import { useFindMatch } from "./hooks/useFindMatch";
@@ -20,9 +20,11 @@ function Result({ playerTurn, matchId }: { playerTurn: Color | null; matchId: st
 
   return (
     <Dialog defaultOpen>
-      <DialogContent className="min-h-[30rem] w-fit min-w-[20rem] dark:text-white">
+      <DialogContent classNames={{ overlay: "bg-transparent" }} className="min-h-[30rem] w-fit min-w-[20rem] dark:text-white">
         <DialogHeader>
-          <h1 className="text-xl font-semibold">Result</h1>
+          <DialogTitle>
+            <div className="text-xl font-semibold">Result</div>
+          </DialogTitle>
         </DialogHeader>
         <div className="mb-auto flex flex-col items-center gap-10 bg-background">
           <div className="relative flex flex-col items-center gap-5">
@@ -45,7 +47,7 @@ function Result({ playerTurn, matchId }: { playerTurn: Color | null; matchId: st
             className="text-xl text-white"
             disabled={isLoading}
             onClick={() => {
-              if (match) findMatchViaSocket(match.baseTime * 60000, match.incrementTime * 1000);
+              if (match) findMatchViaSocket(match.baseTime, match.incrementTime);
             }}
           >
             Play Again
