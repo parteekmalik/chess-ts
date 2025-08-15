@@ -53,3 +53,6 @@ dist/
 
 # turbo
 .turbo
+
+# rust
+target/

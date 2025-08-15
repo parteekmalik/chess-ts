@@ -1,0 +1,17 @@
+[package]
+name = "chess_solana"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "chess_solana"
+crate-type = ["cdylib"]
+path = "packages/solana/src/lib.rs"
+
+[dependencies]
+borsh = "1.5.7"
+borsh-derive = "1.5.7"
+solana-program = "3.0.0"
+
+[workspace.dependencies]
+base64ct = "=1.7.3"
