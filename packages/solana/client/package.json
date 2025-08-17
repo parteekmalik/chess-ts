@@ -4,6 +4,7 @@
   "description": "TypeScript client for Solana Movie CRUD program",
   "main": "movie-client.js",
   "scripts": {
+    "test": "jest --config ./jest.config.js",
     "build": "tsc",
     "start": "node movie-client.js",
     "dev": "ts-node movie-client.ts"
@@ -23,5 +24,10 @@
     "typescript"
   ],
   "author": "Your Name",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@solana-developers/helpers": "^2.8.1",
+    "@solana/web3.js": "^1.98.4",
+    "chess.js": "^1.4.0"
+  }
 }
