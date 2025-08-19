@@ -1,3 +1,4 @@
+import { getKeypairFromFile } from "@solana-developers/helpers";
 import { PublicKey } from "@solana/web3.js";
 
 export const CHESS_PROGRAM_ID = new PublicKey(
@@ -15,4 +16,10 @@ export function pubkeyToArray(pubkey: PublicKey): number[] {
 
 export function arrayToPubkey(arr: number[] | Uint8Array | Buffer): PublicKey {
   return new PublicKey(Buffer.from(arr));
+}
+
+export async function getKeyPairs() {
+  const white = await getKeypairFromFile('./white.json');
+  const black = await getKeypairFromFile('./black.json');
+  return { white, black }
 }

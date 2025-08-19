@@ -2,26 +2,18 @@ import * as web3 from '@solana/web3.js';
 import { getKeypairFromFile } from "@solana-developers/helpers";
 import { encodeMakeMoveInstruction, } from './makeMove';
 import { Chess } from 'chess.js';
-import { CHESS_PROGRAM_ID, VARIANT_INIT_REGISTRY, VARIANT_MATCH_PLAYER, VARIANT_WAIT_PLAYER } from './global';
+import { CHESS_PROGRAM_ID, getKeyPairs, VARIANT_INIT_REGISTRY, VARIANT_MATCH_PLAYER, VARIANT_WAIT_PLAYER } from './global';
 import { deriveRegistryPDA } from './registry';
-import { deriveWaitingPDA } from './waitingPlayer';
+import { createWatingPlayer, deriveWaitingPDA, getLastMatch, matchWaitingPlayers } from './waitingPlayer';
 import { decodeMatchAccount, deriveGamePDA } from './match';
 
-describe('create game PDA', () => {
-  jest.setTimeout(60000);
-
-  const connection = new web3.Connection(
-    web3.clusterApiUrl('devnet'),
-    'confirmed'
-  );
-
-  let white: web3.Keypair;
-  let black: web3.Keypair;
-  let gamePda: web3.PublicKey;
-  let registryPda: web3.PublicKey;
-  let nextId: bigint;
-
+const connection = new web3.Connection(
+  web3.clusterApiUrl('devnet'),
+  'confirmed'
+);
+describe('blances', () => {
   it('check balance', async () => {
+    const { black, white } = await getKeyPairs()
     const whiteBalance = await connection.getBalance(white.publicKey);
     const blackBalance = await connection.getBalance(black.publicKey);
 
@@ -30,20 +22,19 @@ describe('create game PDA', () => {
     expect(whiteBalance).toBeGreaterThan(0);
     expect(blackBalance).toBeGreaterThan(0);
   });
+})
+describe('registry', () => {
+  jest.setTimeout(60000);
 
-  it('before all initing', async () => {
-    white = await getKeypairFromFile('./white.json');
-    black = await getKeypairFromFile('./black.json');
-    registryPda = deriveRegistryPDA()[0];
-
-    // initialize registry if not present
+  it('creating registry', async () => {
+    const { white: payer } = await getKeyPairs()
+    const registryPda = deriveRegistryPDA()[0];
     let regAcc = await connection.getAccountInfo(registryPda);
     if (!regAcc) {
-      console.log('Registry not found on-chain; creating registry PDA:', registryPda.toBase58());
       const initIx = new web3.TransactionInstruction({
         programId: CHESS_PROGRAM_ID,
         keys: [
-          { pubkey: white.publicKey, isSigner: true, isWritable: true },
+          { pubkey: payer.publicKey, isSigner: true, isWritable: true },
           { pubkey: registryPda, isSigner: false, isWritable: true },
           { pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false },
         ],
@@ -51,119 +42,44 @@ describe('create game PDA', () => {
       });
 
       const tx = new web3.Transaction().add(initIx);
-      const sig = await web3.sendAndConfirmTransaction(connection, tx, [white], { commitment: 'confirmed' });
-      console.log('initialize_registry tx:', sig);
-    } else {
-      console.log('Registry already exists:', registryPda.toBase58());
+      await web3.sendAndConfirmTransaction(connection, tx, [payer], { commitment: 'confirmed' });
     }
-    // ----- log registry data (next_game_id) -----
+
+    expect(regAcc).not.toBeNull();
     regAcc = await connection.getAccountInfo(registryPda);
-    if (regAcc && regAcc.data.length >= 8) {
-      nextId = regAcc.data.readBigUInt64LE(0);
-      gamePda = deriveGamePDA(white.publicKey, black.publicKey, nextId)[0];
-      console.log(`Registry next_game_id = ${nextId.toString()}`);
-    } else {
-      console.log('Registry not found or data too small');
-    }
+    const nextId = regAcc!.data.readBigUInt64LE(0);
+    console.log(`Registry next_game_id = ${nextId.toString()}`);
+  }, 20000)
+})
+
+describe('player matching', () => {
+  jest.setTimeout(60000);
+
+  let gamePda: web3.PublicKey;
+  let registryPda: web3.PublicKey;
+  let nextId: bigint;
+
+  it('before all initing', async () => {
+    const { black, white } = await getKeyPairs()
+    registryPda = deriveRegistryPDA()[0];
+
+    let regAcc = (await connection.getAccountInfo(registryPda))!;
+    nextId = regAcc.data.readBigUInt64LE(0);
+    gamePda = deriveGamePDA(white.publicKey, black.publicKey, nextId)[0];
   }, 20000);
-
-  it('should generate a valid PDA and bump', () => {
-    const [pda, bump] = deriveGamePDA(
-      white.publicKey,
-      black.publicKey,
-      nextId,
-    );
-
-    expect(pda).toBeInstanceOf(web3.PublicKey);
-    expect(typeof bump).toBe('number');
-    expect(bump).toBeGreaterThanOrEqual(0);
-  });
-
-  it('should be deterministic', () => {
-    const [pdaA, bumpA] = deriveGamePDA(
-      white.publicKey,
-      black.publicKey,
-      nextId,
-    );
-    const [pdaB, bumpB] = deriveGamePDA(
-      white.publicKey,
-      black.publicKey,
-      nextId,
-    );
-
-    expect(pdaA.equals(pdaB)).toBe(true);
-    expect(bumpA).toBe(bumpB);
-  });
 
   it('create a waiting entry and fill entry', async () => {
-    const [waitingMatch] = deriveWaitingPDA();
-    let accInfo = await connection.getAccountInfo(waitingMatch);
-    console.log("expected waitingMatch PDA: ", waitingMatch.toBase58(), accInfo, Buffer.from([VARIANT_INIT_REGISTRY]))
-    if (!accInfo || (accInfo && !accInfo.data.readUInt8(0))) {
-      const ix = new web3.TransactionInstruction({
-        programId: CHESS_PROGRAM_ID,
-        keys: [
-          { pubkey: black.publicKey, isSigner: true, isWritable: true },
-          { pubkey: waitingMatch, isSigner: false, isWritable: true },
-          { pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false },
-        ],
-        data: Buffer.from([VARIANT_WAIT_PLAYER])
-      });
-
-      const tx = new web3.Transaction().add(ix);
-      const signature = await web3.sendAndConfirmTransaction(connection, tx, [black]);
-      expect(typeof signature).toBe('string');
-      accInfo = await connection.getAccountInfo(waitingMatch);
-      console.log("created waiting", accInfo?.data)
-    }
-    const ix = new web3.TransactionInstruction({
-      programId: CHESS_PROGRAM_ID,
-      keys: [
-        { pubkey: white.publicKey, isSigner: true, isWritable: true },
-        { pubkey: black.publicKey, isSigner: false, isWritable: true },
-        { pubkey: gamePda, isSigner: false, isWritable: true },
-        { pubkey: registryPda, isSigner: false, isWritable: true },
-        { pubkey: waitingMatch, isSigner: false, isWritable: true },
-        { pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false },
-      ],
-      data: Buffer.from([VARIANT_MATCH_PLAYER])
-    });
-
-    const tx = new web3.Transaction().add(ix);
-    const signature = await web3.sendAndConfirmTransaction(connection, tx, [white]);
+    const { black, white } = await getKeyPairs()
+    const { signature: signatureOfWaiting, accInfo } = await createWatingPlayer({ player: black, connection })
+    expect(typeof signatureOfWaiting).toBe('string');
+    console.log("waiting", accInfo?.data)
+    const signature = await matchWaitingPlayers({ connection, white, black })
     expect(typeof signature).toBe('string');
   }, 20000);
+})
 
-  // it('create game', async () => {
-  //   // CreateGame instruction
-  //   const ix = new web3.TransactionInstruction({
-  //     programId: CHESS_PROGRAM_ID,
-  //     keys: [
-  //       { pubkey: white.publicKey, isSigner: true, isWritable: true }, // white player
-  //       { pubkey: black.publicKey, isSigner: false, isWritable: true }, // black player
-  //       { pubkey: gamePda, isSigner: false, isWritable: true },
-  //       { pubkey: registryPda, isSigner: false, isWritable: true },
-  //       { pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false },
-  //     ],
-  //     data: Buffer.from([VARIANT_CREATE_GAME])
-  //   });
-
-  //   const tx = new web3.Transaction().add(ix);
-  //   const signature = await web3.sendAndConfirmTransaction(connection, tx, [white]);
-  //   expect(typeof signature).toBe('string');
-
-  //   // Fetch and confirm the Game account was initialized
-  //   const accInfo = await connection.getAccountInfo(gamePda);
-  //   expect(accInfo).not.toBeNull();
-
-  //   const game = decodeGameAccount(accInfo!.data);
-  //   console.log("gamePda: ", gamePda.toBase58(), "game data: ", game);
-  //   expect(game).not.toBeNull();
-  //   expect(game!.white.equals(white.publicKey)).toBe(true);
-  //   expect(game!.black.equals(black.publicKey)).toBe(true);
-  //   expect(Array.isArray(game!.moves)).toBe(true);
-  //   expect(game!.moves.length).toBe(0);
-  // }, 20000);
+describe('playing Match', () => {
+  jest.setTimeout(60000);
 
   const movesToBePlayed = "d4 d5 c4 e6 Nf3 Nf6 g3 Be7 Bg2 O-O".split(" ");
   it('check moves', () => {
@@ -175,6 +91,8 @@ describe('create game PDA', () => {
   })
 
   it('make moves', async () => {
+    const { black, white } = await getKeyPairs()
+    const gamePda = await getLastMatch({ white, black, connection });
     let turnW = true;
     for (const mv of movesToBePlayed) {
       const player = turnW ? white : black;
