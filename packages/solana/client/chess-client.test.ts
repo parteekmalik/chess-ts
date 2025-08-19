@@ -1,11 +1,11 @@
 import * as web3 from '@solana/web3.js';
 import { getKeypairFromFile } from "@solana-developers/helpers";
-import { decodeGameAccount, encodeMakeMoveInstruction, VARIANT_INIT_REGISTRY, VARIANT_MATCH_PLAYER, VARIANT_WAIT_PLAYER } from './chess-model';
+import { encodeMakeMoveInstruction, } from './makeMove';
 import { Chess } from 'chess.js';
-
-const CHESS_PROGRAM_ID = new web3.PublicKey(
-  '8NtB4KqaEWKbtA9F5t8PBSkYQLdeth8sHPUDQxER55dc'
-);
+import { CHESS_PROGRAM_ID, VARIANT_INIT_REGISTRY, VARIANT_MATCH_PLAYER, VARIANT_WAIT_PLAYER } from './global';
+import { deriveRegistryPDA } from './registry';
+import { deriveWaitingPDA } from './waitingPlayer';
+import { decodeMatchAccount, deriveGamePDA } from './match';
 
 describe('create game PDA', () => {
   jest.setTimeout(60000);
@@ -20,6 +20,16 @@ describe('create game PDA', () => {
   let gamePda: web3.PublicKey;
   let registryPda: web3.PublicKey;
   let nextId: bigint;
+
+  it('check balance', async () => {
+    const whiteBalance = await connection.getBalance(white.publicKey);
+    const blackBalance = await connection.getBalance(black.publicKey);
+
+    console.log(`White balance(${white.publicKey.toBase58()}):`, whiteBalance / web3.LAMPORTS_PER_SOL, `  |  Black balance(${black.publicKey.toBase58()}):`, blackBalance / web3.LAMPORTS_PER_SOL);
+
+    expect(whiteBalance).toBeGreaterThan(0);
+    expect(blackBalance).toBeGreaterThan(0);
+  });
 
   it('before all initing', async () => {
     white = await getKeypairFromFile('./white.json');
@@ -56,7 +66,6 @@ describe('create game PDA', () => {
       console.log('Registry not found or data too small');
     }
   }, 20000);
-
 
   it('should generate a valid PDA and bump', () => {
     const [pda, bump] = deriveGamePDA(
@@ -187,7 +196,7 @@ describe('create game PDA', () => {
       const accInfo = await connection.getAccountInfo(gamePda);
       expect(accInfo).not.toBeNull();
 
-      const game = decodeGameAccount(accInfo!.data);
+      const game = decodeMatchAccount(accInfo!.data);
       console.log(game);
       expect(game).not.toBeNull();
       expect(Array.isArray(game!.moves)).toBe(true);
@@ -196,35 +205,4 @@ describe('create game PDA', () => {
       turnW = !turnW;
     }
   }, 20000)
-
-  it('check balance', async () => {
-    const whiteBalance = await connection.getBalance(white.publicKey);
-    const blackBalance = await connection.getBalance(black.publicKey);
-
-    console.log(`White balance(${white.publicKey.toBase58()}):`, whiteBalance / web3.LAMPORTS_PER_SOL, `  |  Black balance(${black.publicKey.toBase58()}):`, blackBalance / web3.LAMPORTS_PER_SOL);
-
-    // you can also add assertions, for example:
-    // expect(whiteBalance).to.equal(0);
-    // expect(blackBalance).to.equal(0);
-  });
 });
-
-function deriveGamePDA(
-  white: web3.PublicKey,
-  black: web3.PublicKey,
-  id: bigint
-): [web3.PublicKey, number] {
-  const idBuf = Buffer.alloc(8);
-  idBuf.writeBigUInt64LE(id);
-  return web3.PublicKey.findProgramAddressSync(
-    [Buffer.from('clasic'), white.toBuffer(), black.toBuffer(), idBuf],
-    CHESS_PROGRAM_ID
-  );
-}
-// helper: derive registry PDA
-function deriveRegistryPDA(): [web3.PublicKey, number] {
-  return web3.PublicKey.findProgramAddressSync([Buffer.from('games_registry')], CHESS_PROGRAM_ID);
-}
-function deriveWaitingPDA(): [web3.PublicKey, number] {
-  return web3.PublicKey.findProgramAddressSync([Buffer.from('waiting_player')], CHESS_PROGRAM_ID);
-}
