@@ -8,15 +8,15 @@ use thiserror::Error;
 #[derive(Error, Debug)]
 pub enum ChessError {
     #[error("Unauthorized player")]
-    Unauthorized,         // code 0
+    Unauthorized, // code 0
     #[error("Not your turn")]
-    NotYourTurn,          // code 1
+    NotYourTurn, // code 1
     #[error("Move parse failed (invalid UCI)")]
-    MoveParseError,       // code 2
+    MoveParseError, // code 2
     #[error("Illegal move in current position")]
-    IllegalMove,          // code 3
+    IllegalMove, // code 3
     #[error("Account data too small")]
-    AccountDataTooSmall,  // code 4
+    AccountDataTooSmall, // code 4
 }
 
 impl From<ChessError> for ProgramError {

@@ -14,7 +14,9 @@ use solana_program::{
 
 use crate::{
     instruction::ChessInstruction,
-    processor::{initialize_registry, process_create_game, process_make_move},
+    processor::{
+        initialize_registry, process_make_move, process_match_player, process_wait_player,
+    },
 };
 
 entrypoint!(process_instruction);
@@ -27,17 +29,21 @@ pub fn process_instruction(
     let instruction = ChessInstruction::unpack(instruction_data)?;
 
     match instruction {
-        ChessInstruction::CreateGame => {
-            msg!("Instruction: CreateGame");
-            process_create_game(program_id, accounts)
+        ChessInstruction::CreateRegistry => {
+            msg!("Instruction: CreateRegistry");
+            initialize_registry(program_id, accounts)
+        }
+        ChessInstruction::CreateWaitingForMatch => {
+            msg!("Instruction: CreateWaitingForMatch");
+            process_wait_player(program_id, accounts)
+        }
+        ChessInstruction::MatchWaitingPlayer => {
+            msg!("Instruction: MatchWaitingPlayer");
+            process_match_player(program_id, accounts)
         }
         ChessInstruction::MakeMove { uci_move } => {
             msg!("Instruction: MakeMove {}", uci_move);
             process_make_move(program_id, accounts, uci_move)
-        }
-        ChessInstruction::CreateRegistry => {
-          msg!("Instruction: CreateRegistry");
-          initialize_registry(program_id, accounts)
         }
     }
 }

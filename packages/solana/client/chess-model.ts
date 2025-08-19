@@ -6,9 +6,10 @@ import { Buffer } from 'buffer';
 /**
  * Instruction variant tags
  */
-export const VARIANT_CREATE_GAME = 0;
-export const VARIANT_MAKE_MOVE = 1;
-export const VARIANT_INIT_REGISTRY = 2;
+export const VARIANT_INIT_REGISTRY = 0;
+export const VARIANT_WAIT_PLAYER = 1;
+export const VARIANT_MATCH_PLAYER = 2;
+export const VARIANT_MAKE_MOVE = 3;
 
 
 /**
@@ -65,6 +66,7 @@ export function decodeGameAccount(buffer?: Buffer | Uint8Array | null) {
       white: arrayToPubkey(decoded.white),
       black: arrayToPubkey(decoded.black),
       moves: decoded.moves as string[],
+      fen: decoded.fen as string,
     };
   } catch (err) {
     console.error('Failed to decode Game account:', err);

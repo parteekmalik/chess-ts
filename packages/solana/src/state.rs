@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
 use borsh::{BorshDeserialize, BorshSerialize};
-use chess::{Board, ChessMove, Game};
-use solana_program::pubkey::Pubkey;
+use chess::{Board, Game};
+use solana_program::{program_error::ProgramError, pubkey::Pubkey};
 #[derive(BorshSerialize, BorshDeserialize, Debug, Clone)]
 pub struct Match {
     pub id: u64,
@@ -13,11 +13,22 @@ pub struct Match {
 }
 
 impl Match {
+    pub fn serialize_updates_state(&self, data: &mut [u8]) {
+        let mut serialized = Vec::with_capacity(WaitingPlayer::space());
+        self.serialize(&mut serialized)
+            .map_err(|_| ProgramError::InvalidAccountData)
+            .unwrap();
+
+        data[..serialized.len()].copy_from_slice(&serialized);
+        for b in data[serialized.len()..].iter_mut() {
+            *b = 0;
+        }
+    }
     pub fn get_space_plus_one(&self) -> usize {
         let id = 8;
         let white = 32usize;
         let black = 32usize;
-        let fen = 4 + "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1".len();
+        let fen = 4 + self.fen.len();
         let max_move_len = 5usize; // e.g. "e7e8q"
         let moves_region = 4usize + (self.moves.len() + 1) * (4 + max_move_len);
         id + white + black + fen + moves_region
@@ -54,10 +65,52 @@ pub struct Registry {
 }
 
 impl Registry {
+    pub fn serialize_updates_state(&self, data: &mut [u8]) {
+        let mut serialized = Vec::with_capacity(WaitingPlayer::space());
+        self.serialize(&mut serialized)
+            .map_err(|_| ProgramError::InvalidAccountData)
+            .unwrap();
+
+        data[..serialized.len()].copy_from_slice(&serialized);
+        for b in data[serialized.len()..].iter_mut() {
+            *b = 0;
+        }
+    }
     pub fn space() -> usize {
         8
     }
+    pub fn get_pda(program_id: &Pubkey) -> (Pubkey, u8) {
+        Pubkey::find_program_address(&[Registry::seed()], program_id)
+    }
     pub fn seed() -> &'static [u8] {
         b"games_registry"
+    }
+}
+
+#[derive(BorshSerialize, BorshDeserialize, Debug, Clone)]
+pub struct WaitingPlayer {
+    pub player: Option<Pubkey>,
+}
+
+impl WaitingPlayer {
+    pub fn serialize_updates_state(&self, data: &mut [u8]) {
+        let mut serialized = Vec::with_capacity(WaitingPlayer::space());
+        self.serialize(&mut serialized)
+            .map_err(|_| ProgramError::InvalidAccountData)
+            .unwrap();
+
+        data[..serialized.len()].copy_from_slice(&serialized);
+        for b in data[serialized.len()..].iter_mut() {
+            *b = 0;
+        }
+    }
+    pub fn space() -> usize {
+        1 + 32usize
+    }
+    pub fn get_pda(program_id: &Pubkey) -> (Pubkey, u8) {
+        Pubkey::find_program_address(&[WaitingPlayer::seed()], program_id)
+    }
+    pub fn seed() -> &'static [u8] {
+        b"waiting_player"
     }
 }

@@ -1,6 +1,3 @@
-//! Instruction processor: handle CreateGame and MakeMove.
-//! Uses the `chess` crate for board & move validation (version 3.2.0).
-
 use borsh::BorshDeserialize;
 use borsh::BorshSerialize;
 use solana_program::program::invoke;
@@ -19,19 +16,25 @@ use solana_program::{
 use crate::error::ChessError;
 use crate::state::Match;
 use crate::state::Registry;
+use crate::state::WaitingPlayer;
 
 use chess::ChessMove;
 
 pub fn initialize_registry(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
     let acc_iter = &mut accounts.iter();
-    let registry_info = next_account_info(acc_iter)?;
     let payer_info = next_account_info(acc_iter)?;
+    let registry_info = next_account_info(acc_iter)?;
     let system_program_info = next_account_info(acc_iter)?;
 
     // verify PDA
     let (expected_registry, bump) = Pubkey::find_program_address(&[Registry::seed()], program_id);
+    // let (expected_registry, bump) = Registry::get_pda(program_id);
     if expected_registry != *registry_info.key {
-        msg!("Registry PDA mismatch");
+        msg!(
+            "Registry PDA mismatch {} {}",
+            registry_info.key.to_string(),
+            expected_registry.to_string()
+        );
         return Err(ProgramError::InvalidArgument);
     }
 
@@ -64,17 +67,135 @@ pub fn initialize_registry(program_id: &Pubkey, accounts: &[AccountInfo]) -> Pro
         &[seeds],
     )?;
 
-    // initialize next_game_id = 0
     let registry = Registry { next_game_id: 0 };
-    registry
-        .serialize(&mut *registry_info.try_borrow_mut_data()?)
-        .map_err(|_| ProgramError::InvalidAccountData)?;
+    registry.serialize_updates_state(&mut *registry_info.data.borrow_mut());
 
     msg!("Registry initialized at {}", registry_info.key);
     Ok(())
 }
+pub fn process_wait_player(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
+    let account_info_iter = &mut accounts.iter();
+    let player = next_account_info(account_info_iter)?;
+    let waiting_player_account = next_account_info(account_info_iter)?;
+    let system_program = next_account_info(account_info_iter)?;
+
+    if !player.is_signer {
+        msg!("Payer must sign the transaction");
+        return Err(ProgramError::MissingRequiredSignature);
+    }
+
+    // Verify PDA matches expected
+    let (expected_pda, bump_seed) = WaitingPlayer::get_pda(program_id);
+    if expected_pda != *waiting_player_account.key {
+        msg!(
+            "Error: PDA(waiting_player_account) does not match {} {}",
+            waiting_player_account.key.to_string(),
+            expected_pda.to_string(),
+        );
+        return Err(ProgramError::InvalidAccountData);
+    }
+
+    if waiting_player_account.owner != program_id && waiting_player_account.data_is_empty() {
+        msg!("Waiting account not initialized, creating PDA and writing player");
+
+        let create_ix = system_instruction::create_account(
+            player.key,
+            waiting_player_account.key,
+            Rent::get()?.minimum_balance(WaitingPlayer::space()),
+            WaitingPlayer::space() as u64,
+            program_id,
+        );
+
+        let pda_seeds: &[&[_]] = &[WaitingPlayer::seed(), &[bump_seed]];
+
+        invoke_signed(
+            &create_ix,
+            &[
+                player.clone(),
+                waiting_player_account.clone(),
+                system_program.clone(),
+            ],
+            &[pda_seeds],
+        )?;
+
+        msg!("Waiting player set (created PDA)");
+    }
+
+    let data_ref = waiting_player_account.data.borrow();
+    let data_all_zero = data_ref.iter().all(|&b| b == 0);
+    drop(data_ref); // release immutable borrow before mutable borrow later
+
+    let mut waiting_player: WaitingPlayer = if data_all_zero {
+        msg!("Account data is zeroed -> treat as player == None");
+        WaitingPlayer { player: None }
+    } else {
+        WaitingPlayer::try_from_slice(&waiting_player_account.data.borrow())
+            .map_err(|_| ProgramError::InvalidAccountData)?
+    };
+
+    if waiting_player.player.is_none() {
+        msg!("Updating waiting player in place.");
+
+        waiting_player.player = Some(*player.key);
+    } else {
+        msg!("A player is already waiting in PDA; cannot join");
+        return Err(ProgramError::AccountAlreadyInitialized);
+    }
+
+    waiting_player.serialize_updates_state(&mut *waiting_player_account.data.borrow_mut());
+
+    Ok(())
+}
+
+pub fn process_match_player(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
+    let account_info_iter = &mut accounts.iter();
+    let white = next_account_info(account_info_iter)?;
+    let black = next_account_info(account_info_iter)?;
+    let game_account = next_account_info(account_info_iter)?;
+    let registry_account = next_account_info(account_info_iter)?;
+    let waiting_for_match_account = next_account_info(account_info_iter)?;
+    let system_program = next_account_info(account_info_iter)?;
+
+    if !white.is_signer {
+        msg!("Payer must sign the transaction");
+        return Err(ProgramError::MissingRequiredSignature);
+    }
+
+    let (expected_pda, _bump_seed) = WaitingPlayer::get_pda(program_id);
+    if expected_pda != *waiting_for_match_account.key {
+        msg!(
+            "Error: PDA does not match {} {}",
+            waiting_for_match_account.key.to_string(),
+            expected_pda.to_string()
+        );
+        return Err(ProgramError::InvalidAccountData);
+    }
+
+    if waiting_for_match_account.lamports() == 0 {
+        msg!("There is no waiting player for a Match");
+        return Err(ProgramError::AccountAlreadyInitialized);
+    }
+
+    let _ = process_create_game(
+        program_id,
+        &[
+            white.clone(),
+            black.clone(),
+            game_account.clone(),
+            registry_account.clone(),
+            system_program.clone(),
+        ],
+    );
+
+    let waiting_player = WaitingPlayer { player: None };
+
+    waiting_player.serialize_updates_state(&mut *waiting_for_match_account.data.borrow_mut());
+
+    Ok(())
+}
 
 pub fn process_create_game(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
+    msg!("Instruction: CreateGame");
     let account_info_iter = &mut accounts.iter();
     let white = next_account_info(account_info_iter)?;
     let black = next_account_info(account_info_iter)?;
@@ -96,7 +217,6 @@ pub fn process_create_game(program_id: &Pubkey, accounts: &[AccountInfo]) -> Pro
 
     let id_bytes = current_id.to_le_bytes();
 
-    // Derive expected PDA
     let (expected_pda, bump_seed) = Pubkey::find_program_address(
         &[
             Match::seed(),
@@ -111,18 +231,15 @@ pub fn process_create_game(program_id: &Pubkey, accounts: &[AccountInfo]) -> Pro
         return Err(ProgramError::InvalidAccountData);
     }
 
-    // 3) Ensure account not already initialized
     if game_account.lamports() > 0 {
         msg!("Game account already exists");
         return Err(ProgramError::AccountAlreadyInitialized);
     }
 
-    // Compute size and rent
     let space = Match::space_with_zero_moves();
     let rent = Rent::get()?;
     let lamports_required = rent.minimum_balance(space);
 
-    // Create the account (via PDA) with CPI and PDA-derived signer
     let create_ix = system_instruction::create_account(
         white.key,
         game_account.key,
@@ -154,27 +271,7 @@ pub fn process_create_game(program_id: &Pubkey, accounts: &[AccountInfo]) -> Pro
         moves: Vec::new(),
     };
 
-    // Serialize into buffer that fits the space
-    let mut serialized = Vec::with_capacity(space);
-    clasic_match
-        .serialize(&mut serialized)
-        .map_err(|_| ProgramError::InvalidAccountData)?;
-
-    if serialized.len() > game_account.data_len() {
-        msg!(
-            "Serialized game size {} exceeds allocated space {}",
-            serialized.len(),
-            game_account.data_len()
-        );
-        return Err(ChessError::AccountDataTooSmall.into());
-    }
-
-    // Write data
-    let data = &mut *game_account.data.borrow_mut();
-    data[..serialized.len()].copy_from_slice(&serialized);
-    for b in data[serialized.len()..].iter_mut() {
-        *b = 0;
-    }
+    clasic_match.serialize_updates_state(&mut *game_account.data.borrow_mut());
 
     msg!(
         "Game account {} created (space={}, lamports={})",
@@ -185,10 +282,7 @@ pub fn process_create_game(program_id: &Pubkey, accounts: &[AccountInfo]) -> Pro
 
     // --- update registry struct ---
     registry.next_game_id += 1;
-    // serialize registry back into the account
-    registry
-        .serialize(&mut *registry_account.try_borrow_mut_data()?)
-        .map_err(|_| ProgramError::InvalidAccountData)?;
+    registry.serialize_updates_state(&mut *registry_account.data.borrow_mut());
 
     msg!("Registry next_game_id updated to {}", registry.next_game_id);
 
@@ -278,7 +372,7 @@ pub fn process_make_move(
 
         msg!("resized account");
     }
-    
+
     match_account.data.borrow_mut()[..new_size].copy_from_slice(&serialized);
 
     msg!("Move '{}' accepted and stored.", uci_trimmed);

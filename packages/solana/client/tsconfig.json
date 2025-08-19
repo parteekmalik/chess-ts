@@ -16,7 +16,7 @@
   },
   "include": [
     "*.ts"
-  ],
+, "recover.js"  ],
   "exclude": [
     "node_modules",
     "dist"
