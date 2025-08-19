@@ -2,7 +2,7 @@ import { getKeypairFromFile } from "@solana-developers/helpers";
 import { PublicKey } from "@solana/web3.js";
 
 export const CHESS_PROGRAM_ID = new PublicKey(
-  '8NtB4KqaEWKbtA9F5t8PBSkYQLdeth8sHPUDQxER55dc'
+  'ADVUk2XBTRC7zbCxiwiYrZupcuRnDXCgnRYxQfNaLWCe'
 );
 
 export const VARIANT_INIT_REGISTRY = 0;

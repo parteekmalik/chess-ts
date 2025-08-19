@@ -30,6 +30,24 @@ export async function createWatingPlayer(ctx: { player: Keypair, connection: Con
   }
 }
 
+export async function createWatingPlayerWithoutCheck(ctx: { player: Keypair, connection: Connection }) {
+  const { player, connection } = ctx;
+  const [waitingMatchPDA] = deriveWaitingPDA();
+  const ix = new TransactionInstruction({
+    programId: CHESS_PROGRAM_ID,
+    keys: [
+      { pubkey: player.publicKey, isSigner: true, isWritable: true },
+      { pubkey: waitingMatchPDA, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from([VARIANT_WAIT_PLAYER])
+  });
+
+  const tx = new Transaction().add(ix);
+  const signature = sendAndConfirmTransaction(connection, tx, [player]);
+  return signature;
+}
+
 export async function matchWaitingPlayers(ctx: { white: Keypair, black: Keypair, connection: Connection }) {
   const { black, white, connection } = ctx;
   const [waitingMatchPDA] = deriveWaitingPDA();
@@ -41,8 +59,27 @@ export async function matchWaitingPlayers(ctx: { white: Keypair, black: Keypair,
     programId: CHESS_PROGRAM_ID,
     keys: [
       { pubkey: white.publicKey, isSigner: true, isWritable: true },
-      { pubkey: black.publicKey, isSigner: false, isWritable: true },
       { pubkey: gamePda, isSigner: false, isWritable: true },
+      { pubkey: registryPda, isSigner: false, isWritable: true },
+      { pubkey: waitingMatchPDA, isSigner: false, isWritable: true },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    data: Buffer.from([VARIANT_MATCH_PLAYER])
+  });
+
+  const tx = new Transaction().add(ix);
+  const signature = await sendAndConfirmTransaction(connection, tx, [white]);
+  return signature;
+}
+
+export async function matchWaitingPlayersWithoutFullContext(ctx: { white: Keypair, connection: Connection }) {
+  const { white, connection } = ctx;
+  const [waitingMatchPDA] = deriveWaitingPDA();
+  const [registryPda] = deriveRegistryPDA();
+  const ix = new TransactionInstruction({
+    programId: CHESS_PROGRAM_ID,
+    keys: [
+      { pubkey: white.publicKey, isSigner: true, isWritable: true },
       { pubkey: registryPda, isSigner: false, isWritable: true },
       { pubkey: waitingMatchPDA, isSigner: false, isWritable: true },
       { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },

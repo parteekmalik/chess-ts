@@ -146,11 +146,9 @@ pub fn process_wait_player(program_id: &Pubkey, accounts: &[AccountInfo]) -> Pro
 
     Ok(())
 }
-
 pub fn process_match_player(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
     let account_info_iter = &mut accounts.iter();
     let white = next_account_info(account_info_iter)?;
-    let black = next_account_info(account_info_iter)?;
     let game_account = next_account_info(account_info_iter)?;
     let registry_account = next_account_info(account_info_iter)?;
     let waiting_for_match_account = next_account_info(account_info_iter)?;
@@ -176,34 +174,40 @@ pub fn process_match_player(program_id: &Pubkey, accounts: &[AccountInfo]) -> Pr
         return Err(ProgramError::AccountAlreadyInitialized);
     }
 
+    let mut waiting_player =
+        WaitingPlayer::try_from_slice(&waiting_for_match_account.data.borrow())
+            .map_err(|_| ProgramError::InvalidAccountData)?;
+
     let _ = process_create_game(
         program_id,
         &[
             white.clone(),
-            black.clone(),
             game_account.clone(),
             registry_account.clone(),
             system_program.clone(),
         ],
+        waiting_player
+            .player
+            .ok_or(ProgramError::InvalidAccountData)?,
     );
 
-    let waiting_player = WaitingPlayer { player: None };
-
+    waiting_player.player = None;
     waiting_player.serialize_updates_state(&mut *waiting_for_match_account.data.borrow_mut());
 
     Ok(())
 }
-
-pub fn process_create_game(program_id: &Pubkey, accounts: &[AccountInfo]) -> ProgramResult {
+pub fn process_create_game(
+    program_id: &Pubkey,
+    accounts: &[AccountInfo],
+    black_key: Pubkey,
+) -> ProgramResult {
     msg!("Instruction: CreateGame");
     let account_info_iter = &mut accounts.iter();
     let white = next_account_info(account_info_iter)?;
-    let black = next_account_info(account_info_iter)?;
     let game_account = next_account_info(account_info_iter)?;
     let registry_account = next_account_info(account_info_iter)?;
     let system_program = next_account_info(account_info_iter)?;
     let white_key = *white.key;
-    let black_key = *black.key;
 
     // Signer check
     if !white.is_signer {
@@ -220,8 +224,8 @@ pub fn process_create_game(program_id: &Pubkey, accounts: &[AccountInfo]) -> Pro
     let (expected_pda, bump_seed) = Pubkey::find_program_address(
         &[
             Match::seed(),
-            white.key.as_ref(),
-            black.key.as_ref(),
+            white_key.as_ref(),
+            black_key.as_ref(),
             &id_bytes,
         ],
         program_id,
@@ -250,8 +254,8 @@ pub fn process_create_game(program_id: &Pubkey, accounts: &[AccountInfo]) -> Pro
 
     let pda_seeds: &[&[_]] = &[
         Match::seed(),
-        white.key.as_ref(),
-        black.key.as_ref(),
+        white_key.as_ref(),
+        black_key.as_ref(),
         &id_bytes,
         &[bump_seed],
     ];
@@ -288,7 +292,6 @@ pub fn process_create_game(program_id: &Pubkey, accounts: &[AccountInfo]) -> Pro
 
     Ok(())
 }
-
 pub fn process_make_move(
     program_id: &Pubkey,
     accounts: &[AccountInfo],

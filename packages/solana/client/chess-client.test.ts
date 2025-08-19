@@ -4,7 +4,7 @@ import { encodeMakeMoveInstruction, } from './makeMove';
 import { Chess } from 'chess.js';
 import { CHESS_PROGRAM_ID, getKeyPairs, VARIANT_INIT_REGISTRY, VARIANT_MATCH_PLAYER, VARIANT_WAIT_PLAYER } from './global';
 import { deriveRegistryPDA } from './registry';
-import { createWatingPlayer, deriveWaitingPDA, getLastMatch, matchWaitingPlayers } from './waitingPlayer';
+import { createWatingPlayer, createWatingPlayerWithoutCheck, deriveWaitingPDA, getLastMatch, matchWaitingPlayers, matchWaitingPlayersWithoutFullContext } from './waitingPlayer';
 import { decodeMatchAccount, deriveGamePDA } from './match';
 
 const connection = new web3.Connection(
@@ -43,10 +43,10 @@ describe('registry', () => {
 
       const tx = new web3.Transaction().add(initIx);
       await web3.sendAndConfirmTransaction(connection, tx, [payer], { commitment: 'confirmed' });
+      regAcc = await connection.getAccountInfo(registryPda);
     }
-
+    
     expect(regAcc).not.toBeNull();
-    regAcc = await connection.getAccountInfo(registryPda);
     const nextId = regAcc!.data.readBigUInt64LE(0);
     console.log(`Registry next_game_id = ${nextId.toString()}`);
   }, 20000)
@@ -76,6 +76,25 @@ describe('player matching', () => {
     const signature = await matchWaitingPlayers({ connection, white, black })
     expect(typeof signature).toBe('string');
   }, 20000);
+
+  // it('create a waiting entry and fill entry without full context', async () => {
+  //   const { black, white } = await getKeyPairs()
+  //   const { signature: signatureOfWaiting, accInfo } = await createWatingPlayer({ player: black, connection })
+  //   expect(typeof signatureOfWaiting).toBe('string');
+  //   console.log("waiting", accInfo?.data)
+  //   const signature = await matchWaitingPlayersWithoutFullContext({ connection, white })
+  //   expect(typeof signature).toBe('string');
+  // }, 20000);
+
+  // it('multiple requests', async () => {
+  //   const { black, white } = await getKeyPairs()
+  //   let signatres = [createWatingPlayerWithoutCheck({ player: white, connection }), createWatingPlayerWithoutCheck({ player: black, connection })]
+
+  //   for (const signatre of signatres) {
+  //     console.log("signatre", await signatre);
+  //     expect(typeof signatre).toBe('string');
+  //   }
+  // }, 20000)
 })
 
 describe('playing Match', () => {
