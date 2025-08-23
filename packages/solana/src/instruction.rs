@@ -1,12 +1,16 @@
+use crate::{
+    game_match::{GameMatchCreatePayload, MakeMovePayload},
+    profile::ProfilePayload,
+};
 use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::program_error::ProgramError;
 
-/// Program instruction enum (Borsh)
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub enum ChessInstruction {
     CreateRegistry,
-    CreateWaitingForMatch,
-    MatchWaitingPlayer,
+    CreateProfile { payload: ProfilePayload },
+    CreateGameMatch { payload: GameMatchCreatePayload },
+    JoinGameMatch,
     MakeMove { uci_move: String },
 }
 
@@ -22,17 +26,17 @@ impl ChessInstruction {
 
         match variant {
             0 => Ok(ChessInstruction::CreateRegistry),
-            1 => Ok(ChessInstruction::CreateWaitingForMatch),
-            2 => Ok(ChessInstruction::MatchWaitingPlayer),
-            3 => {
-                // payload struct for MakeMove
-                #[derive(BorshDeserialize)]
-                struct MakeMovePayload {
-                    uci_move: String,
-                }
-
-                let payload = MakeMovePayload::try_from_slice(rest)
-                    .map_err(|_| ProgramError::InvalidInstructionData)?;
+            1 => {
+                let payload = ProfilePayload::load(rest)?;
+                Ok(ChessInstruction::CreateProfile { payload })
+            }
+            2 => {
+                let payload = GameMatchCreatePayload::load(rest)?;
+                Ok(ChessInstruction::CreateGameMatch { payload })
+            }
+            3 => Ok(ChessInstruction::JoinGameMatch),
+            4 => {
+                let payload = MakeMovePayload::load(rest)?;
                 Ok(ChessInstruction::MakeMove {
                     uci_move: payload.uci_move,
                 })

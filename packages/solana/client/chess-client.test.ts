@@ -1,16 +1,11 @@
 import * as web3 from '@solana/web3.js';
-import { getKeypairFromFile } from "@solana-developers/helpers";
-import { encodeMakeMoveInstruction, } from './makeMove';
 import { Chess } from 'chess.js';
-import { CHESS_PROGRAM_ID, getKeyPairs, VARIANT_INIT_REGISTRY, VARIANT_MATCH_PLAYER, VARIANT_WAIT_PLAYER } from './global';
-import { deriveRegistryPDA } from './registry';
-import { createWatingPlayer, createWatingPlayerWithoutCheck, deriveWaitingPDA, getLastMatch, matchWaitingPlayers, matchWaitingPlayersWithoutFullContext } from './waitingPlayer';
-import { decodeMatchAccount, deriveGamePDA } from './match';
+import { CHESS_PROGRAM_ID, connection, getKeyPairs } from './global';
+import { encodeMakeMoveInstruction, } from './makeMove';
+import { ProfileClass } from './profile';
+import { RegistryClass } from './registry';
+import { ChessMatchClass } from './gameMatch';
 
-const connection = new web3.Connection(
-  web3.clusterApiUrl('devnet'),
-  'confirmed'
-);
 describe('blances', () => {
   it('check balance', async () => {
     const { black, white } = await getKeyPairs()
@@ -23,82 +18,59 @@ describe('blances', () => {
     expect(blackBalance).toBeGreaterThan(0);
   });
 })
-describe('registry', () => {
-  jest.setTimeout(60000);
-
-  it('creating registry', async () => {
-    const { white: payer } = await getKeyPairs()
-    const registryPda = deriveRegistryPDA()[0];
-    let regAcc = await connection.getAccountInfo(registryPda);
-    if (!regAcc) {
-      const initIx = new web3.TransactionInstruction({
-        programId: CHESS_PROGRAM_ID,
-        keys: [
-          { pubkey: payer.publicKey, isSigner: true, isWritable: true },
-          { pubkey: registryPda, isSigner: false, isWritable: true },
-          { pubkey: web3.SystemProgram.programId, isSigner: false, isWritable: false },
-        ],
-        data: Buffer.from([VARIANT_INIT_REGISTRY]),
-      });
-
-      const tx = new web3.Transaction().add(initIx);
-      await web3.sendAndConfirmTransaction(connection, tx, [payer], { commitment: 'confirmed' });
-      regAcc = await connection.getAccountInfo(registryPda);
-    }
-    
-    expect(regAcc).not.toBeNull();
-    const nextId = regAcc!.data.readBigUInt64LE(0);
-    console.log(`Registry next_game_id = ${nextId.toString()}`);
-  }, 20000)
-})
-
-describe('player matching', () => {
-  jest.setTimeout(60000);
-
-  let gamePda: web3.PublicKey;
-  let registryPda: web3.PublicKey;
-  let nextId: bigint;
-
-  it('before all initing', async () => {
-    const { black, white } = await getKeyPairs()
-    registryPda = deriveRegistryPDA()[0];
-
-    let regAcc = (await connection.getAccountInfo(registryPda))!;
-    nextId = regAcc.data.readBigUInt64LE(0);
-    gamePda = deriveGamePDA(white.publicKey, black.publicKey, nextId)[0];
-  }, 20000);
-
-  it('create a waiting entry and fill entry', async () => {
-    const { black, white } = await getKeyPairs()
-    const { signature: signatureOfWaiting, accInfo } = await createWatingPlayer({ player: black, connection })
-    expect(typeof signatureOfWaiting).toBe('string');
-    console.log("waiting", accInfo?.data)
-    const signature = await matchWaitingPlayers({ connection, white, black })
-    expect(typeof signature).toBe('string');
-  }, 20000);
-
-  // it('create a waiting entry and fill entry without full context', async () => {
-  //   const { black, white } = await getKeyPairs()
-  //   const { signature: signatureOfWaiting, accInfo } = await createWatingPlayer({ player: black, connection })
-  //   expect(typeof signatureOfWaiting).toBe('string');
-  //   console.log("waiting", accInfo?.data)
-  //   const signature = await matchWaitingPlayersWithoutFullContext({ connection, white })
-  //   expect(typeof signature).toBe('string');
-  // }, 20000);
-
-  // it('multiple requests', async () => {
-  //   const { black, white } = await getKeyPairs()
-  //   let signatres = [createWatingPlayerWithoutCheck({ player: white, connection }), createWatingPlayerWithoutCheck({ player: black, connection })]
-
-  //   for (const signatre of signatres) {
-  //     console.log("signatre", await signatre);
-  //     expect(typeof signatre).toBe('string');
-  //   }
-  // }, 20000)
-})
 
 describe('playing Match', () => {
-  jest.setTimeout(60000);
+  jest.setTimeout(360000);
+  const registry = new RegistryClass();
+  it('creating registry', async () => {
+    await registry.init();
+    console.log("registryPda: ", RegistryClass.derivePDA(), registry.data);
+
+    expect(registry.data).not.toBeNull();
+    console.log(`Registry data: `, registry.data);
+  }, 20000)
+
+  it('creating profile white', async () => {
+    const { white } = await getKeyPairs()
+    const profile = new ProfileClass(white);
+    await profile.init();
+
+    expect(profile.data).not.toBeNull();
+
+    console.log(`profile id: `, ProfileClass.derivePDA(white.publicKey));
+    console.log(`profile data: `, profile.data);
+  }, 20000)
+
+  it('creating profile black', async () => {
+    const { black } = await getKeyPairs()
+    const profile = new ProfileClass(black);
+    await profile.init();
+
+    expect(profile.data).not.toBeNull();
+    console.log(`profile id: `, ProfileClass.derivePDA(black.publicKey));
+    console.log(`profile data: `, profile.data);
+  }, 20000)
+
+  it('create a match entry and fill entry', async () => {
+    const { black, white } = await getKeyPairs()
+    const { signature: signatureOfCreate, chessMatch } = await ChessMatchClass.createChessMatch(black, 60000, 1);
+    expect(typeof signatureOfCreate).toBe('string');
+    console.log("waiting", chessMatch.match);
+    const { signature } = await chessMatch.joinChessMatch(white)
+    console.log("joined", chessMatch.match);
+    expect(typeof signature).toBe('string');
+    expect(chessMatch.match.white).not.toBeNull();
+    expect(chessMatch.match.black).not.toBeNull();
+  }, 40000);
+
+  it('check match fetching', async () => {
+    const lastMatch = await ChessMatchClass.getLastMatch()
+    expect(lastMatch).not.toBeNull();
+
+    const matches = await ChessMatchClass.getAllMatches();
+    expect(Array.isArray(matches)).toBe(true);
+    expect(matches.length).toBeGreaterThan(0);
+  }, 20000)
 
   const movesToBePlayed = "d4 d5 c4 e6 Nf3 Nf6 g3 Be7 Bg2 O-O".split(" ");
   it('check moves', () => {
@@ -111,7 +83,7 @@ describe('playing Match', () => {
 
   it('make moves', async () => {
     const { black, white } = await getKeyPairs()
-    const gamePda = await getLastMatch({ white, black, connection });
+    const gamePda = await ChessMatchClass.getLastMatch();
     let turnW = true;
     for (const mv of movesToBePlayed) {
       const player = turnW ? white : black;
@@ -133,10 +105,10 @@ describe('playing Match', () => {
       const accInfo = await connection.getAccountInfo(gamePda);
       expect(accInfo).not.toBeNull();
 
-      const game = decodeMatchAccount(accInfo!.data);
+      const game = new ChessMatchClass(accInfo!.data);
       console.log(game);
       expect(game).not.toBeNull();
-      expect(Array.isArray(game!.moves)).toBe(true);
+      expect(Array.isArray(game.match.moves)).toBe(true);
       // expect(game!.moves.length).toBe(0);
 
       turnW = !turnW;

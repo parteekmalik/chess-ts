@@ -28,6 +28,7 @@
   "dependencies": {
     "@solana-developers/helpers": "^2.8.1",
     "@solana/web3.js": "^1.98.4",
+    "borsh": "^2.0.0",
     "chess.js": "^1.4.0"
   }
 }

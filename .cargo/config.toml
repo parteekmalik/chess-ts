@@ -1,4 +1,0 @@
-
-[alias]
-# override build inside this project to run the SBF builder
-sbf-build = "build-sbf --sbf-out-dir=packages/solana/dist"
