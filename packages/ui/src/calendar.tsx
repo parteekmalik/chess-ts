@@ -46,10 +46,10 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         ...classNames,
       }}
       components={{
-        IconLeft: ({ className, ...props }: { className?: string; style?: React.CSSProperties }) => (
+        PreviousMonthButton: ({ className, ...props }: { className?: string; style?: React.CSSProperties }) => (
           <ChevronLeftIcon className={cn("h-4 w-4", className)} {...props} />
         ),
-        IconRight: ({ className, ...props }: { className?: string; style?: React.CSSProperties }) => (
+        NextMonthButton: ({ className, ...props }: { className?: string; style?: React.CSSProperties }) => (
           <ChevronRightIcon className={cn("h-4 w-4", className)} {...props} />
         ),
       }}
