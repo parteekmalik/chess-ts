@@ -1,20 +1,16 @@
 {
-  "name": "movie-crud-client",
+  "name": "just-testing",
   "version": "1.0.0",
   "description": "TypeScript client for Solana Movie CRUD program",
-  "main": "movie-client.js",
   "scripts": {
-    "test": "jest --config ./jest.config.js",
-    "build": "tsc",
-    "start": "node movie-client.js",
-    "dev": "ts-node movie-client.ts"
+    "test": "jest --config ./jest.config.js"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "@types/node": "^20.10.0",
+    "@types/node": "^22.13.11",
     "jest": "^30.0.5",
     "ts-jest": "^29.4.1",
-    "ts-node": "^10.9.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.0"
   },
   "keywords": [
