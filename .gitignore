@@ -57,3 +57,5 @@ dist/
 # rust
 target/
 .nx
+black.json
+white.json

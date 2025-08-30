@@ -3,5 +3,20 @@
     {
       "mode": "auto"
     }
-  ]
+  ],
+  // Tell Rust Analyzer which Cargo.toml belongs to your Anchor program(s)
+  "rust-analyzer.linkedProjects": [
+    "apps/web3/anchor/programs/web3/Cargo.toml"
+  ],
+
+  // Optional: run cargo check only on save (helps performance)
+  "rust-analyzer.checkOnSave.command": "clippy",
+
+  // Optional: specify Solana’s BPF target (not always needed)
+  // "rust-analyzer.cargo.target": "bpfel-unknown-unknown",
+
+  // Better Rust formatting
+  "editor.formatOnSave": true,
+  "rust-analyzer.inlayHints.enable": true,
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
