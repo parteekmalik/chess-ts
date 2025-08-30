@@ -4,9 +4,9 @@ import React from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 
-import { BoardWithTime } from "./_components/BoardWithTime";
-import { useLiveGame } from "./_components/hooks/useLiveGame";
-import Result from "./_components/result";
+import { BoardWithTime } from "~/components/LiveMatch/BoardWithTime";
+import { useLiveGame } from "~/components/LiveMatch/hooks/useLiveGame";
+import Result from "~/components/LiveMatch/result";
 
 const LiveBoard: React.FunctionComponent = () => {
   const params = useParams();

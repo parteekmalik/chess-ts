@@ -1,6 +1,6 @@
 import type { ChessMoveType } from "@acme/lib";
 
-import type { IPuzzleContextState } from "~/app/play/puzzle/_components/PuzzleReducer";
+import type { IPuzzleContextState } from "~/components/Puzzle/PuzzleReducer";
 
 export interface BoardProps {
   State: IPuzzleContextState;

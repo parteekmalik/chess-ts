@@ -11,7 +11,7 @@ import { Dialog, DialogContent } from "@acme/ui/dialog";
 
 import { ChessBoardWrapper } from "~/components/board/board";
 import { BoardProvider } from "~/components/contexts/Board/BoardContextComponent";
-import usePuzzle from "./_components/usePuzzle";
+import usePuzzle from "~/components/Puzzle/usePuzzle";
 
 function Puzzle() {
   const { PuzzleDispatch, PuzzleState, reset } = usePuzzle();
