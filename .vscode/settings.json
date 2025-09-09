@@ -11,6 +11,7 @@
   ],
 
   // Optional: run cargo check only on save (helps performance)
+  "rust-analyzer.checkOnSave": true,
   "rust-analyzer.checkOnSave.command": "clippy",
 
   // Optional: specify Solana’s BPF target (not always needed)
