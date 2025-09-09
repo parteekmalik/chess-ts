@@ -22,9 +22,9 @@ import {
   type ParsedJoinChessMatchInstruction,
   type ParsedMakeMoveInstruction,
 } from '../instructions';
+import { Web3IDL } from '../../../../web3-exports';
 
-export const WEB3_PROGRAM_ADDRESS =
-  'hvD9qm7aUZmbosN7pyYHKNAgthyWU8x1ybxPJoNv3LU' as Address<'hvD9qm7aUZmbosN7pyYHKNAgthyWU8x1ybxPJoNv3LU'>;
+export const WEB3_PROGRAM_ADDRESS = Web3IDL.address as Address;
 
 export enum Web3Account {
   ChessMatch,
@@ -174,23 +174,23 @@ export type ParsedWeb3Instruction<
   TProgram extends string = 'EiJx3QZ1UUgvKJvp9Vt67LqztCmK3bNu9tw6yibQfAtf',
 > =
   | ({
-      instructionType: Web3Instruction.CleanProfile;
-    } & ParsedCleanProfileInstruction<TProgram>)
+    instructionType: Web3Instruction.CleanProfile;
+  } & ParsedCleanProfileInstruction<TProgram>)
   | ({
-      instructionType: Web3Instruction.CloseChessMatch;
-    } & ParsedCloseChessMatchInstruction<TProgram>)
+    instructionType: Web3Instruction.CloseChessMatch;
+  } & ParsedCloseChessMatchInstruction<TProgram>)
   | ({
-      instructionType: Web3Instruction.CreateChessMatch;
-    } & ParsedCreateChessMatchInstruction<TProgram>)
+    instructionType: Web3Instruction.CreateChessMatch;
+  } & ParsedCreateChessMatchInstruction<TProgram>)
   | ({
-      instructionType: Web3Instruction.InitializeProfile;
-    } & ParsedInitializeProfileInstruction<TProgram>)
+    instructionType: Web3Instruction.InitializeProfile;
+  } & ParsedInitializeProfileInstruction<TProgram>)
   | ({
-      instructionType: Web3Instruction.InitializeRegistry;
-    } & ParsedInitializeRegistryInstruction<TProgram>)
+    instructionType: Web3Instruction.InitializeRegistry;
+  } & ParsedInitializeRegistryInstruction<TProgram>)
   | ({
-      instructionType: Web3Instruction.JoinChessMatch;
-    } & ParsedJoinChessMatchInstruction<TProgram>)
+    instructionType: Web3Instruction.JoinChessMatch;
+  } & ParsedJoinChessMatchInstruction<TProgram>)
   | ({
-      instructionType: Web3Instruction.MakeMove;
-    } & ParsedMakeMoveInstruction<TProgram>);
+    instructionType: Web3Instruction.MakeMove;
+  } & ParsedMakeMoveInstruction<TProgram>);

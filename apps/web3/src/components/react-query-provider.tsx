@@ -2,12 +2,14 @@
 'use client'
 
 import { isServer, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60 * 1000,
+        staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh for 5 minutes
+        gcTime: 0, // 0 minutes - keep in cache for 0 minutes its not supposed to be cheched
       },
     },
   })
@@ -27,5 +29,10 @@ function getQueryClient() {
 export function ReactQueryProvider({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient()
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  )
 }

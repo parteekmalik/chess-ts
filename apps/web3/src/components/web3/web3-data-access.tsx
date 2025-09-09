@@ -1,17 +1,21 @@
 import {
-  Web3Account,
-  getCloseInstruction,
-  getWeb3ProgramAccounts,
+  getRegistryAccount,
+  getProfileAccounts,
+  getChessMatchAccounts,
   getWeb3ProgramId,
-  getDecrementInstruction,
-  getIncrementInstruction,
-  getInitializeInstruction,
-  getSetInstruction,
+  getCreateChessMatchInstructionAsync,
+  getJoinChessMatchInstructionAsync,
+  getInitializeRegistryInstructionAsync,
+  getInitializeProfileInstructionAsync,
+  getMakeMoveInstructionAsync,
+  fetchChessMatch,
+  fetchProfile,
+  getProfileByWallet,
 } from '@project/anchor'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { generateKeyPairSigner } from 'gill'
+import { Address } from 'gill'
 import { useWalletUi } from '@wallet-ui/react'
 import { useWalletTransactionSignAndSend } from '../solana/use-wallet-transaction-sign-and-send'
 import { useClusterVersion } from '@/components/cluster/use-cluster-version'
@@ -22,14 +26,14 @@ import { install as installEd25519 } from '@solana/webcrypto-ed25519-polyfill'
 // polyfill ed25519 for browsers (to allow `generateKeyPairSigner` to work)
 installEd25519()
 
-export function useWeb3ProgramId() {
+export function useProgramId() {
   const { cluster } = useWalletUi()
   return useMemo(() => getWeb3ProgramId(cluster.id), [cluster])
 }
 
-export function useWeb3Program() {
+export function useProgram() {
   const { client, cluster } = useWalletUi()
-  const programId = useWeb3ProgramId()
+  const programId = useProgramId()
   const query = useClusterVersion()
 
   return useQuery({
@@ -39,7 +43,7 @@ export function useWeb3Program() {
   })
 }
 
-export function useWeb3InitializeMutation() {
+export function useInitializeRegistryMutation() {
   const { cluster } = useWalletUi()
   const queryClient = useQueryClient()
   const signer = useWalletUiSigner()
@@ -47,88 +51,135 @@ export function useWeb3InitializeMutation() {
 
   return useMutation({
     mutationFn: async () => {
-      const web3 = await generateKeyPairSigner()
-      return await signAndSend(getInitializeInstruction({ payer: signer, web3 }), signer)
+      return await signAndSend(await getInitializeRegistryInstructionAsync({ payer: signer }), signer)
     },
     onSuccess: async (tx) => {
       toastTx(tx)
-      await queryClient.invalidateQueries({ queryKey: ['web3', 'accounts', { cluster }] })
+      await queryClient.invalidateQueries({ queryKey: ['web3', 'accounts', 'registry', { cluster }] })
     },
     onError: () => toast.error('Failed to run program'),
   })
 }
 
-export function useWeb3DecrementMutation({ web3 }: { web3: Web3Account }) {
-  const invalidateAccounts = useWeb3AccountsInvalidate()
+export function useInitializeProfileMutation() {
+  const { cluster } = useWalletUi()
+  const queryClient = useQueryClient()
   const signer = useWalletUiSigner()
   const signAndSend = useWalletTransactionSignAndSend()
 
   return useMutation({
-    mutationFn: async () => await signAndSend(getDecrementInstruction({ web3: web3.address }), signer),
+    mutationFn: async (name: string) => {
+      return await signAndSend(await getInitializeProfileInstructionAsync({ payer: signer, name }), signer)
+    },
     onSuccess: async (tx) => {
       toastTx(tx)
-      await invalidateAccounts()
+      await queryClient.invalidateQueries({ queryKey: ['web3', 'accounts', 'profile', { cluster }] })
+    },
+    onError: () => toast.error('Failed to run program'),
+  })
+}
+
+export function useCreateChessMatchMutation() {
+  const invalidateAll = useInvalidateAll()
+  const signer = useWalletUiSigner()
+  const signAndSend = useWalletTransactionSignAndSend()
+
+  return useMutation({
+    mutationFn: async ({ baseTimeSeconds, incrementSeconds }: { baseTimeSeconds: number, incrementSeconds: number }) => {
+      const randomSafeMath = (): number => {
+        return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+      }
+
+      const matchId = randomSafeMath()
+      return await signAndSend(await getCreateChessMatchInstructionAsync({ payer: signer, baseTimeSeconds, incrementSeconds, matchId }), signer)
+    },
+    onSuccess: async (tx) => {
+      toastTx(tx)
+      await invalidateAll()
     },
   })
 }
 
-export function useWeb3IncrementMutation({ web3 }: { web3: Web3Account }) {
-  const invalidateAccounts = useWeb3AccountsInvalidate()
+export function useJoinChessMatchMutation() {
+  const invalidateAll = useInvalidateAll()
   const signAndSend = useWalletTransactionSignAndSend()
   const signer = useWalletUiSigner()
 
   return useMutation({
-    mutationFn: async () => await signAndSend(getIncrementInstruction({ web3: web3.address }), signer),
-    onSuccess: async (tx) => {
-      toastTx(tx)
-      await invalidateAccounts()
-    },
-  })
-}
-
-export function useWeb3SetMutation({ web3 }: { web3: Web3Account }) {
-  const invalidateAccounts = useWeb3AccountsInvalidate()
-  const signAndSend = useWalletTransactionSignAndSend()
-  const signer = useWalletUiSigner()
-
-  return useMutation({
-    mutationFn: async (value: number) =>
+    mutationFn: async ({ chessMatch }: { chessMatch: Address }) =>
       await signAndSend(
-        getSetInstruction({
-          web3: web3.address,
-          value,
+        await getJoinChessMatchInstructionAsync({
+          payer: signer,
+          chessMatch,
         }),
         signer,
       ),
     onSuccess: async (tx) => {
       toastTx(tx)
-      await invalidateAccounts()
+      await invalidateAll()
     },
   })
 }
 
-export function useWeb3CloseMutation({ web3 }: { web3: Web3Account }) {
-  const invalidateAccounts = useWeb3AccountsInvalidate()
+export function useMakeMoveMutation() {
+  const invalidateAll = useInvalidateAll()
   const signAndSend = useWalletTransactionSignAndSend()
   const signer = useWalletUiSigner()
+  const { client } = useWalletUi()
 
   return useMutation({
-    mutationFn: async () => {
-      return await signAndSend(getCloseInstruction({ payer: signer, web3: web3.address }), signer)
+    mutationFn: async ({ chessMatch, moveFenStr }: { chessMatch: Address, moveFenStr: string }) => {
+      const match = await fetchChessMatch(client.rpc, chessMatch)
+
+      // Get the opponent profile - check if black or white is the opponent
+      let opponentProfile: Address | undefined
+      if (match.data.black.__option === "Some") {
+        opponentProfile = match.data.black.value
+      } else if (match.data.white.__option === "Some") {
+        opponentProfile = match.data.white.value
+      }
+
+      if (!opponentProfile) {
+        throw new Error("No opponent found in chess match")
+      }
+
+      return await signAndSend(await getMakeMoveInstructionAsync({
+        chessMatch,
+        moveFenStr,
+        opponentProfile,
+        payer: signer,
+      }), signer)
     },
     onSuccess: async (tx) => {
       toastTx(tx)
-      await invalidateAccounts()
+      await invalidateAll()
     },
   })
 }
 
-export function useWeb3AccountsQuery() {
-  const { client } = useWalletUi()
+// Single invalidate function for all queries
+export function useInvalidateAll() {
+  const queryClient = useQueryClient()
+  const { cluster } = useWalletUi()
+  return () => queryClient.invalidateQueries({ queryKey: ['web3', { cluster }] })
+}
 
+// Generic function to create queries
+function CreateQuery<T>(
+  queryKey: string,
+  queryFn: () => Promise<T>
+) {
   return useQuery({
-    queryKey: useWeb3AccountsQueryKey(),
-    queryFn: async () => await getWeb3ProgramAccounts(client.rpc),
+    queryKey: ['web3', queryKey],
+    queryFn: async () => {
+      try {
+        const result = await queryFn()
+        console.log('result of query: ', queryKey, result)
+        return result
+      } catch (error) {
+        console.error(`[React Query] Query failed for ${queryKey}:`, error)
+      }
+    },
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     gcTime: 0,
@@ -137,15 +188,50 @@ export function useWeb3AccountsQuery() {
   })
 }
 
-function useWeb3AccountsInvalidate() {
-  const queryClient = useQueryClient()
-  const queryKey = useWeb3AccountsQueryKey()
-
-  return () => queryClient.invalidateQueries({ queryKey })
+// React hooks for fetching data
+export function useRegistryQuery() {
+  const { client } = useWalletUi()
+  return CreateQuery('registry', () => getRegistryAccount(client.rpc))
 }
 
-function useWeb3AccountsQueryKey() {
-  const { cluster } = useWalletUi()
+export function useProfilesQuery() {
+  const { client } = useWalletUi()
+  return CreateQuery('profile', () => getProfileAccounts(client.rpc))
+}
 
-  return ['web3', 'accounts', { cluster }]
+export function useChessMatchesQuery() {
+  const { client } = useWalletUi()
+  return CreateQuery('chessMatch', () => getChessMatchAccounts(client.rpc))
+}
+
+export function useProfileByAddressQuery(address: Address) {
+  const { client } = useWalletUi()
+  return CreateQuery(`profile-${address}`, () => fetchProfile(client.rpc, address))
+}
+
+export function useChessMatchByAddressQuery(address: Address) {
+  const { client } = useWalletUi()
+  return CreateQuery(`chessMatch-${address}`, () => fetchChessMatch(client.rpc, address))
+}
+
+export function useConnectedWalletProfileQuery() {
+  const { client, account } = useWalletUi()
+  return CreateQuery('connected-wallet-profile', () => {
+    if (!account) {
+      throw new Error('No wallet connected')
+    }
+    return getProfileByWallet(client.rpc, account.address as Address)
+  })
+}
+
+// Fetcher object with typed methods (for backward compatibility)
+export const fetcher = {
+  // Fetch all accounts of each type
+  registry: useRegistryQuery,
+  profiles: useProfilesQuery,
+  chessMatches: useChessMatchesQuery,
+
+  // Fetch specific accounts by address
+  profileByAddress: useProfileByAddressQuery,
+  chessMatchByAddress: useChessMatchByAddressQuery,
 }

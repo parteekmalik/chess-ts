@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-web3 = "hvD9qm7aUZmbosN7pyYHKNAgthyWU8x1ybxPJoNv3LU"
+web3 = "ESRLQpbUEEBfgnnsBmkffVsuow2e24L56xXM3WEF9XwL"
 
 [registry]
 url = "https://api.apr.dev"

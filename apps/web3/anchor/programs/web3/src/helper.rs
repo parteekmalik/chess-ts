@@ -49,7 +49,8 @@ pub fn time_before_game_ends(
 
 #[test]
 fn test_calculate_time_left() {
-    let moves = vec![
+    // Test with two moves
+    let mut moves = vec![
         MoveRecord {
             ts: 1010,
             san: "e4".to_string(),
@@ -62,4 +63,17 @@ fn test_calculate_time_left() {
     let (white_time_left, black_time_left) = calculate_time_left(1000, 1, &moves, 1000);
     assert_eq!(white_time_left, 991);
     assert_eq!(black_time_left, 981);
+
+    moves = vec![MoveRecord {
+        ts: 1010,
+        san: "e4".to_string(),
+    }];
+    let (white_time_left, black_time_left) = calculate_time_left(1000, 0, &moves, 1000);
+    assert_eq!(white_time_left, 990);
+    assert_eq!(black_time_left, 1000);
+
+    moves = vec![];
+    let (white_time_left, black_time_left) = calculate_time_left(1000, 0, &moves, 1000);
+    assert_eq!(white_time_left, 1000);
+    assert_eq!(black_time_left, 1000);
 }
