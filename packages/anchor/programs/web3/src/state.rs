@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{cmp, str::FromStr};
 
 use crate::{error::*, helper::time_before_game_ends};
 use anchor_lang::prelude::*;
@@ -46,6 +46,7 @@ pub struct ChessMatch {
 
     pub result: MatchResult,
 
+    pub abandonment_at: Option<i64>,
     pub ends_at: Option<i64>,
     pub created_at: i64,
     pub matched_at: Option<i64>,
@@ -103,6 +104,7 @@ impl ChessMatch {
             &self.moves,
             self.created_at,
         ));
+        self.abandonment_at = Some(self.created_at + cmp::max(120,self.base_time_seconds as i64 / 10));
     }
 
     pub fn verify_turn(&self, profile: Pubkey) -> Result<()> {
@@ -126,9 +128,9 @@ impl ChessMatch {
     }
     pub fn check_abandonment(&mut self) -> bool {
         if self.moves.is_empty()
-            && self.matched_at.is_some()
+            && self.status == MatchStatus::Active
             && Clock::get().unwrap().unix_timestamp
-                > self.matched_at.unwrap() + self.base_time_seconds as i64 / 10
+                > self.abandonment_at.unwrap()
         {
             self.status = MatchStatus::Finished;
             self.finished_at = Some(Clock::get().unwrap().unix_timestamp);

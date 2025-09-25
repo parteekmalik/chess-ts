@@ -55,7 +55,9 @@ dist/
 .turbo
 
 # rust
-target/
+.anchor
+target
+!/packages/**/web3.json
 .nx
 black.json
 white.json

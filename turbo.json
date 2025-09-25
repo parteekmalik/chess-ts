@@ -3,45 +3,77 @@
   "ui": "tui",
   "tasks": {
     "topo": {
-      "dependsOn": ["^topo"]
+      "dependsOn": [
+        "^topo"
+      ]
     },
     "@acme/db#migrate": {
       "cache": false,
-      "inputs": ["./schema.prisma", "./migrations/**/*.sql"]
+      "inputs": [
+        "./schema.prisma",
+        "./migrations/**/*.sql"
+      ]
     },
     "@acme/web#build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "next-env.d.ts"
+      ]
     },
     "@acme/web#dev": {
       "persistent": true
     },
     "@acme/backend#build": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "@acme/backend#dev": {
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".cache/tsbuildinfo.json", "dist/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".cache/tsbuildinfo.json",
+        "dist/**"
+      ]
     },
     "dev": {
-      "dependsOn": ["^dev"],
+      "dependsOn": [
+        "^dev"
+      ],
       "cache": false,
       "persistent": false
     },
     "format": {
-      "outputs": [".cache/.prettiercache"],
+      "outputs": [
+        ".cache/.prettiercache"
+      ],
       "outputLogs": "new-only"
     },
     "lint": {
-      "dependsOn": ["^topo", "^build"],
-      "outputs": [".cache/.eslintcache"]
+      "dependsOn": [
+        "^topo",
+        "^build"
+      ],
+      "outputs": [
+        ".cache/.eslintcache"
+      ]
     },
     "typecheck": {
-      "dependsOn": ["^topo", "^build"],
-      "outputs": [".cache/tsbuildinfo.json"]
+      "dependsOn": [
+        "^topo",
+        "^build"
+      ],
+      "outputs": [
+        ".cache/tsbuildinfo.json"
+      ]
     },
     "clean": {
       "cache": false
@@ -62,7 +94,9 @@
       "interactive": true
     }
   },
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "globalEnv": [
     "AUTH_URL",
     "AUTH_DISCORD_ID",
@@ -77,7 +111,10 @@
     "BACKEND_WS",
     "NEXT_PUBLIC_BACKEND_WS",
     "PORT",
-    "NEXT_PUBLIC_LOGGER_LEVEL"
+    "NEXT_PUBLIC_LOGGER_LEVEL",
+    "CHESS_PROGRAM_ID",
+    "WHITE_PLAYER_KEYPAIR",
+    "BLACK_PLAYER_KEYPAIR"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",

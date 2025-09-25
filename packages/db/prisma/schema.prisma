@@ -54,6 +54,7 @@ model User {
   rating       Int            @default(1200)
   matches      Match[]
   WatingPlayer WatingPlayer[]
+  solanaWallet SolanaWallet?
 }
 
 model VerificationToken {
@@ -113,4 +114,14 @@ model Move {
 
   matchId String
   match   Match  @relation(fields: [matchId], references: [id])
+}
+
+model SolanaWallet {
+  publicKey  String @id
+  privateKey String
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([publicKey])
 }

@@ -14,6 +14,7 @@ import {
 import { toast } from 'sonner'
 import { toastTx } from '@/components/toast-tx'
 import { useWalletUiSigner } from '@/components/solana/use-wallet-ui-signer'
+import { useInvalidateAll } from '../web3/web3-data-access'
 
 function useGetBalanceQueryKey({ address }: { address: Address }) {
   const { cluster } = useWalletUi()
@@ -88,8 +89,7 @@ export function useGetTokenAccountsQuery({ address }: { address: Address }) {
 export function useTransferSolMutation({ address }: { address: Address }) {
   const { client } = useWalletUi()
   const signer = useWalletUiSigner()
-  const invalidateBalanceQuery = useInvalidateGetBalanceQuery({ address })
-  const invalidateSignaturesQuery = useInvalidateGetSignaturesQuery({ address })
+  const invalidateAll = useInvalidateAll()
 
   return useMutation({
     mutationFn: async (input: { destination: Address; amount: number }) => {
@@ -98,7 +98,7 @@ export function useTransferSolMutation({ address }: { address: Address }) {
 
         const transaction = createTransaction({
           feePayer: signer,
-          version: 0,
+          version: 'legacy',
           latestBlockhash,
           instructions: [
             getTransferSolInstruction({
@@ -122,7 +122,8 @@ export function useTransferSolMutation({ address }: { address: Address }) {
     },
     onSuccess: async (tx) => {
       toastTx(tx)
-      await Promise.all([invalidateBalanceQuery(), invalidateSignaturesQuery()])
+      // Invalidate all queries at once
+      await invalidateAll()
     },
     onError: (error) => {
       toast.error(`Transaction failed! ${error}`)
@@ -132,8 +133,7 @@ export function useTransferSolMutation({ address }: { address: Address }) {
 
 export function useRequestAirdropMutation({ address }: { address: Address }) {
   const { client } = useWalletUi()
-  const invalidateBalanceQuery = useInvalidateGetBalanceQuery({ address })
-  const invalidateSignaturesQuery = useInvalidateGetSignaturesQuery({ address })
+  const invalidateAll = useInvalidateAll()
   const airdrop = airdropFactory(client)
 
   return useMutation({
@@ -145,7 +145,8 @@ export function useRequestAirdropMutation({ address }: { address: Address }) {
       }),
     onSuccess: async (tx) => {
       toastTx(tx)
-      await Promise.all([invalidateBalanceQuery(), invalidateSignaturesQuery()])
+      // Invalidate all queries at once
+      await invalidateAll()
     },
   })
 }

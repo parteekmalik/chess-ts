@@ -196,69 +196,6 @@ describe('web3', () => {
     }
     expect(chessMatch.data.moves.length).toEqual(movesToBePlayed.length)
   }, 120000)
-
-  // it('Increment Web3 Again', async () => {
-  //   // ARRANGE
-  //   expect.assertions(1)
-  //   const ix = getIncrementInstruction({ web3: web3.address })
-
-  //   // ACT
-  //   await sendAndConfirm({ ix, payer })
-
-  //   // ASSERT
-  //   const currentCount = await fetchWeb3(rpc, web3.address)
-  //   expect(currentCount.data.count).toEqual(2)
-  // })
-
-  // it('Decrement Web3', async () => {
-  //   // ARRANGE
-  //   expect.assertions(1)
-  //   const ix = getDecrementInstruction({
-  //     web3: web3.address,
-  //   })
-
-  //   // ACT
-  //   await sendAndConfirm({ ix, payer })
-
-  //   // ASSERT
-  //   const currentCount = await fetchWeb3(rpc, web3.address)
-  //   expect(currentCount.data.count).toEqual(1)
-  // })
-
-  // it('Set web3 value', async () => {
-  //   // ARRANGE
-  //   expect.assertions(1)
-  //   const ix = getSetInstruction({ web3: web3.address, value: 42 })
-
-  //   // ACT
-  //   await sendAndConfirm({ ix, payer })
-
-  //   // ASSERT
-  //   const currentCount = await fetchWeb3(rpc, web3.address)
-  //   expect(currentCount.data.count).toEqual(42)
-  // })
-
-  // it('Set close the web3 account', async () => {
-  //   // ARRANGE
-  //   expect.assertions(1)
-  //   const ix = getCloseInstruction({
-  //     payer: payer,
-  //     web3: web3.address,
-  //   })
-
-  //   // ACT
-  //   await sendAndConfirm({ ix, payer })
-
-  //   // ASSERT
-  //   try {
-  //     await fetchWeb3(rpc, web3.address)
-  //   } catch (e) {
-  //     if (!isSolanaError(e)) {
-  //       throw new Error(`Unexpected error: ${e}`)
-  //     }
-  //     expect(e.message).toEqual(`Account not found at address: ${web3.address}`)
-  //   }
-  // })
 })
 
 // Helper function to keep the tests DRY

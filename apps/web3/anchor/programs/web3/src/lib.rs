@@ -1,4 +1,4 @@
-#![allow(clippy::result_large_err)]
+// #![allow(clippy::result_large_err)]
 #![allow(unexpected_cfgs)]
 
 use anchor_lang::prelude::*;
@@ -8,7 +8,7 @@ pub mod error;
 use crate::error::*;
 pub mod helper;
 
-declare_id!("ESRLQpbUEEBfgnnsBmkffVsuow2e24L56xXM3WEF9XwL");
+declare_id!("5BkBHgkeRwiX4RP5XaPeaJF7njmYhsHBgS8djaXi8o8d");
 
 #[program]
 pub mod web3 {
@@ -96,13 +96,13 @@ pub mod web3 {
         if chess_match.status != MatchStatus::Active {
             return Err(ChessError::MatchNotActiveOrFinished.into());
         }
+        chess_match.verify_turn(ctx.accounts.player_profile.key())?;
         if chess_match.check_abandonment() {
             return Err(ChessError::MatchAbandoned.into());
         }
         if chess_match.is_game_ended_by_time() {
             return Err(ChessError::MatchTimeOut.into());
         }
-        chess_match.verify_turn(ctx.accounts.player_profile.key())?;
         chess_match.make_move(move_fen_str)?;
         Ok(())
     }

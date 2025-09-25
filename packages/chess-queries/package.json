@@ -7,7 +7,8 @@
     ".": "./src/index.ts",
     "./hooks/*": "./src/hooks/*",
     "./queries/*": "./src/queries/*",
-    "./mutations/*": "./src/mutations/*"
+    "./mutations/*": "./src/mutations/*",
+    "./utils/*": "./src/utils/*"
   },
   "license": "MIT",
   "scripts": {
@@ -16,24 +17,32 @@
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "lint": "eslint",
-    "format": "prettier --check . --ignore-path ../../.gitignore"
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@acme/anchor": "workspace:*",
+    "@acme/lib": "workspace:*",
+    "@t3-oss/env-nextjs": "^0.12.0",
     "@tanstack/react-query": "catalog:",
     "@wallet-ui/react": "1.1.1",
-    "gill": "0.10.2"
+    "chess.js": "^1.4.0",
+    "gill": "0.10.2",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
     "@acme/prettier-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
+    "@types/jest": "^30.0.0",
     "eslint": "catalog:",
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
     "prettier": "catalog:",
+    "ts-jest": "^29.4.1",
     "typescript": "catalog:"
-  },
-  "peerDependencies": {
-    "react": "catalog:react19"
   },
   "prettier": "@acme/prettier-config"
 }

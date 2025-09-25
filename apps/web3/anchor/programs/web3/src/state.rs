@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{cmp, i64::MIN, str::FromStr};
 
 use crate::{error::*, helper::time_before_game_ends};
 use anchor_lang::prelude::*;
@@ -126,9 +126,9 @@ impl ChessMatch {
     }
     pub fn check_abandonment(&mut self) -> bool {
         if self.moves.is_empty()
-            && self.matched_at.is_some()
+            && self.status == MatchStatus::Active
             && Clock::get().unwrap().unix_timestamp
-                > self.matched_at.unwrap() + self.base_time_seconds as i64 / 10
+                > self.created_at + cmp::max(60,self.base_time_seconds as i64 / 10)
         {
             self.status = MatchStatus::Finished;
             self.finished_at = Some(Clock::get().unwrap().unix_timestamp);

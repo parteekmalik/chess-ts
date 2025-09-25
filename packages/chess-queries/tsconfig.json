@@ -1,6 +1,6 @@
 {
   "extends": "@acme/tsconfig/internal-package.json",
   "compilerOptions": {},
-  "include": ["*.ts", "src"],
+  "include": ["*.ts", "src", "tests", "env.ts"],
   "exclude": ["node_modules"]
 }

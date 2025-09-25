@@ -1,16 +1,7 @@
-// Main exports for @acme/chess-queries package
-
-// Export all hooks
-export * from "./hooks";
-
-// Export all queries
-export * from "./queries";
-
-// Export all mutations
-export * from "./mutations";
-
-// Export types
-export * from "./types";
-
-// Export utilities
+// Utils exports
 export * from "./utils";
+
+// Account-specific exports
+export * from "./registry";
+export * from "./profile";
+export * from "./match";

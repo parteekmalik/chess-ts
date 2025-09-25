@@ -16,7 +16,6 @@ export function RequiredPdas() {
   const { account } = useWalletUi()
   const registryQuery = useRegistryQuery()
   const profileQuery = useConnectedWalletProfileQuery()
-  const [profileName, setProfileName] = useState('')
 
   const needsRegistry = registryQuery.data === null
   const needsProfile = profileQuery.data === null
@@ -48,7 +47,7 @@ export function RequiredPdas() {
       <CardContent className="space-y-4">
         <div className="flex flex-col gap-4">
           {needsRegistry && <InitializeRegistryButton />}
-          {needsProfile && <InitializeProfileButton profileName={profileName} setProfileName={setProfileName} />}
+          {needsProfile && <InitializeProfileButton />}
         </div>
       </CardContent>
     </Card>
@@ -79,13 +78,9 @@ function InitializeRegistryButton() {
   )
 }
 
-function InitializeProfileButton({
-  profileName,
-  setProfileName
-}: {
-  profileName: string
-  setProfileName: (name: string) => void
-}) {
+function InitializeProfileButton() {
+  const [profileName, setProfileName] = useState('')
+
   const mutation = useInitializeProfileMutation()
   const invalidateAll = useInvalidateAll()
 

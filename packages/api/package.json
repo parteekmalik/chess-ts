@@ -29,6 +29,7 @@
     "@acme/validators": "workspace:*",
     "@trpc/server": "catalog:",
     "axios": "^1.8.4",
+    "next-auth": "catalog:",
     "superjson": "2.2.2",
     "zod": "catalog:"
   },

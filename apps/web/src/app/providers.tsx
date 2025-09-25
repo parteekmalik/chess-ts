@@ -17,7 +17,7 @@ interface ProviderProps {
   children: ReactNode;
   session: Session | null;
 }
-const footerNotShownPaths = ["/play"];
+const footerNotShownPaths = ["/play",'/web3'];
 export function Providers({ children, session }: ProviderProps) {
   const path = usePathname();
   return (
