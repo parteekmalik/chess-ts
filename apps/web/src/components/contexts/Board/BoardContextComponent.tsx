@@ -68,7 +68,6 @@ function useBoardContextLogic(props: BoardContextProps) {
     if (movesUndone.length) return;
     const { isValid, square } = checkForValidClick(event, flip);
     if (!isValid || !handleMove) return;
-    console.log("valid", square, game.get(square), initalFlip);
     if (square === selectedPiece) {
       setSelectedPiece(null);
       return;
@@ -76,19 +75,21 @@ function useBoardContextLogic(props: BoardContextProps) {
     if (selectedPiece && props.gameData?.iAmPlayer === game.turn() && movesUndone.length === 0) {
       try {
         const move = { from: selectedPiece, to: square };
+        const new_game = _.cloneDeep(game);
         try {
-          game.move(move);
+          new_game.move(move);
         } catch {
-          game.move({ ...move, promotion: "q" });
+          new_game.move({ ...move, promotion: "q" });
         }
-        handleMove(game.history()[game.history().length - 1]!);
+        const lastMove = new_game.history()[new_game.history().length - 1]!;
+        setGame(new_game);
+        handleMove(lastMove);
         setSelectedPiece(null);
       } catch {
         if (game.get(square)) setSelectedPiece(square);
         else setSelectedPiece(null);
       }
     } else {
-      console.log(square, game.get(square), initalFlip);
       setSelectedPiece(square);
     }
   };

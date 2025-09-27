@@ -1,7 +1,7 @@
 // Match React Query hooks and mutations - works independently from API
 
 import type { Address } from "gill";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useWalletUi } from "@wallet-ui/react";
 import _ from "lodash";
 import { toast } from "sonner";
@@ -172,7 +172,7 @@ export function useMakeMoveMutation() {
   const signer = useWalletUiSigner();
   const signAndSend = useWalletTransactionSignAndSend();
   const invalidateAllCryptoQueries = useInvalidateCryptoQueries();
-
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ matchId, move }: { matchId: bigint | number; move: string }) => {
       const matchAddress = await matchFetcher.getMatchPda(matchId);
@@ -196,8 +196,11 @@ export function useMakeMoveMutation() {
       // Invalidate all crypto queries at once
       await invalidateAllCryptoQueries();
     },
-    onError: (error: Error) => {
+    onError: async (error: Error, variables) => {
       toast.error(`Failed to make move: ${error.message}`);
+      const matchAddress = (await matchFetcher.getMatchPda(variables.matchId))[0];
+      queryClient.setQueryData(["match", matchAddress], () => null);
+      await invalidateAllCryptoQueries();
     },
   });
 }

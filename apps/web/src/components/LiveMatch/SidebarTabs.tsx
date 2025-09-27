@@ -9,12 +9,14 @@ import { MovesDisplay } from "./MovesDisplay";
 import { NewMatch } from "./NewMatch";
 
 function SidebarTabs() {
-  const { gameData, sideBar } = useBoard();
+  const { gameData, sideBar, layout } = useBoard();
+  const height = `calc(100vh - 3rem ${layout?.boardHeightOffset ? "- " + layout.boardHeightOffset + "px" : ""})`;
+
   const disabled = gameData && gameData.status === MatchStatus.Active && gameData.result === MatchResult.Pending && gameData.iAmPlayer;
   return (
     <Card className="w-full bg-background lg:max-w-[450px]">
-      <CardContent className="p-0">
-        <Tabs className="w-full" defaultValue="play">
+      <CardContent className="max-h-full p-0">
+        <Tabs className="w-full" defaultValue="play" style={{ height }}>
           <TabsList indicatorClassName="bg-primary/70" className="m-0 w-full bg-black/15 p-0">
             <TabsTrigger className="h-16 flex-1 flex-col dark:data-[state=active]:text-white" value="play">
               <span className="font-chess text-2xl" style={{ lineHeight: "1.5rem" }}>

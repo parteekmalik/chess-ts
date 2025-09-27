@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 
 import { calculateTimeLeft } from "@acme/lib";
 
@@ -33,9 +33,7 @@ export function BoardWithTime(props: BoardWithTimeProps) {
     [props.gameData],
   );
   const isTurn = useMemo(() => (props.gameData ? props.gameData.moves.length % 2 === 1 : false), [props.gameData]);
-  useEffect(() => {
-    console.log("updated game data: ", props.gameData);
-  }, [props.gameData]);
+
   return (
     <BoardProvider {...props}>
       <div className="flex grow flex-col justify-between gap-4 lg:flex-row lg:p-4">

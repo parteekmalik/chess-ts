@@ -11,6 +11,7 @@ function Result() {
 
   if (!gameData?.iAmPlayer || gameData.result === MatchResult.Pending) return null;
   const isIWin = gameData.result === (gameData.iAmPlayer === "w" ? MatchResult.WhiteWin : MatchResult.BlackWin);
+  const isAbandoned = gameData.result === MatchResult.Abandoned;
   return (
     <Dialog defaultOpen>
       <DialogContent classNames={{ overlay: "bg-transparent" }} className="min-h-[30rem] w-fit min-w-[20rem] dark:text-white">
@@ -32,7 +33,7 @@ function Result() {
               />
             )}
             <div className="font-semiBold flex flex-col items-center text-2xl">
-              <h1>{gameData.result === MatchResult.Draw ? "Match Draw" : isIWin ? "You Won" : "You Lost"}</h1>
+              <h1>{gameData.result === MatchResult.Draw ? "Match Draw" : isAbandoned ? "Match was Abandoned" : isIWin ? "You Won" : "You Lost"}</h1>
               {/* <p className="text-foreground-muted text-tiny">by {match?.stats?.reason}</p> */}
             </div>
           </div>

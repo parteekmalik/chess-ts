@@ -1,5 +1,6 @@
 "use client";
 
+import type { Color } from "chess.js";
 import React from "react";
 import { useParams } from "next/navigation";
 import { BLACK, WHITE } from "chess.js";
@@ -22,7 +23,9 @@ const LiveBoard: React.FunctionComponent = () => {
   if (isLoading) return <div>Loading...</div>;
   if (!match) return <div>Match not found</div>;
 
-  const iAmPlayer = match.whitePlayerId === session?.user.id ? WHITE : match.blackPlayerId === session?.user.id ? BLACK : undefined;
+  const iAmPlayer: Color | undefined =
+    match.whitePlayerId === session?.user.id ? WHITE : match.blackPlayerId === session?.user.id ? BLACK : undefined;
+  const gameData = { ...convertMatchToGameData(match), iAmPlayer };
 
   const createMatch = (baseTime: number, incrementTime: number) => {
     findMatchViaSocket(baseTime, incrementTime);
@@ -34,7 +37,7 @@ const LiveBoard: React.FunctionComponent = () => {
         isInMatching={isInMatching}
         sideBar={{ createMatch }}
         reload={reload}
-        gameData={{ ...convertMatchToGameData(match), iAmPlayer }}
+        gameData={gameData}
         whitePlayerData={{ id: match.whitePlayerId }}
         blackPlayerData={{ id: match.blackPlayerId }}
         handleMove={handleMove}

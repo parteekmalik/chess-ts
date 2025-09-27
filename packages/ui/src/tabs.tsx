@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 
 import { cn } from ".";
@@ -103,17 +103,30 @@ const TabsTrigger = React.forwardRef<React.ElementRef<typeof TabsPrimitive.Trigg
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
 const TabsContent = React.forwardRef<React.ElementRef<typeof TabsPrimitive.Content>, React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>>(
-  ({ className, ...props }, ref) => (
-    <TabsPrimitive.Content
-      ref={ref}
-      className={cn(
-        "mt-2 pb-3 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        className,
-      )}
-      style={{ maxHeight: "calc(100% - 36px)" }}
-      {...props}
-    />
-  ),
+  ({ className, ...props }, ref) => {
+    const tabsListRef = useRef<HTMLDivElement | null>(null);
+    const [height, setHeight] = useState(0);
+
+    React.useLayoutEffect(() => {
+      if (!tabsListRef.current) return;
+
+      const height = tabsListRef.current.parentElement?.firstElementChild?.getBoundingClientRect()?.height;
+      if (height) setHeight(height + 8);
+    }, []);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    useImperativeHandle(ref, () => tabsListRef.current!);
+    return (
+      <TabsPrimitive.Content
+        ref={tabsListRef}
+        className={cn(
+          "mt-2 overflow-y-scroll pb-0 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          className,
+        )}
+        style={{ maxHeight: `calc(100% - ${height}px)` }}
+        {...props}
+      />
+    );
+  },
 );
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 

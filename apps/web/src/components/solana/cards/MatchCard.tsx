@@ -67,18 +67,20 @@ export function MatchCard({ match, className }: MatchCardProps) {
       return <Badge className="rounded-full border-yellow-200 bg-yellow-50 px-3 py-1 text-yellow-800 shadow-sm">Waiting</Badge>;
     }
     // Finished
-    return <Badge className="rounded-full border-gray-200 bg-gray-50 px-3 py-1 text-gray-800 shadow-sm">Finished</Badge>;
+    return null;
   };
 
   const resultLabel = () => {
     if (!isFinished || !match.result) return null;
     switch (match.result as MatchResult) {
       case MatchResult.WhiteWin:
-        return { label: "White won", icon: <Trophy className="h-4 w-4" /> };
+        return { label: <span className="text-yellow-700">White won</span>, icon: <Trophy className="h-4 w-4 text-yellow-600" /> };
       case MatchResult.BlackWin:
-        return { label: "Black won", icon: <Trophy className="h-4 w-4" /> };
+        return { label: <span className="text-yellow-700">Black won</span>, icon: <Trophy className="h-4 w-4 text-yellow-600" /> };
       case MatchResult.Draw:
-        return { label: "Draw", icon: <Trophy className="h-4 w-4" /> };
+        return { label: <span className="text-muted-foreground">Draw</span>, icon: null };
+      case MatchResult.Abandoned:
+        return { label: <span className="text-destructive">Abandoned</span>, icon: null };
       default:
         return null;
     }
@@ -104,9 +106,9 @@ export function MatchCard({ match, className }: MatchCardProps) {
             <div className="flex items-center gap-3">
               {getStatusBadge()}
               {isFinished && resultLabel() && (
-                <div className="flex items-center gap-2 text-sm text-yellow-700">
-                  <Trophy className="h-4 w-4 text-yellow-600" />
-                  <span className="font-medium">{resultLabel()!.label}</span>
+                <div className="flex items-center gap-2 text-sm">
+                  {resultLabel()?.icon}
+                  {resultLabel()?.label}
                 </div>
               )}
             </div>
