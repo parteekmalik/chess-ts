@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Chess } from "chess.js";
 import moment from "moment";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
@@ -9,7 +8,6 @@ import toast from "react-hot-toast";
 import type { Move } from "@acme/db";
 import type { ChessMoveType } from "@acme/lib";
 import type { NOTIFICATION_PAYLOAD } from "@acme/lib/WStypes/typeForFrontendToSocket";
-import { calculateTimeLeft } from "@acme/lib";
 
 import { useBackend } from "~/components/contexts/socket/SocketContextComponent";
 import { useTRPC } from "~/trpc/react";
@@ -55,16 +53,6 @@ export const useLiveGame = (matchId?: string) => {
     }
   }, [lastMessage]);
 
-  const gameState = useMemo(() => {
-    const game = new Chess();
-    if (match) {
-      match.moves.forEach((move) => {
-        game.move(move.move);
-      });
-    }
-    return game;
-  }, [match?.moves]);
-
   const moveAPI = useMutation(trpc.liveGame.makeMove.mutationOptions());
   const handleMove = useCallback(
     (move: ChessMoveType) => {
@@ -80,20 +68,10 @@ export const useLiveGame = (matchId?: string) => {
     [matchId, moveAPI],
   );
 
-  const playerTimes = useMemo(() => {
-    const timeData = match
-      ? calculateTimeLeft(
-          { baseTime: match.baseTime, incrementTime: match.incrementTime },
-          [match.startedAt].concat(match.moves.map((move) => move.timestamp)),
-        )
-      : { w: 0, b: 0 };
-    return timeData;
-  }, [match?.moves]);
-
   const openResult = useMemo(
-    () => match?.stats?.winner !== "PLAYING" && session && (session.user.id === match?.blackPlayerId || session.user.id === match?.whitePlayerId),
+    () => match?.stats.winner !== "PLAYING" && session && (session.user.id === match?.blackPlayerId || session.user.id === match?.whitePlayerId),
     [match, session],
   );
 
-  return { match, isLoading, gameState, playerTimes, handleMove, openResult, reload };
+  return { match, isLoading, handleMove, openResult, reload };
 };

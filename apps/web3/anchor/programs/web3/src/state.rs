@@ -1,4 +1,4 @@
-use std::{cmp, i64::MIN, str::FromStr};
+use std::{cmp, str::FromStr};
 
 use crate::{error::*, helper::time_before_game_ends};
 use anchor_lang::prelude::*;
@@ -46,6 +46,7 @@ pub struct ChessMatch {
 
     pub result: MatchResult,
 
+    pub abandonment_at: Option<i64>,
     pub ends_at: Option<i64>,
     pub created_at: i64,
     pub matched_at: Option<i64>,
@@ -103,6 +104,7 @@ impl ChessMatch {
             &self.moves,
             self.created_at,
         ));
+        self.abandonment_at = Some(self.created_at + cmp::max(120,self.base_time_seconds as i64 / 10));
     }
 
     pub fn verify_turn(&self, profile: Pubkey) -> Result<()> {
@@ -128,7 +130,7 @@ impl ChessMatch {
         if self.moves.is_empty()
             && self.status == MatchStatus::Active
             && Clock::get().unwrap().unix_timestamp
-                > self.created_at + cmp::max(60,self.base_time_seconds as i64 / 10)
+                > self.abandonment_at.unwrap()
         {
             self.status = MatchStatus::Finished;
             self.finished_at = Some(Clock::get().unwrap().unix_timestamp);
@@ -138,8 +140,19 @@ impl ChessMatch {
         }
         false
     }
-    pub fn is_game_ended_by_time(&self) -> bool {
-        self.ends_at.is_some() && Clock::get().unwrap().unix_timestamp > self.ends_at.unwrap()
+    pub fn is_game_ended_by_time(&mut self) -> bool {
+        if self.ends_at.is_some() && Clock::get().unwrap().unix_timestamp > self.ends_at.unwrap() {
+            self.status = MatchStatus::Finished;
+            self.finished_at = Some(Clock::get().unwrap().unix_timestamp);
+            let turn = Game::from_str(&self.fen).unwrap().side_to_move();
+            self.result = match turn {
+                Color::White => MatchResult::BlackWin,
+                _ => MatchResult::WhiteWin,
+            };
+            self.ends_at = None;
+            return true;
+        }
+        false
     }
     pub fn make_move(&mut self, move_fen_str: String) -> Result<()> {
         let mut game = Game::from_str(&self.fen).unwrap();

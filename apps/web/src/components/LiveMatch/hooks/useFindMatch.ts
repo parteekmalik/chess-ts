@@ -44,5 +44,5 @@ export function useFindMatch() {
     if (isLoading) redirectMatch();
   }, [redirectMatch, isLoading]);
 
-  return { findMatchAPI, redirectMatch, isLoading, findMatchViaSocket };
+  return { findMatchAPI, redirectMatch, isLoading: isLoading ?? false, findMatchViaSocket };
 }

@@ -89,3 +89,7 @@
   font-style: normal;
   font-display: swap;
 }
+
+#wallet-dropdown > div > button + div {
+  z-index: 100 !important;
+}

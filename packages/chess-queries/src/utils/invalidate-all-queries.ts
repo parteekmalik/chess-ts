@@ -21,7 +21,7 @@ export function useInvalidateCryptoQueries() {
       queryClient.invalidateQueries({ queryKey: ["match"] }),
       queryClient.invalidateQueries({ queryKey: ["matches"] }),
 
-      // Profile queries  
+      // Profile queries
       queryClient.invalidateQueries({ queryKey: ["profile"] }),
       queryClient.invalidateQueries({ queryKey: ["profiles"] }),
 

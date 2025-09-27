@@ -6,7 +6,7 @@
   ],
   // Tell Rust Analyzer which Cargo.toml belongs to your Anchor program(s)
   "rust-analyzer.linkedProjects": [
-    "apps/web3/anchor/programs/web3/Cargo.toml",
+    // "apps/web3/anchor/programs/web3/Cargo.toml",
     "packages/anchor/programs/web3/Cargo.toml"
   ],
 

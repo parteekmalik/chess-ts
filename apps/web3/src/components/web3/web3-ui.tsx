@@ -301,6 +301,14 @@ function ChessMatchCard({ account }: { account: Account<ChessMatch, string> }) {
             const seconds = Math.floor((timeLeft % 60000) / 1000);
             return `${minutes}m ${seconds}s left`;
           })() : "Not set"}</p>
+          <p>Abandonment At: {account.data.abandonmentAt.__option === "Some" ? (() => {
+            const endTime = Number(account.data.abandonmentAt.value) * 1000;
+            const now = Date.now();
+            const timeLeft = Math.max(0, endTime - now);
+            const minutes = Math.floor(timeLeft / 60000);
+            const seconds = Math.floor((timeLeft % 60000) / 1000);
+            return `${minutes}m ${seconds}s left`;
+          })() : "Not set"}</p>
 
           {needsJoin && (
             <Button

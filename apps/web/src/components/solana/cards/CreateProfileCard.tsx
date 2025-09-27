@@ -1,11 +1,12 @@
 "use client";
 
-import { useInitializeProfileMutation, useConnectedWalletProfile } from "@acme/chess-queries";
+import { useState } from "react";
+
+import { useConnectedWalletProfile, useInitializeProfileMutation } from "@acme/chess-queries";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@acme/ui/card";
 import { Input } from "@acme/ui/input";
 import { Label } from "@acme/ui/label";
-import { useState } from "react";
 
 export function CreateProfileCard() {
   const createProfileMutation = useInitializeProfileMutation();
@@ -16,22 +17,17 @@ export function CreateProfileCard() {
   const handleCreateProfile = async () => {
     if (!profileName.trim()) return;
 
-    try {
-      await createProfileMutation.mutateAsync({
-        name: profileName.trim(),
-      });
-      // Clear form after successful creation
-      setProfileName("");
-    } catch (error) {
-      console.error("Failed to create profile:", error);
-    }
+    await createProfileMutation.mutateAsync({
+      name: profileName.trim(),
+    });
+    // Clear form after successful creation
+    setProfileName("");
   };
 
   // Don't show the card if user already has a profile or is loading
   if (isLoading || userProfile) {
     return null;
   }
-
 
   return (
     <Card>
@@ -52,14 +48,9 @@ export function CreateProfileCard() {
             />
           </div>
 
-          <Button
-            onClick={handleCreateProfile}
-            disabled={!profileName.trim() || createProfileMutation.isPending}
-            className="w-full"
-          >
+          <Button onClick={handleCreateProfile} disabled={!profileName.trim() || createProfileMutation.isPending} className="w-full">
             {createProfileMutation.isPending ? "Creating Profile..." : "Create Profile"}
           </Button>
-
         </div>
       </CardContent>
     </Card>

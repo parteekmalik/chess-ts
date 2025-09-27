@@ -26,7 +26,8 @@ export const liveGameRouter = createTRPCRouter({
         stats: true,
       },
     });
-    return data;
+    if (data) return { ...data, stats: data.stats! };
+    else return null;
   }),
   cancelWaiting: protectedProcedure.mutation(async ({ ctx }) => {
     await ctx.db.watingPlayer.deleteMany({

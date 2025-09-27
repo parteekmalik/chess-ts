@@ -1,5 +1,6 @@
-import { z } from "zod";
 import type { Account } from "gill";
+import { address } from "gill";
+import { z } from "zod";
 
 import type { Profile } from "@acme/anchor";
 
@@ -16,13 +17,13 @@ export const ProfileAccountSchema = z.object({
   matches: z.array(z.number()),
 });
 
-export type ProfileAccount = z.infer<typeof ProfileAccountSchema>;
+export type ProfileAccount = z.infer<typeof ProfileAccountSchema> & { address: ReturnType<typeof address> };
 
 export function profileProcessor(account: Account<Profile, string>): ProfileAccount {
   return {
     discriminator: new Uint8Array(account.data.discriminator),
     accType: account.data.accType,
-    address: account.address,
+    address: address(account.address),
     wallet: account.data.wallet,
     rating: account.data.rating,
     wins: account.data.wins,

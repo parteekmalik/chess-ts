@@ -3,6 +3,7 @@
 import React, { useRef } from "react";
 import { twMerge } from "tailwind-merge";
 
+import { MatchResult } from "@acme/anchor";
 import { cn } from "@acme/ui";
 
 import { useBoard } from "../contexts/Board/BoardContextComponent";
@@ -51,12 +52,15 @@ export interface BoardProps {
 }
 
 export const ChessBoardWrapper: React.FC<BoardProps> = ({ whiteBar, blackBar, className }) => {
-  const { PieceLogic, lastMove, playerTurn, flip, game, selectedPiece, movesUndone, result } = useBoard();
-  const style = { width: `min(100%,calc(100vh ${whiteBar ? "- 96px" : ""} - 3rem))` };
+  const { PieceLogic, lastMove, playerTurn, flip, game, selectedPiece, movesUndone, gameData, layout } = useBoard();
+  const result = gameData?.result;
+  const style = {
+    width: `min(100%,calc(100vh ${whiteBar ? "- 96px" : ""} - 3rem))`,
+    height: `calc(100vh - 3rem ${layout?.boardHeightOffset ? "- " + layout.boardHeightOffset + "px" : ""})`,
+  };
   const boardRef = useRef<HTMLDivElement | null>(null);
-
   return (
-    <div className={cn("mx-auto flex h-[calc(100vh-3rem)] flex-col gap-2", className)} style={style}>
+    <div className={cn("mx-auto flex flex-col gap-2", className)} style={style}>
       {flip === "w" ? blackBar : whiteBar}
       <div className="flex-1" style={style}>
         <div
@@ -69,12 +73,14 @@ export const ChessBoardWrapper: React.FC<BoardProps> = ({ whiteBar, blackBar, cl
           onClick={PieceLogic}
           ref={boardRef}
         >
-          {(result?.winner === "BLACK" || result?.winner === "WHITE") && !movesUndone.length && (
+          {(result === MatchResult.BlackWin || result === MatchResult.WhiteWin) && !movesUndone.length && (
             <>
               <span
                 className="absolute z-10 flex h-[5%] w-[5%] items-center justify-center rounded-full bg-primary [&_svg]:size-6"
                 style={{
-                  transform: scaleTranslate(boardRef.current?.querySelector<HTMLElement>(result.winner === "BLACK" ? ".bk" : ".wk")!.style.transform),
+                  transform: scaleTranslate(
+                    boardRef.current?.querySelector<HTMLElement>(result === MatchResult.BlackWin ? ".bk" : ".wk")!.style.transform,
+                  ),
                 }}
               >
                 {icons.winner}
@@ -82,7 +88,9 @@ export const ChessBoardWrapper: React.FC<BoardProps> = ({ whiteBar, blackBar, cl
               <span
                 className="absolute z-10 flex h-[5%] w-[5%] items-center justify-center rounded-full bg-red-500 [&_svg]:size-6"
                 style={{
-                  transform: scaleTranslate(boardRef.current?.querySelector<HTMLElement>(result.winner === "WHITE" ? ".bk" : ".wk")!.style.transform),
+                  transform: scaleTranslate(
+                    boardRef.current?.querySelector<HTMLElement>(result === MatchResult.WhiteWin ? ".bk" : ".wk")!.style.transform,
+                  ),
                 }}
               >
                 {icons.loser}

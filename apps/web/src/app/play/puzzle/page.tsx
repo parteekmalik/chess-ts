@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Chess } from "chess.js";
 
 import type { ChessMoveType } from "@acme/lib";
+import { MatchResult, MatchStatus } from "@acme/anchor";
 import { cn } from "@acme/ui";
 import { Card, CardContent, CardHeader } from "@acme/ui/card";
 import { Dialog, DialogContent } from "@acme/ui/dialog";
@@ -31,7 +32,20 @@ function Puzzle() {
   const attempltedPuzzles = PuzzleState.puzzleList.slice(0, PuzzleState.puzzleNo);
 
   return (
-    <BoardProvider gameState={gameState} initalFlip={gameState.turn()} handleMove={handleMove}>
+    <BoardProvider
+      gameData={{
+        gameState,
+        iAmPlayer: gameState.turn(),
+        moves: [],
+        baseTime: 0,
+        incrementTime: 0,
+        result: MatchResult.Pending,
+        status: MatchStatus.Active,
+        startedAt: new Date(),
+      }}
+      isInMatching={false}
+      handleMove={handleMove}
+    >
       <div className="flex h-full w-full flex-col p-4">
         <div className="flex flex-col gap-4 lg:flex-row">
           <ChessBoardWrapper />

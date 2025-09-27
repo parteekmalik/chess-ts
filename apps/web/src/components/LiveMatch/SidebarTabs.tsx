@@ -1,28 +1,20 @@
-import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
+"use client";
 
+import { MatchResult, MatchStatus } from "@acme/anchor";
 import { Card, CardContent } from "@acme/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
-import { useTRPC } from "~/trpc/react";
+import { useBoard } from "../contexts/Board/BoardContextComponent";
 import { MovesDisplay } from "./MovesDisplay";
 import { NewMatch } from "./NewMatch";
 
 function SidebarTabs() {
-  const params = useParams();
-  const trpc = useTRPC();
-  const { data: session } = useSession();
-  const { data: match } = useQuery(trpc.liveGame.getMatch.queryOptions(params.matchId as string, { enabled: params.matchId !== undefined }));
-  const disabled =
-    session == null ||
-    (((match != null && match.stats?.winner == null) || (params.matchId && match?.stats?.winner === "PLAYING")) &&
-      (session.user.id === match.whitePlayerId || session.user.id === match.blackPlayerId));
-
+  const { gameData, sideBar } = useBoard();
+  const disabled = gameData && gameData.status === MatchStatus.Active && gameData.result === MatchResult.Pending && gameData.iAmPlayer;
   return (
     <Card className="w-full bg-background lg:max-w-[450px]">
       <CardContent className="p-0">
-        <Tabs className="w-full" defaultValue={params.matchId ? "play" : "new_game"}>
+        <Tabs className="w-full" defaultValue="play">
           <TabsList indicatorClassName="bg-primary/70" className="m-0 w-full bg-black/15 p-0">
             <TabsTrigger className="h-16 flex-1 flex-col dark:data-[state=active]:text-white" value="play">
               <span className="font-chess text-2xl" style={{ lineHeight: "1.5rem" }}>
@@ -55,8 +47,8 @@ function SidebarTabs() {
           <TabsContent value="new_game" className="p-4">
             <NewMatch />
           </TabsContent>
-          <TabsContent value="games">{/* Content for games tab */}</TabsContent>
-          <TabsContent value="players">{/* Content for players tab */}</TabsContent>
+          <TabsContent value="games">{sideBar?.matches}</TabsContent>
+          <TabsContent value="players">{sideBar?.players}</TabsContent>
         </Tabs>
       </CardContent>
     </Card>

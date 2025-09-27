@@ -17,10 +17,7 @@
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
     "lint": "eslint",
-    "format": "prettier --check . --ignore-path ../../.gitignore",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "format": "prettier --check . --ignore-path ../../.gitignore"
   },
   "dependencies": {
     "@acme/anchor": "workspace:*",
@@ -30,6 +27,9 @@
     "@wallet-ui/react": "1.1.1",
     "chess.js": "^1.4.0",
     "gill": "0.10.2",
+    "lodash": "^4.17.21",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -38,8 +38,6 @@
     "@acme/tsconfig": "workspace:*",
     "@types/jest": "^30.0.0",
     "eslint": "catalog:",
-    "jest": "^30.0.5",
-    "jest-environment-jsdom": "^30.0.5",
     "prettier": "catalog:",
     "ts-jest": "^29.4.1",
     "typescript": "catalog:"

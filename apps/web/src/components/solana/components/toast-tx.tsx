@@ -1,11 +1,12 @@
-import { toast } from 'sonner'
-import { ExplorerLink } from './cluster/cluster-ui'
+import { toast } from "sonner";
 
-export function toastTx(signature?: string, title = 'Transaction sent') {
+import { ExplorerLink } from "./cluster/cluster-ui";
+
+export function toastTx(signature?: string, title = "Transaction sent") {
   if (!signature) {
-    return
+    return;
   }
   toast(title, {
     description: <ExplorerLink transaction={signature} label="View Transaction" />,
-  })
+  });
 }

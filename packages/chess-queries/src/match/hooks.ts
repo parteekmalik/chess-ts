@@ -1,8 +1,9 @@
 // Match React Query hooks and mutations - works independently from API
 
+import type { Address } from "gill";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useWalletUi } from "@wallet-ui/react";
-import type { Address } from "gill";
+import _ from "lodash";
 import { toast } from "sonner";
 
 import {
@@ -10,23 +11,16 @@ import {
   getCreateChessMatchInstructionAsync,
   getJoinChessMatchInstructionAsync,
   getMakeMoveInstructionAsync,
-  MatchStatus
+  MatchStatus,
 } from "@acme/anchor";
 import { randomSafeMath } from "@acme/lib";
-import { BLACK, WHITE } from "chess.js";
+
 import { useInvalidateCryptoQueries } from "../utils/invalidate-all-queries";
 import { useWalletTransactionSignAndSend } from "../utils/use-wallet-transaction-sign-and-send";
 import { useWalletUiSigner } from "../utils/use-wallet-ui-signer";
 import { matchFetcher } from "./fetcher";
-// ===== QUERY HOOKS =====
 
-export function useIsPlayerInMatch(matchAddress: Address) {
-  const { account } = useWalletUi();
-  const { data: match } = useChessMatch(matchAddress);
-  if (match?.white === account?.address) return WHITE
-  else if (match?.black === account?.address) return BLACK
-  else return null;
-}
+// ===== QUERY HOOKS =====
 
 export function useChessMatch(matchAddress: Address) {
   const { client } = useWalletUi();
@@ -37,7 +31,14 @@ export function useChessMatch(matchAddress: Address) {
       const account = await matchFetcher.getMatch(matchAddress, client.rpc);
       return account;
     },
-    refetchInterval: 5000, // Refetch every 5 seconds for live matches
+    refetchIntervalInBackground: true,
+    refetchInterval: 5000,
+    structuralSharing(oldData, newData) {
+      if (oldData !== undefined && _.isEqual(oldData, newData)) {
+        return oldData;
+      }
+      return newData;
+    },
   });
 }
 
@@ -68,7 +69,7 @@ export function useActiveMatches() {
 
   return {
     ...rest,
-    data: allMatches?.filter(match => match.status === MatchStatus.Active) ?? [],
+    data: allMatches?.filter((match) => match.status === MatchStatus.Active) ?? [],
   };
 }
 
@@ -77,7 +78,7 @@ export function useWaitingMatches() {
 
   return {
     ...rest,
-    data: allMatches?.filter(match => match.status === MatchStatus.Waiting) ?? [],
+    data: allMatches?.filter((match) => match.status === MatchStatus.Waiting) ?? [],
   };
 }
 
@@ -86,7 +87,7 @@ export function useFinishedMatches() {
 
   return {
     ...rest,
-    data: allMatches?.filter(match => match.status === MatchStatus.Finished) ?? [],
+    data: allMatches?.filter((match) => match.status === MatchStatus.Finished) ?? [],
   };
 }
 
@@ -98,9 +99,9 @@ export function useMatchesByState() {
     isLoading,
     isError,
     error,
-    activeMatches: allMatches?.filter(match => match.status === MatchStatus.Active) ?? [],
-    waitingMatches: allMatches?.filter(match => match.status === MatchStatus.Waiting) ?? [],
-    finishedMatches: allMatches?.filter(match => match.status === MatchStatus.Finished) ?? [],
+    activeMatches: allMatches?.filter((match) => match.status === MatchStatus.Active) ?? [],
+    waitingMatches: allMatches?.filter((match) => match.status === MatchStatus.Waiting) ?? [],
+    finishedMatches: allMatches?.filter((match) => match.status === MatchStatus.Finished) ?? [],
     allMatches: allMatches ?? [],
   };
 }
@@ -114,20 +115,17 @@ export function useCreateChessMatchMutation() {
   const invalidateAllCryptoQueries = useInvalidateCryptoQueries();
 
   return useMutation({
-    mutationFn: async ({
-      baseTimeSeconds,
-      incrementSeconds,
-    }: {
-      baseTimeSeconds: number;
-      incrementSeconds: number;
-    }) => {
+    mutationFn: async ({ baseTimeSeconds, incrementSeconds }: { baseTimeSeconds: number; incrementSeconds: number }) => {
       const matchId = randomSafeMath();
-      return await signAndSend(await getCreateChessMatchInstructionAsync({
-        matchId,
-        baseTimeSeconds,
-        incrementSeconds,
-        payer: signer,
-      }), signer);
+      return await signAndSend(
+        await getCreateChessMatchInstructionAsync({
+          matchId,
+          baseTimeSeconds,
+          incrementSeconds,
+          payer: signer,
+        }),
+        signer,
+      );
     },
     onSuccess: async (data) => {
       toast.success(`Chess match created with ID: ${data}`);
@@ -149,10 +147,13 @@ export function useJoinChessMatchMutation() {
   return useMutation({
     mutationFn: async (matchId: bigint | number) => {
       const matchAddress = await matchFetcher.getMatchPda(matchId);
-      return await signAndSend(await getJoinChessMatchInstructionAsync({
-        chessMatch: matchAddress[0],
-        payer: signer,
-      }), signer);
+      return await signAndSend(
+        await getJoinChessMatchInstructionAsync({
+          chessMatch: matchAddress[0],
+          payer: signer,
+        }),
+        signer,
+      );
     },
     onSuccess: async (data, _matchAddress) => {
       toast.success(`Joined chess match: ${data}`);
@@ -173,19 +174,11 @@ export function useMakeMoveMutation() {
   const invalidateAllCryptoQueries = useInvalidateCryptoQueries();
 
   return useMutation({
-    mutationFn: async ({
-      matchId,
-      move
-    }: {
-      matchId: bigint | number;
-      move: string;
-    }) => {
+    mutationFn: async ({ matchId, move }: { matchId: bigint | number; move: string }) => {
       const matchAddress = await matchFetcher.getMatchPda(matchId);
       const matchAccount = await matchFetcher.getMatch(matchAddress[0], client.rpc);
       // Create the instruction using gill
-      const opponet = matchAccount.moves.length % 2 === 0
-        ? matchAccount.black
-        : matchAccount.white
+      const opponet = matchAccount.moves.length % 2 === 0 ? matchAccount.black : matchAccount.white;
       const instruction = await getMakeMoveInstructionAsync({
         chessMatch: matchAddress[0],
         opponentProfile: opponet!,
@@ -217,10 +210,13 @@ export function useCloseChessMatchMutation() {
   return useMutation({
     mutationFn: async (matchId: bigint | number) => {
       const matchAddress = await matchFetcher.getMatchPda(matchId);
-      return await signAndSend(getCloseChessMatchInstruction({
-        chessMatch: matchAddress[0],
-        payer: signer,
-      }), signer);
+      return await signAndSend(
+        getCloseChessMatchInstruction({
+          chessMatch: matchAddress[0],
+          payer: signer,
+        }),
+        signer,
+      );
     },
     onSuccess: async (data) => {
       toast.success(`Chess match closed: ${data}`);

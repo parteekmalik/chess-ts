@@ -17,7 +17,7 @@ interface ProviderProps {
   children: ReactNode;
   session: Session | null;
 }
-const footerNotShownPaths = ["/play",'/web3'];
+const footerNotShownPaths = ["/play", "/web3"];
 export function Providers({ children, session }: ProviderProps) {
   const path = usePathname();
   return (
@@ -27,7 +27,7 @@ export function Providers({ children, session }: ProviderProps) {
           <SocketContextComponent>
             <main className="max-w-screen relative flex h-full min-h-screen flex-col dark:bg-foreground lg:flex-row">
               <Header />
-              <div className="z-0 flex w-full max-w-full grow flex-col lg:mx-auto lg:max-w-screen-lg xl:max-w-screen-xl 2xl:max-w-screen-2xl">
+              <div className="z-0 flex w-full max-w-full grow flex-col lg:mx-auto">
                 <div className="flex-1">{children}</div>
                 {!footerNotShownPaths.find((i) => path.startsWith(i)) && <Footer />}
               </div>

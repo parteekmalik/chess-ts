@@ -1,7 +1,8 @@
-import { fetchRegistry } from "@acme/anchor";
 import type { SolanaClient } from "gill";
-
 import { getProgramDerivedAddress } from "gill";
+
+import { fetchRegistry } from "@acme/anchor";
+
 import { getChessProgramId } from "../utils";
 
 export async function getRegistryPda() {
@@ -12,7 +13,7 @@ export async function getRegistryPda() {
 }
 
 export const registryFetcher = {
-  async getRegistry(rpcClient?: SolanaClient['rpc']) {
+  async getRegistry(rpcClient?: SolanaClient["rpc"]) {
     try {
       if (!rpcClient) {
         throw new Error("RPC client required for blockchain operations");

@@ -1,8 +1,9 @@
 // Here we export some useful types and functions for interacting with the Anchor program.
 
-import type { ChessMatch, Profile, Registry } from "./client/js/generated/accounts";
-import Web3IDL from '../target/idl/web3.json'
 import { address } from "gill";
+
+import type { ChessMatch, Profile, Registry } from "./client/js/generated/accounts";
+import Web3IDL from "../target/idl/web3.json";
 
 // Export the chess-related account types using proper generated types
 export type ChessMatchAccount = ChessMatch;
@@ -11,7 +12,7 @@ export type RegistryAccount = Registry;
 
 // Re-export all generated client code
 export * from "./client/js";
-export { Web3IDL }
+export { Web3IDL };
 
 // Get program ID from IDL
 export function getWeb3ProgramId(): string {
@@ -27,10 +28,4 @@ export function getWeb3ProgramIdAsAddress() {
 export * from "./helpers/get-program-accounts-decoded";
 
 // Re-export functions from the working web3 app
-export {
-  getChessMatchAccounts,
-  getProfileAccounts,
-  getProfileByWallet,
-  getRegistryAccount,
-  getProfilePda,
-} from "./helpers/get-program-accounts";
+export { getChessMatchAccounts, getProfileAccounts, getProfileByWallet, getRegistryAccount, getProfilePda } from "./helpers/get-program-accounts";

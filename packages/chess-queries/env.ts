@@ -14,7 +14,10 @@ const getProgramId = () => {
 
 export const env = createEnv({
   server: {
-    CHESS_PROGRAM_ID: z.string().optional().transform((str) => str ? address(str) : getWeb3ProgramIdAsAddress()),
+    CHESS_PROGRAM_ID: z
+      .string()
+      .optional()
+      .transform((str) => (str ? address(str) : getWeb3ProgramIdAsAddress())),
     WHITE_PLAYER_KEYPAIR: z.string().transform((str) => JSON.parse(str) as number[]),
     BLACK_PLAYER_KEYPAIR: z.string().transform((str) => JSON.parse(str) as number[]),
     NODE_ENV: z.enum(["development", "production"]).optional().default("development"),

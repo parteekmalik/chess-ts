@@ -1,19 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useWalletUi } from "@wallet-ui/react";
+import { address, airdropFactory, createSolanaRpc, createSolanaRpcSubscriptions, devnet, lamports } from "gill";
+import { toast } from "sonner";
+
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@acme/ui/card";
 import { Separator } from "@acme/ui/separator";
-import { useWalletUi } from "@wallet-ui/react";
-import {
-  address,
-  airdropFactory,
-  createSolanaRpc,
-  createSolanaRpcSubscriptions,
-  devnet,
-  lamports
-} from "gill";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+
 import { AccountTokens, AccountTransactions } from "~/components/solana/components/account/account-ui";
 
 export default function WalletPage() {
@@ -40,7 +35,7 @@ export default function WalletPage() {
 
       // Request 1 SOL airdrop (1,000,000,000 lamports)
       await airdrop({
-        commitment: 'confirmed',
+        commitment: "confirmed",
         recipientAddress: address(account.address),
         lamports: lamports(1_000_000_000n),
       });
@@ -93,15 +88,13 @@ export default function WalletPage() {
     return `${sol.toFixed(4)} SOL`;
   };
 
-  if (!account) return null
+  if (!account) return null;
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      <div className="text-center space-y-4">
+    <div className="container mx-auto space-y-8 p-6">
+      <div className="space-y-4 text-center">
         <h1 className="text-4xl font-bold text-primary">Wallet Information</h1>
-        <p className="text-xl text-muted-foreground/80">
-          Check your connected wallet details and status
-        </p>
+        <p className="text-xl text-muted-foreground/80">Check your connected wallet details and status</p>
       </div>
 
       <Separator />
@@ -113,41 +106,27 @@ export default function WalletPage() {
           <CardDescription>Current wallet connection information</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold mb-2">Wallet Address</h3>
+                <h3 className="mb-2 font-semibold">Wallet Address</h3>
                 <div className="space-y-2">
-                  <div className="font-mono text-sm bg-muted p-2 rounded">
-                    {account.address}
-                  </div>
-                  <div className="text-xs text-muted-foreground/70">
-                    Short: {formatAddress(account.address)}
-                  </div>
+                  <div className="rounded bg-muted p-2 font-mono text-sm">{account.address}</div>
+                  <div className="text-xs text-muted-foreground/70">Short: {formatAddress(account.address)}</div>
                 </div>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Balance</h3>
+                <h3 className="mb-2 font-semibold">Balance</h3>
                 <div className="space-y-2">
                   {loading ? (
                     <div className="text-muted-foreground/70">Loading...</div>
                   ) : balance !== null ? (
-                    <div className="font-mono text-lg font-bold">
-                      {balance === "Error" ? "Error fetching" : formatBalance(balance)}
-                    </div>
+                    <div className="font-mono text-lg font-bold">{balance === "Error" ? "Error fetching" : formatBalance(balance)}</div>
                   ) : (
                     <div className="text-muted-foreground/70">No balance data</div>
                   )}
-                  <Button
-                    onClick={handleAirdrop}
-                    disabled={airdropping || !account}
-                    size="sm"
-                    variant="outline"
-                    className="w-full"
-                  >
+                  <Button onClick={handleAirdrop} disabled={airdropping || !account} size="sm" variant="outline" className="w-full">
                     {airdropping ? "Airdropping..." : "Airdrop 1 SOL"}
                   </Button>
                 </div>

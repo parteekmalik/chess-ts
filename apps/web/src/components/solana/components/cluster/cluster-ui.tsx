@@ -1,19 +1,22 @@
-import { ReactNode } from 'react'
-import { getExplorerLink, GetExplorerLinkArgs } from 'gill'
-import { Button } from '@acme/ui/button'
-import { AppAlert } from '../app-alert'
-import { useWalletUi } from '@wallet-ui/react'
-import { useClusterVersion } from './use-cluster-version'
+import type { GetExplorerLinkArgs } from "gill";
+import type { ReactNode } from "react";
+import { useWalletUi } from "@wallet-ui/react";
+import { getExplorerLink } from "gill";
+
+import { Button } from "@acme/ui/button";
+
+import { AppAlert } from "../app-alert";
+import { useClusterVersion } from "./use-cluster-version";
 
 export function ExplorerLink({
   className,
-  label = '',
+  label = "",
   ...link
 }: GetExplorerLinkArgs & {
-  className?: string
-  label: string
+  className?: string;
+  label: string;
 }) {
-  const { cluster } = useWalletUi()
+  const { cluster } = useWalletUi();
   return (
     <a
       href={getExplorerLink({ ...link, cluster: cluster.cluster })}
@@ -23,15 +26,15 @@ export function ExplorerLink({
     >
       {label}
     </a>
-  )
+  );
 }
 
 export function ClusterChecker({ children }: { children: ReactNode }) {
-  const { cluster } = useWalletUi()
-  const query = useClusterVersion()
+  const { cluster } = useWalletUi();
+  const query = useClusterVersion();
 
   if (query.isLoading) {
-    return null
+    return null;
   }
 
   if (query.isError || !query.data) {
@@ -46,7 +49,7 @@ export function ClusterChecker({ children }: { children: ReactNode }) {
       >
         Error connecting to cluster <span className="font-bold">{cluster.label}</span>.
       </AppAlert>
-    )
+    );
   }
-  return children
+  return children;
 }

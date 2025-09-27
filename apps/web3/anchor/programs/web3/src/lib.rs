@@ -8,7 +8,7 @@ pub mod error;
 use crate::error::*;
 pub mod helper;
 
-declare_id!("5BkBHgkeRwiX4RP5XaPeaJF7njmYhsHBgS8djaXi8o8d");
+declare_id!("2yPLmwjdWoBuX5jca96tjfxGL2wAPNfHQEyCMAcABcyU");
 
 #[program]
 pub mod web3 {
@@ -96,13 +96,15 @@ pub mod web3 {
         if chess_match.status != MatchStatus::Active {
             return Err(ChessError::MatchNotActiveOrFinished.into());
         }
-        chess_match.verify_turn(ctx.accounts.player_profile.key())?;
         if chess_match.check_abandonment() {
-            return Err(ChessError::MatchAbandoned.into());
+            msg!("match is abandoned");
+            return Ok(());
         }
         if chess_match.is_game_ended_by_time() {
-            return Err(ChessError::MatchTimeOut.into());
+            msg!("match is ended by time");
+            return Ok(());
         }
+        chess_match.verify_turn(ctx.accounts.player_profile.key())?;
         chess_match.make_move(move_fen_str)?;
         Ok(())
     }

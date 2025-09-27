@@ -75,7 +75,7 @@ export function Header() {
           </div>
         )}
       </header>
-      <VerticalHeader className="sticky top-0 z-50 hidden lg:block" />
+      <VerticalHeader className="sticky top-0 hidden lg:block" />
     </>
   );
 }

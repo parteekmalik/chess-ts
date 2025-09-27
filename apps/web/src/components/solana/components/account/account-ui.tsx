@@ -1,50 +1,53 @@
-import { ellipsify } from '@acme/lib'
-import { Button } from '@acme/ui/button'
-import { Input } from '@acme/ui/input'
-import { Label } from '@acme/ui/label'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@acme/ui/table'
-import { useQueryClient } from '@tanstack/react-query'
-import { useWalletUi } from '@wallet-ui/react'
-import { address, Address, Lamports, lamportsToSol } from 'gill'
-import { RefreshCw } from 'lucide-react'
-import { ErrorBoundary } from 'next/dist/client/components/error-boundary'
-import { useMemo, useState } from 'react'
+import type { Address, Lamports } from "gill";
+import { useMemo, useState } from "react";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
+import { useQueryClient } from "@tanstack/react-query";
+import { useWalletUi } from "@wallet-ui/react";
+import { address, lamportsToSol } from "gill";
+import { RefreshCw } from "lucide-react";
+
+import { ellipsify } from "@acme/lib";
+import { Button } from "@acme/ui/button";
+import { Input } from "@acme/ui/input";
+import { Label } from "@acme/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@acme/ui/table";
+
+import { AppAlert } from "../app-alert";
+import { AppModal } from "../app-modal";
+import { ExplorerLink } from "../cluster/cluster-ui";
 import {
   useGetBalanceQuery,
   useGetSignaturesQuery,
   useGetTokenAccountsQuery,
   useRequestAirdropMutation,
   useTransferSolMutation,
-} from './account-data-access'
-import { AppAlert } from '../app-alert'
-import { ExplorerLink } from '../cluster/cluster-ui'
-import { AppModal } from '../app-modal'
+} from "./account-data-access";
 
 export function AccountBalance({ address }: { address: Address }) {
-  const query = useGetBalanceQuery({ address })
+  const query = useGetBalanceQuery({ address });
 
   return (
-    <h1 className="text-5xl font-bold cursor-pointer" onClick={() => query.refetch()}>
-      {query.data?.value ? <BalanceSol balance={query.data.value} /> : '...'} SOL
+    <h1 className="cursor-pointer text-5xl font-bold" onClick={() => query.refetch()}>
+      {query.data?.value ? <BalanceSol balance={query.data.value} /> : "..."} SOL
     </h1>
-  )
+  );
 }
 
 export function AccountChecker() {
-  const { account } = useWalletUi()
+  const { account } = useWalletUi();
   if (!account) {
-    return null
+    return null;
   }
-  return <AccountBalanceCheck address={address(account.address)} />
+  return <AccountBalanceCheck address={address(account.address)} />;
 }
 
 export function AccountBalanceCheck({ address }: { address: Address }) {
-  const { cluster } = useWalletUi()
-  const mutation = useRequestAirdropMutation({ address })
-  const query = useGetBalanceQuery({ address })
+  const { cluster } = useWalletUi();
+  const mutation = useRequestAirdropMutation({ address });
+  const query = useGetBalanceQuery({ address });
 
   if (query.isLoading) {
-    return null
+    return null;
   }
   if (query.isError || !query.data?.value) {
     return (
@@ -57,35 +60,35 @@ export function AccountBalanceCheck({ address }: { address: Address }) {
       >
         You are connected to <strong>{cluster.label}</strong> but your account is not found on this cluster.
       </AppAlert>
-    )
+    );
   }
-  return null
+  return null;
 }
 
 export function AccountButtons({ address }: { address: Address }) {
-  const { cluster } = useWalletUi()
+  const { cluster } = useWalletUi();
 
   return (
     <div>
       <div className="space-x-2">
-        {cluster.id === 'solana:mainnet' ? null : <ModalAirdrop address={address} />}
+        {cluster.id === "solana:mainnet" ? null : <ModalAirdrop address={address} />}
         <ErrorBoundary errorComponent={() => null}>
           <ModalSend address={address} />
         </ErrorBoundary>
         <ModalReceive address={address} />
       </div>
     </div>
-  )
+  );
 }
 
 export function AccountTokens({ address }: { address: Address }) {
-  const [showAll, setShowAll] = useState(false)
-  const query = useGetTokenAccountsQuery({ address })
-  const client = useQueryClient()
+  const [showAll, setShowAll] = useState(false);
+  const query = useGetTokenAccountsQuery({ address });
+  const client = useQueryClient();
   const items = useMemo(() => {
-    if (showAll) return query.data
-    return query.data?.slice(0, 5)
-  }, [query.data, showAll])
+    if (showAll) return query.data;
+    return query.data?.slice(0, 5);
+  }, [query.data, showAll]);
 
   return (
     <div className="space-y-2">
@@ -99,10 +102,10 @@ export function AccountTokens({ address }: { address: Address }) {
               <Button
                 variant="outline"
                 onClick={async () => {
-                  await query.refetch()
+                  await query.refetch();
                   await client.invalidateQueries({
-                    queryKey: ['getTokenAccountBalance'],
-                  })
+                    queryKey: ["getTokenAccountBalance"],
+                  });
                 }}
               >
                 <RefreshCw size={16} />
@@ -138,10 +141,7 @@ export function AccountTokens({ address }: { address: Address }) {
                     <TableCell>
                       <div className="flex space-x-2">
                         <span className="font-mono">
-                          <ExplorerLink
-                            label={ellipsify(account.data.parsed.info.mint)}
-                            address={account.data.parsed.info.mint.toString()}
-                          />
+                          <ExplorerLink label={ellipsify(account.data.parsed.info.mint)} address={account.data.parsed.info.mint.toString()} />
                         </span>
                       </div>
                     </TableCell>
@@ -151,11 +151,11 @@ export function AccountTokens({ address }: { address: Address }) {
                   </TableRow>
                 ))}
 
-                {(query.data.length) > 5 && (
+                {query.data.length > 5 && (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center">
                       <Button variant="outline" onClick={() => setShowAll(!showAll)}>
-                        {showAll ? 'Show Less' : 'Show All'}
+                        {showAll ? "Show Less" : "Show All"}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -166,17 +166,17 @@ export function AccountTokens({ address }: { address: Address }) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export function AccountTransactions({ address }: { address: Address }) {
-  const query = useGetSignaturesQuery({ address })
-  const [showAll, setShowAll] = useState(false)
+  const query = useGetSignaturesQuery({ address });
+  const [showAll, setShowAll] = useState(false);
 
   const items = useMemo(() => {
-    if (showAll) return query.data
-    return query.data?.slice(0, 5)
-  }, [query.data, showAll])
+    if (showAll) return query.data;
+    return query.data?.slice(0, 5);
+  }, [query.data, showAll]);
 
   return (
     <div className="space-y-2">
@@ -213,7 +213,7 @@ export function AccountTransactions({ address }: { address: Address }) {
                     <TableHead className="font-mono">
                       <ExplorerLink transaction={item.signature} label={ellipsify(item.signature, 8)} />
                     </TableHead>
-                    <TableCell className="font-mono text-right">
+                    <TableCell className="text-right font-mono">
                       <ExplorerLink block={item.slot.toString()} label={item.slot.toString()} />
                     </TableCell>
                     <TableCell>{new Date(Number(item.blockTime) * 1000).toISOString()}</TableCell>
@@ -228,11 +228,11 @@ export function AccountTransactions({ address }: { address: Address }) {
                     </TableCell>
                   </TableRow>
                 ))}
-                {(query.data.length) > 5 && (
+                {query.data.length > 5 && (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center">
                       <Button variant="outline" onClick={() => setShowAll(!showAll)}>
-                        {showAll ? 'Show Less' : 'Show All'}
+                        {showAll ? "Show Less" : "Show All"}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -243,11 +243,11 @@ export function AccountTransactions({ address }: { address: Address }) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 function BalanceSol({ balance }: { balance: Lamports }) {
-  return <span>{lamportsToSol(balance)}</span>
+  return <span>{lamportsToSol(balance)}</span>;
 }
 
 function ModalReceive({ address }: { address: Address }) {
@@ -256,12 +256,12 @@ function ModalReceive({ address }: { address: Address }) {
       <p>Receive assets by sending them to your public key:</p>
       <code>{address.toString()}</code>
     </AppModal>
-  )
+  );
 }
 
 function ModalAirdrop({ address }: { address: Address }) {
-  const mutation = useRequestAirdropMutation({ address })
-  const [amount, setAmount] = useState('2')
+  const mutation = useRequestAirdropMutation({ address });
+  const [amount, setAmount] = useState("2");
 
   return (
     <AppModal
@@ -282,16 +282,16 @@ function ModalAirdrop({ address }: { address: Address }) {
         value={amount}
       />
     </AppModal>
-  )
+  );
 }
 
 function ModalSend(props: { address: Address }) {
-  const mutation = useTransferSolMutation({ address: props.address })
-  const [destination, setDestination] = useState('')
-  const [amount, setAmount] = useState('1')
+  const mutation = useTransferSolMutation({ address: props.address });
+  const [destination, setDestination] = useState("");
+  const [amount, setAmount] = useState("1");
 
   if (!props.address) {
-    return <div>Wallet not connected</div>
+    return <div>Wallet not connected</div>;
   }
 
   return (
@@ -303,7 +303,7 @@ function ModalSend(props: { address: Address }) {
         await mutation.mutateAsync({
           destination: address(destination),
           amount: parseFloat(amount),
-        })
+        });
       }}
     >
       <Label htmlFor="destination">Destination</Label>
@@ -327,5 +327,5 @@ function ModalSend(props: { address: Address }) {
         value={amount}
       />
     </AppModal>
-  )
+  );
 }

@@ -1,44 +1,79 @@
-import type { Chess, Color, Square } from "chess.js";
-import type { PropsWithChildren } from "react";
-import React, { createContext, useContext, useEffect, useState } from "react";
+"use client";
+
+import type { Color, Square } from "chess.js";
+import type { PropsWithChildren, ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { Chess } from "chess.js";
 import _ from "lodash";
 
-import type { MatchResult } from "@acme/db";
+import type { MatchResult, MatchStatus } from "@acme/anchor";
+import type { MatchMove } from "@acme/chess-queries";
 import type { ChessMoveType } from "@acme/lib";
 
 import { checkForValidClick } from "~/components/Utils";
 
+export interface GameData {
+  startedAt: Date;
+  baseTime: number;
+  incrementTime: number;
+  moves: MatchMove[];
+  status: MatchStatus;
+  result: MatchResult;
+  iAmPlayer?: Color;
+  gameState?: Chess;
+}
+
+export interface SideBar {
+  createMatch?: (baseTime: number, incrementTime: number) => void;
+  matches?: ReactNode;
+  players?: ReactNode;
+}
+
+export interface Layout {
+  boardHeightOffset?: number;
+}
 export interface BoardContextProps {
-  result?: MatchResult | null;
   reload?: () => void;
-  gameState: Chess;
   handleMove?: (move: ChessMoveType) => void;
-  initalFlip?: Color;
+  layout?: Layout;
+  isInMatching: boolean;
+  gameData?: GameData;
+  sideBar?: SideBar;
 }
 
 function useBoardContextLogic(props: BoardContextProps) {
-  const { gameState, handleMove, initalFlip } = props;
+  const { handleMove } = props;
+  const initalFlip = useMemo(() => props.gameData?.iAmPlayer ?? "w", [props.gameData?.iAmPlayer]);
+  const gameState = useMemo(() => {
+    const game = props.gameData?.gameState ?? new Chess();
+    props.gameData?.moves.forEach((mv) => game.move(mv.san));
+    return game;
+  }, [props.gameData]);
   const [game, setGame] = useState(gameState);
   const [selectedPiece, setSelectedPiece] = useState<Square | null>(null);
-  const [flip, setFlip] = useState(gameState.turn());
+  const [flip, setFlip] = useState(initalFlip);
   const [movesUndone, setMovesUndone] = useState<ChessMoveType[]>([]);
   const playerTurn = game.turn();
   const lastMove = game.history({ verbose: true })[game.history({ verbose: true }).length - 1];
 
   useEffect(() => {
+    if (props.gameData?.iAmPlayer) setFlip(props.gameData.iAmPlayer);
+  }, [props.gameData?.iAmPlayer]);
+  useEffect(() => {
     setGame(gameState);
     setSelectedPiece(null);
     setMovesUndone([]);
-
-    if (initalFlip) setFlip(initalFlip);
-    else setFlip(gameState.turn());
   }, [gameState]);
   const PieceLogic = (event: React.MouseEvent) => {
     if (movesUndone.length) return;
     const { isValid, square } = checkForValidClick(event, flip);
     if (!isValid || !handleMove) return;
     console.log("valid", square, game.get(square), initalFlip);
-    if (selectedPiece && initalFlip === game.turn() && movesUndone.length === 0) {
+    if (square === selectedPiece) {
+      setSelectedPiece(null);
+      return;
+    }
+    if (selectedPiece && props.gameData?.iAmPlayer === game.turn() && movesUndone.length === 0) {
       try {
         const move = { from: selectedPiece, to: square };
         try {
@@ -52,7 +87,7 @@ function useBoardContextLogic(props: BoardContextProps) {
         if (game.get(square)) setSelectedPiece(square);
         else setSelectedPiece(null);
       }
-    } else if (initalFlip && game.get(square)?.color === initalFlip) {
+    } else {
       console.log(square, game.get(square), initalFlip);
       setSelectedPiece(square);
     }
@@ -102,10 +137,8 @@ function useBoardContextLogic(props: BoardContextProps) {
   const reloadGame = () => props.reload?.();
 
   return {
-    reloadGame: () => {
-      reloadGame();
-      setGame(_.cloneDeep(gameState));
-    },
+    ...props,
+    initalFlip,
     playerTurn,
     PieceLogic,
     lastMove,
@@ -113,8 +146,11 @@ function useBoardContextLogic(props: BoardContextProps) {
     game,
     selectedPiece,
     movesUndone,
+    reloadGame: () => {
+      reloadGame();
+      setGame(_.cloneDeep(gameState));
+    },
     boardFunctions: { doMove, undoMove, setFlip, gotoMove, goEnd, goStart },
-    result: props.result,
   };
 }
 

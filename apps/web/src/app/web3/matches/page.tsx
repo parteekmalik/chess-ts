@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
+import { useWalletUi } from "@wallet-ui/react";
+
+import type { MatchAccount } from "@acme/chess-queries";
 import { MatchStatus } from "@acme/anchor";
-import { useAllMatches  } from "@acme/chess-queries";
-import type {MatchAccount} from "@acme/chess-queries";
+import { useAllMatches } from "@acme/chess-queries";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@acme/ui/card";
@@ -10,8 +13,6 @@ import { Input } from "@acme/ui/input";
 import { Label } from "@acme/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@acme/ui/select";
 import { Separator } from "@acme/ui/separator";
-import { useWalletUi } from "@wallet-ui/react";
-import { useState } from "react";
 
 export default function FindPage() {
   const { data: allMatches, isLoading: _matchesLoading } = useAllMatches();
@@ -27,22 +28,21 @@ export default function FindPage() {
   // Filter matches based on search criteria
   const filteredMatches = (allMatches ?? []).filter((match: MatchAccount) => {
     const matchId = match.matchId.toString();
-    const matchesSearch = searchTerm === "" ||
+    const matchesSearch =
+      searchTerm === "" ||
       matchId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (match.white?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
       (match.black?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
 
     const matchesStatus = statusFilter === "all";
 
-    const matchesTimeControl = timeControlFilter === "all" ||
+    const matchesTimeControl =
+      timeControlFilter === "all" ||
       (timeControlFilter === "blitz" && match.baseTimeSeconds <= 300) ||
       (timeControlFilter === "rapid" && match.baseTimeSeconds > 300 && match.baseTimeSeconds <= 900) ||
       (timeControlFilter === "classical" && match.baseTimeSeconds > 900);
 
-    const matchesRating = ratingFilter === "all" ||
-      (ratingFilter === "beginner") ||
-      (ratingFilter === "intermediate") ||
-      (ratingFilter === "advanced");
+    const matchesRating = ratingFilter === "all" || ratingFilter === "beginner" || ratingFilter === "intermediate" || ratingFilter === "advanced";
 
     return matchesSearch && matchesStatus && matchesTimeControl && matchesRating;
   });
@@ -52,26 +52,32 @@ export default function FindPage() {
   };
 
   const formatDate = (date: Date) => {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   };
 
-
-
-  const   getStatusColor = (status: MatchStatus) => {
+  const getStatusColor = (status: MatchStatus) => {
     switch (status) {
-      case MatchStatus.Active: return "bg-green-500";
-      case MatchStatus.Waiting: return "bg-yellow-500";
-      case MatchStatus.Finished: return "bg-gray-500";
-      default: return "bg-gray-400";
+      case MatchStatus.Active:
+        return "bg-green-500";
+      case MatchStatus.Waiting:
+        return "bg-yellow-500";
+      case MatchStatus.Finished:
+        return "bg-gray-500";
+      default:
+        return "bg-gray-400";
     }
   };
 
   const getStatusText = (status: MatchStatus) => {
     switch (status) {
-      case MatchStatus.Active: return "In Progress";
-      case MatchStatus.Waiting: return "Waiting for Player";
-      case MatchStatus.Finished: return "Game Over";
-      default: return "Unknown";
+      case MatchStatus.Active:
+        return "In Progress";
+      case MatchStatus.Waiting:
+        return "Waiting for Player";
+      case MatchStatus.Finished:
+        return "Game Over";
+      default:
+        return "Unknown";
     }
   };
 
@@ -89,26 +95,20 @@ export default function FindPage() {
           <div className="space-y-4">
             <h1 className="text-6xl font-bold text-primary">🔍</h1>
             <h2 className="text-4xl font-bold text-primary">Find Chess Matches</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Connect your wallet to search and filter available chess matches
-            </p>
+            <p className="mx-auto max-w-2xl text-xl text-muted-foreground">Connect your wallet to search and filter available chess matches</p>
           </div>
 
           <Separator />
 
-          <Card className="max-w-md mx-auto">
+          <Card className="mx-auto max-w-md">
             <CardHeader className="text-center">
               <CardTitle>Wallet Required</CardTitle>
-              <CardDescription>
-                To find and join chess matches, you need to connect your wallet first
-              </CardDescription>
+              <CardDescription>To find and join chess matches, you need to connect your wallet first</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-center py-4">
-                <p className="text-muted-foreground mb-4">
-                  Use the wallet connection button in the top-right header
-                </p>
-                <Badge variant="outline" className="text-lg px-4 py-2">
+              <div className="py-4 text-center">
+                <p className="mb-4 text-muted-foreground">Use the wallet connection button in the top-right header</p>
+                <Badge variant="outline" className="px-4 py-2 text-lg">
                   WalletButton → Header
                 </Badge>
               </div>
@@ -136,12 +136,12 @@ export default function FindPage() {
 
           <Separator />
 
-          <div className="text-center space-y-4">
+          <div className="space-y-4 text-center">
             <h3 className="text-2xl font-semibold">What You Can Do</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-2">
               <Card className="text-center">
                 <CardHeader>
-                  <div className="text-3xl mb-2">🔍</div>
+                  <div className="mb-2 text-3xl">🔍</div>
                   <CardTitle>Search Matches</CardTitle>
                   <CardDescription>Find games by player, rating, or time control</CardDescription>
                 </CardHeader>
@@ -149,7 +149,7 @@ export default function FindPage() {
 
               <Card className="text-center">
                 <CardHeader>
-                  <div className="text-3xl mb-2">🎯</div>
+                  <div className="mb-2 text-3xl">🎯</div>
                   <CardTitle>Join Games</CardTitle>
                   <CardDescription>Join waiting matches or create new ones</CardDescription>
                 </CardHeader>
@@ -157,7 +157,7 @@ export default function FindPage() {
 
               <Card className="text-center">
                 <CardHeader>
-                  <div className="text-3xl mb-2">⚡</div>
+                  <div className="mb-2 text-3xl">⚡</div>
                   <CardTitle>Quick Filters</CardTitle>
                   <CardDescription>Filter by status, time control, and rating</CardDescription>
                 </CardHeader>
@@ -165,7 +165,7 @@ export default function FindPage() {
 
               <Card className="text-center">
                 <CardHeader>
-                  <div className="text-3xl mb-2">👥</div>
+                  <div className="mb-2 text-3xl">👥</div>
                   <CardTitle>Player Matching</CardTitle>
                   <CardDescription>Find opponents at your skill level</CardDescription>
                 </CardHeader>
@@ -179,12 +179,10 @@ export default function FindPage() {
 
   // Wallet is connected, show the search interface
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      <div className="text-center space-y-4">
+    <div className="container mx-auto space-y-8 p-6">
+      <div className="space-y-4 text-center">
         <h1 className="text-4xl font-bold text-primary">Find Chess Matches</h1>
-        <p className="text-xl text-muted-foreground">
-          Search and filter available chess matches
-        </p>
+        <p className="text-xl text-muted-foreground">Search and filter available chess matches</p>
       </div>
 
       <Separator />
@@ -196,15 +194,10 @@ export default function FindPage() {
           <CardDescription>Find matches that match your criteria</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <Label htmlFor="search">Search</Label>
-              <Input
-                id="search"
-                placeholder="Match ID, player name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+              <Input id="search" placeholder="Match ID, player name..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             </div>
 
             <div className="space-y-2">
@@ -253,10 +246,8 @@ export default function FindPage() {
             </div>
           </div>
 
-          <div className="mt-4 flex justify-between items-center">
-            <div className="text-sm text-muted-foreground">
-              Found {filteredMatches.length} matches
-            </div>
+          <div className="mt-4 flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">Found {filteredMatches.length} matches</div>
             <Button
               variant="outline"
               onClick={() => {
@@ -274,7 +265,7 @@ export default function FindPage() {
 
       {/* Search Results */}
       <div>
-        <h2 className="text-2xl font-semibold mb-4">Available Matches</h2>
+        <h2 className="mb-4 text-2xl font-semibold">Available Matches</h2>
         {filteredMatches.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">
@@ -294,43 +285,35 @@ export default function FindPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {filteredMatches.map((match) => (
-              <Card key={match.matchId.toString()} className="hover:shadow-lg transition-shadow">
+              <Card key={match.matchId.toString()} className="transition-shadow hover:shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <span>Match {match.matchId.toString()}</span>
                     <div className="flex items-center space-x-2">
-                      <Badge className={getStatusColor(match.status)}>
-                        {getStatusText(match.status)}
-                      </Badge>
-                      <Badge variant="outline">
-                        {getTimeControlText(match.baseTimeSeconds, match.incrementSeconds)}
-                      </Badge>
+                      <Badge className={getStatusColor(match.status)}>{getStatusText(match.status)}</Badge>
+                      <Badge variant="outline">{getTimeControlText(match.baseTimeSeconds, match.incrementSeconds)}</Badge>
                     </div>
                   </CardTitle>
                   <CardDescription>
-                    {match.status === MatchStatus.Waiting ? "Created" : "Started"}: {formatDate(match.createdAt)} •
-                    Time: {match.baseTimeSeconds}s + {match.incrementSeconds}s
+                    {match.status === MatchStatus.Waiting ? "Created" : "Started"}: {formatDate(match.createdAt)} • Time: {match.baseTimeSeconds}s +{" "}
+                    {match.incrementSeconds}s
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-muted-foreground font-medium">White</Label>
+                      <Label className="font-medium text-muted-foreground">White</Label>
                       <div className="font-mono text-sm text-muted-foreground">{match.white ? formatAddress(match.white) : "Unknown"}</div>
-                      <div className="text-xs text-muted-foreground">
-                        Rating: N/A
-                      </div>
+                      <div className="text-xs text-muted-foreground">Rating: N/A</div>
                     </div>
                     <div>
-                      <Label className="text-muted-foreground font-medium">Black</Label>
+                      <Label className="font-medium text-muted-foreground">Black</Label>
                       {match.black ? (
                         <>
                           <div className="font-mono text-sm text-muted-foreground">{formatAddress(match.black)}</div>
-                          <div className="text-xs text-muted-foreground">
-                            Rating: N/A
-                          </div>
+                          <div className="text-xs text-muted-foreground">Rating: N/A</div>
                         </>
                       ) : (
                         <div className="text-muted-foreground">Waiting for player...</div>
@@ -340,18 +323,14 @@ export default function FindPage() {
 
                   {match.status === MatchStatus.Active && (
                     <div>
-                      <Label className="text-muted-foreground font-medium">Current Position</Label>
-                      <div className="font-mono text-xs bg-muted p-2 rounded">
-                        {match.fen}
-                      </div>
+                      <Label className="font-medium text-muted-foreground">Current Position</Label>
+                      <div className="rounded bg-muted p-2 font-mono text-xs">{match.fen}</div>
                     </div>
                   )}
 
                   {match.status === MatchStatus.Waiting && (
                     <div className="pt-2">
-                      <Button className="w-full">
-                        Join Match
-                      </Button>
+                      <Button className="w-full">Join Match</Button>
                     </div>
                   )}
 
@@ -376,8 +355,6 @@ export default function FindPage() {
           </div>
         )}
       </div>
-
-
     </div>
   );
 }

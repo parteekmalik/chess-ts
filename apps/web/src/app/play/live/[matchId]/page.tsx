@@ -4,30 +4,39 @@ import React from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 
+import type { Match, MatchResult, MatchWinner, Move } from "@acme/db";
+import { MatchStatus, MatchResult as Web3MatchResult } from "@acme/anchor";
+
+import type { GameData } from "~/components/contexts/Board/BoardContextComponent";
 import { BoardWithTime } from "~/components/LiveMatch/BoardWithTime";
+import { useFindMatch } from "~/components/LiveMatch/hooks/useFindMatch";
 import { useLiveGame } from "~/components/LiveMatch/hooks/useLiveGame";
 import Result from "~/components/LiveMatch/result";
 
 const LiveBoard: React.FunctionComponent = () => {
   const params = useParams();
-  const { match, isLoading, gameState, playerTimes, handleMove, openResult, reload } = useLiveGame(params.matchId as string | undefined);
+  const { match, isLoading, handleMove, openResult, reload } = useLiveGame(params.matchId as string | undefined);
   const { data: session } = useSession();
+  const { findMatchViaSocket, isLoading: isInMatching } = useFindMatch();
 
   if (isLoading) return <div>Loading...</div>;
   if (!match) return <div>Match not found</div>;
 
   const iAmPlayer = match.whitePlayerId === session?.user.id ? "w" : match.blackPlayerId === session?.user.id ? "b" : null;
 
+  const createMatch = (baseTime: number, incrementTime: number) => {
+    findMatchViaSocket(baseTime, incrementTime);
+  };
+
   return (
     <div className="text-background-foreground flex w-full flex-col">
       <BoardWithTime
-        gameState={gameState}
-        initalFlip={iAmPlayer ?? "w"}
-        turn={match.moves.length % 2 === 0 ? "w" : "b"}
-        result={match.stats}
+        isInMatching={isInMatching}
+        sideBar={{ createMatch }}
         reload={reload}
-        whitePlayerData={{ time: playerTimes.w, id: match.whitePlayerId }}
-        blackPlayerData={{ time: playerTimes.b, id: match.blackPlayerId }}
+        gameData={convertMatchToGameData(match)}
+        whitePlayerData={{ id: match.whitePlayerId }}
+        blackPlayerData={{ id: match.blackPlayerId }}
         handleMove={handleMove}
       />
       {openResult && <Result playerTurn={iAmPlayer} matchId={params.matchId as string} />}
@@ -36,3 +45,26 @@ const LiveBoard: React.FunctionComponent = () => {
 };
 
 export default LiveBoard;
+
+const convertMatchToGameData = (match: Match & { moves: Move[]; stats: MatchResult }): GameData => {
+  return {
+    moves: match.moves.map((move) => ({ san: move.move, ts: move.timestamp })),
+    startedAt: match.startedAt,
+    baseTime: match.baseTime,
+    incrementTime: match.incrementTime,
+    status: match.stats.winner === "PLAYING" ? MatchStatus.Active : MatchStatus.Finished,
+    result: convertResult(match.stats.winner),
+  };
+};
+function convertResult(result: MatchWinner): Web3MatchResult {
+  switch (result) {
+    case "PLAYING":
+      return Web3MatchResult.Pending;
+    case "WHITE":
+      return Web3MatchResult.WhiteWin;
+    case "BLACK":
+      return Web3MatchResult.BlackWin;
+    case "DRAW":
+      return Web3MatchResult.Draw;
+  }
+}

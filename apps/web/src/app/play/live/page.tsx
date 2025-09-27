@@ -1,13 +1,17 @@
 "use client";
 
-import { Chess } from "chess.js";
-
 import { BoardWithTime } from "~/components/LiveMatch/BoardWithTime";
+import { useFindMatch } from "~/components/LiveMatch/hooks/useFindMatch";
 
 function Online() {
+  const { findMatchViaSocket, isLoading: isInMatching } = useFindMatch();
+
+  const createMatch = (baseTime: number, incrementTime: number) => {
+    findMatchViaSocket(baseTime, incrementTime);
+  };
   return (
     <div className="flex h-full justify-center p-2">
-      <BoardWithTime whitePlayerData={{ time: 5 * 60 * 1000 }} blackPlayerData={{ time: 5 * 60 * 1000 }} gameState={new Chess()} />
+      <BoardWithTime isInMatching={isInMatching} sideBar={{ createMatch }} />
     </div>
   );
 }

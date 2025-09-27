@@ -1,13 +1,13 @@
 // Profile React Query hooks and mutations - works independently from API
 
+import type { Address, SolanaClient } from "gill";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useWalletUi } from "@wallet-ui/react";
 import { address } from "gill";
-import type { Address } from "gill";
 import { toast } from "sonner";
 
-import { fetchAllChessMatch, getCleanProfileInstructionAsync, getInitializeProfileInstructionAsync } from "@acme/anchor";
-import type { SolanaClient } from "gill";
+import { fetchAllChessMatch, getCleanProfileInstructionAsync, getInitializeProfileInstructionAsync, MatchStatus } from "@acme/anchor";
+
 import { getMatchPda, matchProcessor } from "../match";
 import { useInvalidateCryptoQueries } from "../utils/invalidate-all-queries";
 import { useWalletTransactionSignAndSend } from "../utils/use-wallet-transaction-sign-and-send";
@@ -25,9 +25,10 @@ async function getProfileMatchIds(profileAddress: Address, client: SolanaClient)
 }
 
 // Helper function to get connected wallet profile match IDs
-async function getConnectedWalletMatchIds(client: SolanaClient) {
-  const { account } = useWalletUi();
-  const profileAccount = await profileFetcher.getProfileByWalletAddress(address(account!.address), client.rpc);
+// NOTE: Must NOT call hooks inside helpers. Accept required params instead.
+async function getConnectedWalletMatchIds(client: SolanaClient, accountAddress: string | undefined) {
+  if (!accountAddress) return [];
+  const profileAccount = await profileFetcher.getProfileByWalletAddress(address(accountAddress), client.rpc);
   return profileAccount?.matches ?? [];
 }
 
@@ -40,14 +41,14 @@ async function fetchProfileMatches(matchIds: number[], client: SolanaClient) {
     matchIds.map(async (matchId) => {
       const [pda] = await getMatchPda(matchId);
       return pda;
-    })
+    }),
   );
 
   // Fetch all matches efficiently using fetchAllChessMatch
   const matches = await fetchAllChessMatch(client.rpc, matchPdas);
 
   // Process the matches
-  return matches.map(match => matchProcessor(match));
+  return matches.map((match) => matchProcessor(match));
 }
 
 export function useProfile(profileAddress: Address) {
@@ -107,14 +108,40 @@ export function useProfileMatches(profileAddress: Address) {
 }
 
 export function useConnectedWalletProfileMatches() {
-  const { client } = useWalletUi();
+  const { client, account } = useWalletUi();
 
   return useQuery({
     queryKey: ["profile", "matches", "connected"],
     queryFn: async () => {
-      const matchIds = await getConnectedWalletMatchIds(client);
+      const matchIds = await getConnectedWalletMatchIds(client, account?.address);
       return await fetchProfileMatches(matchIds, client);
     },
+  });
+}
+
+export function useWaitForJoin() {
+  const { account, client } = useWalletUi();
+  return useQuery({
+    queryKey: ["profile", "matches", "connected", "isWaiting"],
+    queryFn: async () => {
+      const matchIds = await getConnectedWalletMatchIds(client, account?.address);
+      const matches = await fetchProfileMatches(matchIds, client);
+      return matches.find((match) => match.status === MatchStatus.Waiting) ?? null;
+    },
+    refetchInterval: 5000,
+  });
+}
+
+export function useFindJoinedMatch() {
+  const { account, client } = useWalletUi();
+  return useQuery({
+    queryKey: ["profile", "matches", "connected", "activeMatch"],
+    queryFn: async () => {
+      const matchIds = await getConnectedWalletMatchIds(client, account?.address);
+      const matches = await fetchProfileMatches(matchIds, client);
+      return matches.find((match) => match.status === MatchStatus.Active) ?? null;
+    },
+    refetchInterval: 5000,
   });
 }
 
@@ -128,10 +155,13 @@ export function useInitializeProfileMutation() {
 
   return useMutation({
     mutationFn: async ({ name }: { name: string }) => {
-      return await signAndSend(await getInitializeProfileInstructionAsync({
-        name,
-        payer: signer,
-      }), signer);
+      return await signAndSend(
+        await getInitializeProfileInstructionAsync({
+          name,
+          payer: signer,
+        }),
+        signer,
+      );
     },
     onSuccess: async (data, { name }) => {
       toast.success(`Profile initialized: ${name} with signature: ${data}`);
@@ -151,11 +181,14 @@ export function useCleanProfileMutation() {
   const invalidateAllCryptoQueries = useInvalidateCryptoQueries();
 
   return useMutation({
-    mutationFn: async ({ profileAddress }: { profileAddress: string }) => {
-      return await signAndSend(await getCleanProfileInstructionAsync({
-        profile: profileAddress as Address,
-        payer: signer,
-      }), signer);
+    mutationFn: async ({ profileAddress }: { profileAddress: Address }) => {
+      return await signAndSend(
+        await getCleanProfileInstructionAsync({
+          profile: profileAddress,
+          payer: signer,
+        }),
+        signer,
+      );
     },
     onSuccess: async (data, { profileAddress }) => {
       toast.success(`Profile cleaned: ${profileAddress} with signature: ${data}`);

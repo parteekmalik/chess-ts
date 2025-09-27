@@ -6,7 +6,7 @@ import { cn } from "@acme/ui";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@acme/ui/accordion";
 import { Button } from "@acme/ui/button";
 
-import { useFindMatch } from "./hooks/useFindMatch";
+import { useBoard } from "../contexts/Board/BoardContextComponent";
 
 export function NewMatch() {
   const [selectedGameType, setSelectedGameType] = useState<{
@@ -15,11 +15,7 @@ export function NewMatch() {
     name: string;
   }>({ baseTime: 10, incrementTime: 0, name: "Rapid" });
 
-  const { findMatchViaSocket, isLoading } = useFindMatch();
-
-  const handleSubmit = () => {
-    findMatchViaSocket(selectedGameType.baseTime * 60000, selectedGameType.incrementTime * 1000);
-  };
+  const { sideBar, isInMatching } = useBoard();
 
   return (
     <div className="space-y-4">
@@ -68,8 +64,12 @@ export function NewMatch() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-
-        <Button disabled={isLoading} color="success" onClick={handleSubmit} className="text-bold h-auto w-full py-3 text-xl text-white">
+        <Button
+          disabled={isInMatching}
+          color="success"
+          onClick={() => sideBar?.createMatch?.(selectedGameType.baseTime * 60000, selectedGameType.incrementTime * 1000)}
+          className="text-bold h-auto w-full py-3 text-xl text-white"
+        >
           Start Game
         </Button>
       </div>

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import moment from "moment";
 
+import { MatchStatus } from "@acme/anchor";
 import { cn } from "@acme/ui";
 import { Card, CardContent } from "@acme/ui/card";
 
@@ -11,10 +12,10 @@ import { UserCard } from "~/components/userCard";
 
 export const TimerContainer = ({ variant, isTurn, time, userId }: { variant: "white" | "black"; time: number; userId?: string; isTurn: boolean }) => {
   const [liveTimeLeft, setLiveTimeLeft] = React.useState(0);
-  const { result } = useBoard();
+  const gameData = useBoard().gameData;
 
   useEffect(() => {
-    if (isTurn && result?.winner === "PLAYING") {
+    if (isTurn && gameData?.status === MatchStatus.Active) {
       const worker = new Worker(new URL("~/workers/timer.worker.ts", import.meta.url));
       worker.postMessage({ time });
       worker.onmessage = (e) => {
@@ -23,7 +24,7 @@ export const TimerContainer = ({ variant, isTurn, time, userId }: { variant: "wh
       };
       return () => worker.terminate();
     }
-  }, [time, isTurn, result]);
+  }, [time, isTurn, gameData]);
 
   useEffect(() => {
     setLiveTimeLeft(time);
@@ -60,7 +61,7 @@ const TimerComponent = ({ time, variant, isTurn }: { time: number; variant: "whi
           isTurn && isMicroSec && "fill-red-400 text-red-400",
         )}
       >
-        <ClockSvg isTurn={isTurn} />
+        <ClockSvg time={time} isTurn={isTurn} />
         <p className={cn("ml-auto text-2xl")} style={{ fontFamily: "monospace" }}>
           {hour}
           {minute}:{seconds}
@@ -71,19 +72,16 @@ const TimerComponent = ({ time, variant, isTurn }: { time: number; variant: "whi
   );
 };
 
-const ClockSvg = ({ isTurn }: { isTurn: boolean }) => {
-  const { result } = useBoard();
+const ClockSvg = ({ isTurn, time }: { isTurn: boolean; time: number }) => {
+  const { gameData } = useBoard();
   const [rotation, setRotation] = React.useState(0);
-  useEffect(() => {
-    if (isTurn && result?.winner === "PLAYING") {
-      const interval = setInterval(() => {
-        setRotation((prev) => prev + 90);
-      }, 1000);
-      return () => clearInterval(interval);
+  useLayoutEffect(() => {
+    if (isTurn && gameData?.status === MatchStatus.Active) {
+      setRotation((prev) => prev + 90);
     } else {
       setRotation(0);
     }
-  }, [isTurn, result]);
+  }, [isTurn, gameData, time]);
 
   if (isTurn)
     return (
