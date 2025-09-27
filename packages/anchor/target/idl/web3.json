@@ -1,0 +1,700 @@
+{
+  "address": "2yPLmwjdWoBuX5jca96tjfxGL2wAPNfHQEyCMAcABcyU",
+  "metadata": {
+    "name": "web3",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "clean_profile",
+      "discriminator": [
+        200,
+        172,
+        74,
+        131,
+        246,
+        80,
+        72,
+        26
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "payer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "close_chess_match",
+      "discriminator": [
+        114,
+        13,
+        159,
+        131,
+        41,
+        71,
+        181,
+        151
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "chess_match",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_chess_match",
+      "discriminator": [
+        151,
+        70,
+        109,
+        219,
+        177,
+        191,
+        236,
+        31
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "chess_match",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "arg",
+                "path": "match_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "payer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "match_id",
+          "type": "u64"
+        },
+        {
+          "name": "base_time_seconds",
+          "type": "u32"
+        },
+        {
+          "name": "increment_seconds",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "initialize_profile",
+      "discriminator": [
+        32,
+        145,
+        77,
+        213,
+        58,
+        39,
+        251,
+        234
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "payer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "initialize_registry",
+      "discriminator": [
+        189,
+        181,
+        20,
+        17,
+        174,
+        57,
+        249,
+        59
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "join_chess_match",
+      "discriminator": [
+        54,
+        143,
+        175,
+        160,
+        64,
+        21,
+        123,
+        211
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "chess_match",
+          "writable": true
+        },
+        {
+          "name": "registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "payer"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "make_move",
+      "discriminator": [
+        78,
+        77,
+        152,
+        203,
+        222,
+        211,
+        208,
+        233
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "chess_match",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "chess_match.id",
+                "account": "ChessMatch"
+              }
+            ]
+          }
+        },
+        {
+          "name": "registry",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  103,
+                  105,
+                  115,
+                  116,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "payer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "opponent_profile",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "move_fen_str",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ChessMatch",
+      "discriminator": [
+        72,
+        241,
+        122,
+        67,
+        252,
+        229,
+        79,
+        237
+      ]
+    },
+    {
+      "name": "Profile",
+      "discriminator": [
+        184,
+        101,
+        165,
+        188,
+        95,
+        63,
+        127,
+        188
+      ]
+    },
+    {
+      "name": "Registry",
+      "discriminator": [
+        47,
+        174,
+        110,
+        246,
+        184,
+        182,
+        252,
+        218
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "NotReachable",
+      "msg": "This is not supposed to be reachable"
+    },
+    {
+      "code": 6001,
+      "name": "MatchAlreadyFull",
+      "msg": "Match is already full"
+    },
+    {
+      "code": 6002,
+      "name": "IllegalMove",
+      "msg": "Illegal move"
+    },
+    {
+      "code": 6003,
+      "name": "MatchNotActiveOrFinished",
+      "msg": "Match is not active or finished"
+    },
+    {
+      "code": 6004,
+      "name": "MatchNotStarted",
+      "msg": "Match is not started"
+    },
+    {
+      "code": 6005,
+      "name": "NotYourTurn",
+      "msg": "It's not your turn"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidProfileSent",
+      "msg": "Invalid profile sent not mached with player"
+    },
+    {
+      "code": 6007,
+      "name": "MatchTimeOut",
+      "msg": "Match time out"
+    },
+    {
+      "code": 6008,
+      "name": "MatchAbandoned",
+      "msg": "Match abandoned"
+    }
+  ],
+  "types": [
+    {
+      "name": "ChessMatch",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "acc_type",
+            "type": "u8"
+          },
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "white",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "black",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "MatchStatus"
+              }
+            }
+          },
+          {
+            "name": "white_win_rating_change",
+            "type": "u8"
+          },
+          {
+            "name": "black_win_rating_change",
+            "type": "u8"
+          },
+          {
+            "name": "base_time_seconds",
+            "type": "u32"
+          },
+          {
+            "name": "increment_seconds",
+            "type": "u32"
+          },
+          {
+            "name": "result",
+            "type": {
+              "defined": {
+                "name": "MatchResult"
+              }
+            }
+          },
+          {
+            "name": "abandonment_at",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "ends_at",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "matched_at",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "finished_at",
+            "type": {
+              "option": "i64"
+            }
+          },
+          {
+            "name": "fen",
+            "type": "string"
+          },
+          {
+            "name": "moves",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "MoveRecord"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MatchResult",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Pending"
+          },
+          {
+            "name": "WhiteWin"
+          },
+          {
+            "name": "BlackWin"
+          },
+          {
+            "name": "Draw"
+          },
+          {
+            "name": "Abandoned"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MatchStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Waiting"
+          },
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Finished"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MoveRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ts",
+            "type": "i64"
+          },
+          {
+            "name": "san",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Profile",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "acc_type",
+            "type": "u8"
+          },
+          {
+            "name": "wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "rating",
+            "type": "u32"
+          },
+          {
+            "name": "wins",
+            "type": "u32"
+          },
+          {
+            "name": "losses",
+            "type": "u32"
+          },
+          {
+            "name": "draws",
+            "type": "u32"
+          },
+          {
+            "name": "display_name",
+            "type": "string"
+          },
+          {
+            "name": "matches",
+            "type": {
+              "vec": "u64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Registry",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "acc_type",
+            "type": "u8"
+          },
+          {
+            "name": "matches_played",
+            "type": "u32"
+          },
+          {
+            "name": "matches_pending",
+            "type": "u32"
+          },
+          {
+            "name": "matches_playing",
+            "type": "u32"
+          }
+        ]
+      }
+    }
+  ]
+}

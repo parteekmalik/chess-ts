@@ -16,7 +16,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "pnpm run anchor-build && tsc",
+    "build": "tsc",
     "build:watch": "tsc --watch",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "anchor": "anchor",

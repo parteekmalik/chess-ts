@@ -57,7 +57,7 @@ dist/
 # rust
 .anchor
 target
-!/packages/**/web3.json
+!target/idl/web3.json
 .nx
 black.json
 white.json
