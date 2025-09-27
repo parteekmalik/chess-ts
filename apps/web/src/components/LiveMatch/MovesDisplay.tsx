@@ -33,14 +33,14 @@ export function MovesDisplay() {
         <div ref={scrollRef} className="overflow-aut flex max-h-40">
           <div className="flex w-fit flex-col">
             {result.map((_, index) => (
-              <div key={index} className={cn("h-[30px] w-full items-center px-4 text-sm text-white/80 odd:bg-black/10 even:bg-[#ffffff05]")}>
-                <td className="text-muted-foreground">{index + 1}.</td>
+              <div key={index} className={cn("flex h-[30px] w-full items-center px-4 text-sm text-white/80 odd:bg-black/10 even:bg-[#ffffff05]")}>
+                <p className="text-muted-foreground">{index + 1}.</p>
               </div>
             ))}
           </div>
           <div className="flex w-fit flex-col">
             {result.map((move, index) => (
-              <div key={index} className={cn("h-[30px] w-full items-center px-4 text-sm text-white/80 odd:bg-black/10 even:bg-[#ffffff05]")}>
+              <div key={index} className={cn("h-[30px] w-full px-4 text-sm text-white/80 odd:bg-black/10 even:bg-[#ffffff05]")}>
                 {move.white && (
                   <Button variant="ghost" className="h-[30px] p-0" style={{ lineHeight: "30px" }} onClick={() => gotoMove(index * 2)}>
                     {move.white.move.san}
@@ -51,7 +51,7 @@ export function MovesDisplay() {
           </div>
           <div className="flex w-fit flex-col">
             {result.map((move, index) => (
-              <div key={index} className={cn("h-[30px] w-full items-center px-4 text-sm text-white/80 odd:bg-black/10 even:bg-[#ffffff05]")}>
+              <div key={index} className={cn("h-[30px] w-full px-4 text-sm text-white/80 odd:bg-black/10 even:bg-[#ffffff05]")}>
                 {move.black && (
                   <Button variant="ghost" className="h-[30px] p-0" style={{ lineHeight: "30px" }} onClick={() => gotoMove(index * 2 + 1)}>
                     {move.black.move.san}
@@ -62,7 +62,7 @@ export function MovesDisplay() {
           </div>
           <div className="flex grow flex-col">
             {result.map((move, index) => (
-              <div key={index} className={cn("h-[30px] w-full items-center pl-4 text-sm text-white/80 odd:bg-black/10 even:bg-[#ffffff05]")}>
+              <div key={index} className={cn("h-[30px] w-full pl-4 text-sm text-white/80 odd:bg-black/10 even:bg-[#ffffff05]")}>
                 <div className="h-[30px] items-end py-[3px]">
                   <div className={cn("flex-1")}>
                     {
@@ -86,7 +86,7 @@ export function MovesDisplay() {
           </div>
           <div className="flex flex-col">
             {result.map((move, index) => (
-              <div key={index} className={cn("h-[30px] w-full items-center pr-4 text-sm text-white/80 odd:bg-black/10 even:bg-[#ffffff05]")}>
+              <div key={index} className={cn("h-[30px] w-full pr-4 text-sm text-white/80 odd:bg-black/10 even:bg-[#ffffff05]")}>
                 <div className="h-[30px] items-end py-[3px]">
                   <p className="ml-1 text-muted-foreground" style={{ fontSize: "10px", lineHeight: "10px" }}>
                     {move.white?.difference ? `${(move.white.difference / 1000).toFixed(1)} s` : ""}

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useParams } from "next/navigation";
+import { BLACK, WHITE } from "chess.js";
 import { useSession } from "next-auth/react";
 
 import type { Match, MatchResult, MatchWinner, Move } from "@acme/db";
@@ -11,18 +12,17 @@ import type { GameData } from "~/components/contexts/Board/BoardContextComponent
 import { BoardWithTime } from "~/components/LiveMatch/BoardWithTime";
 import { useFindMatch } from "~/components/LiveMatch/hooks/useFindMatch";
 import { useLiveGame } from "~/components/LiveMatch/hooks/useLiveGame";
-import Result from "~/components/LiveMatch/result";
 
 const LiveBoard: React.FunctionComponent = () => {
   const params = useParams();
-  const { match, isLoading, handleMove, openResult, reload } = useLiveGame(params.matchId as string | undefined);
+  const { match, isLoading, handleMove, reload } = useLiveGame(params.matchId as string | undefined);
   const { data: session } = useSession();
   const { findMatchViaSocket, isLoading: isInMatching } = useFindMatch();
 
   if (isLoading) return <div>Loading...</div>;
   if (!match) return <div>Match not found</div>;
 
-  const iAmPlayer = match.whitePlayerId === session?.user.id ? "w" : match.blackPlayerId === session?.user.id ? "b" : null;
+  const iAmPlayer = match.whitePlayerId === session?.user.id ? WHITE : match.blackPlayerId === session?.user.id ? BLACK : undefined;
 
   const createMatch = (baseTime: number, incrementTime: number) => {
     findMatchViaSocket(baseTime, incrementTime);
@@ -34,12 +34,11 @@ const LiveBoard: React.FunctionComponent = () => {
         isInMatching={isInMatching}
         sideBar={{ createMatch }}
         reload={reload}
-        gameData={convertMatchToGameData(match)}
+        gameData={{ ...convertMatchToGameData(match), iAmPlayer }}
         whitePlayerData={{ id: match.whitePlayerId }}
         blackPlayerData={{ id: match.blackPlayerId }}
         handleMove={handleMove}
       />
-      {openResult && <Result playerTurn={iAmPlayer} matchId={params.matchId as string} />}
     </div>
   );
 };

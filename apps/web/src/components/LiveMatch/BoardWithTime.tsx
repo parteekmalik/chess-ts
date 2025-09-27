@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import { calculateTimeLeft } from "@acme/lib";
 
@@ -8,6 +8,7 @@ import type { BoardProps } from "~/components/board/board";
 import type { BoardContextProps } from "~/components/contexts/Board/BoardContextComponent";
 import { ChessBoardWrapper } from "~/components/board/board";
 import { BoardProvider } from "~/components/contexts/Board/BoardContextComponent";
+import Result from "./result";
 import SidebarTabs from "./SidebarTabs";
 import { TimerContainer } from "./TimeContainerBar";
 
@@ -31,7 +32,10 @@ export function BoardWithTime(props: BoardWithTimeProps) {
         : { w: 5 * 60 * 1000, b: 5 * 60 * 1000 },
     [props.gameData],
   );
-
+  const isTurn = useMemo(() => (props.gameData ? props.gameData.moves.length % 2 === 1 : false), [props.gameData]);
+  useEffect(() => {
+    console.log("updated game data: ", props.gameData);
+  }, [props.gameData]);
   return (
     <BoardProvider {...props}>
       <div className="flex grow flex-col justify-between gap-4 lg:flex-row lg:p-4">
@@ -44,16 +48,10 @@ export function BoardWithTime(props: BoardWithTimeProps) {
               userId={props.whitePlayerData?.id}
             />
           }
-          blackBar={
-            <TimerContainer
-              variant="black"
-              isTurn={props.gameData ? props.gameData.moves.length % 2 === 1 : false}
-              time={playerTimes.b}
-              userId={props.blackPlayerData?.id}
-            />
-          }
+          blackBar={<TimerContainer variant="black" isTurn={isTurn} time={playerTimes.b} userId={props.blackPlayerData?.id} />}
         />
         <SidebarTabs />
+        <Result />
       </div>
     </BoardProvider>
   );
