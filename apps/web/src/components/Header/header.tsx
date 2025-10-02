@@ -111,12 +111,12 @@ function VerticalHeader({ className }: { className?: string }) {
           <Link
             href="/web3"
             className={twMerge(
-              "bg-success-200 mb-2 mx-auto flex w-full items-center justify-center gap-4 rounded-lg border border-gray-300 py-3 text-sm font-medium focus:outline-none focus:ring-4",
+              "bg-success-200 mb-2 mx-auto flex w-full items-center justify-center gap-4 rounded-lg border border-gray-300 p-0 text-sm font-medium focus:outline-none focus:ring-4",
               !isExpanded && "aspect-square px-0 py-1",
             )}
           >
             {isExpanded && <span>Web3</span>}
-            <Image src="https://s3-symbol-logo.tradingview.com/crypto/XTVCSOL.svg" alt="Web3" width={24} height={24} />
+            <Image src="https://s3-symbol-logo.tradingview.com/crypto/XTVCSOL.svg" alt="Web3" width={36} height={36} />
           </Link>
           <Link
             href={session?.user ? "/api/auth/signout" : "/api/auth/signin"}
