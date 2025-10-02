@@ -11,6 +11,7 @@ import { cn } from "@acme/ui";
 import { Drawer, DrawerContent, DrawerTrigger } from "@acme/ui/drawer";
 
 import { ThemeSwitch } from "./ThemeSwitch";
+import Image from "next/image";
 
 const iconClassName = "h-[3em] w-[3em] text-[10px]";
 const navLinks = [
@@ -107,6 +108,16 @@ function VerticalHeader({ className }: { className?: string }) {
               </li>
             ))}
           </ul>
+          <Link
+            href="/web3"
+            className={twMerge(
+              "bg-success-200 mb-2 mx-auto flex w-full items-center justify-center gap-4 rounded-lg border border-gray-300 py-3 text-sm font-medium focus:outline-none focus:ring-4",
+              !isExpanded && "aspect-square px-0 py-1",
+            )}
+          >
+            {isExpanded && <span>Web3</span>}
+            <Image src="https://s3-symbol-logo.tradingview.com/crypto/XTVCSOL.svg" alt="Web3" width={24} height={24} />
+          </Link>
           <Link
             href={session?.user ? "/api/auth/signout" : "/api/auth/signin"}
             className={twMerge(
