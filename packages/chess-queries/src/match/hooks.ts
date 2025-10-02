@@ -166,6 +166,46 @@ export function useJoinChessMatchMutation() {
   });
 }
 
+export function useMatchMakingMutation() {
+  const { client } = useWalletUi();
+  const signer = useWalletUiSigner();
+  const signAndSend = useWalletTransactionSignAndSend();
+  const invalidateAllCryptoQueries = useInvalidateCryptoQueries();
+
+  return useMutation({
+    mutationFn: async ({ baseTimeSeconds, incrementSeconds }: { baseTimeSeconds: number; incrementSeconds: number }) => {
+      const allMatches = await matchFetcher.getAllMatches(client.rpc)
+      const sameGame = allMatches.find((match) => match.baseTimeSeconds === baseTimeSeconds && match.incrementSeconds === incrementSeconds && match.status === MatchStatus.Waiting)
+      if (sameGame) {
+        const matchAddress = await matchFetcher.getMatchPda(sameGame.matchId);
+        return await signAndSend(
+          await getJoinChessMatchInstructionAsync({
+            chessMatch: matchAddress[0],
+            payer: signer,
+          }),
+          signer,
+        );
+      } else {
+        const matchId = randomSafeMath();
+        return await signAndSend(
+          await getCreateChessMatchInstructionAsync({
+            matchId,
+            baseTimeSeconds,
+            incrementSeconds,
+            payer: signer,
+          }),
+          signer,
+        );
+      }
+    },
+    onSuccess: async (data) => {
+      toast.success(`Match making: ${data}`);
+      // Invalidate all crypto queries at once
+      await invalidateAllCryptoQueries();
+    },
+  });
+}
+
 // Make move mutation
 export function useMakeMoveMutation() {
   const { client } = useWalletUi();

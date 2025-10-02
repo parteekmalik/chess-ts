@@ -1,21 +1,21 @@
 "use client";
 
 import type { Color } from "chess.js";
-import type { Address } from "gill";
-import { useEffect, useMemo } from "react";
-import { useParams, useRouter } from "next/navigation";
 import { BLACK, WHITE } from "chess.js";
+import type { Address } from "gill";
 import { address } from "gill";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useMemo } from "react";
 
-import type { ChessMoveType } from "@acme/lib";
 import {
   useChessMatch,
   useConnectedWalletProfile,
-  useCreateChessMatchMutation,
   useFindJoinedMatch,
+  useIsWaitForJoin,
   useMakeMoveMutation,
-  useWaitForJoin,
+  useMatchMakingMutation
 } from "@acme/chess-queries";
+import type { ChessMoveType } from "@acme/lib";
 
 import { BoardWithTime } from "~/components/LiveMatch/BoardWithTime";
 import { MatchesList } from "~/components/solana/cards/MatchesList";
@@ -35,8 +35,8 @@ export function Web3MatchPage() {
   const { data: match } = useChessMatch(matchAddress);
   const iAmPlayer = useIsPlayerInMatch(matchAddress);
   const makeMoveMutation = useMakeMoveMutation();
-  const createMatchMutation = useCreateChessMatchMutation();
-  const { data: watingMatch } = useWaitForJoin();
+  const gameMatchMutation = useMatchMakingMutation();
+  const { data: watingMatch } = useIsWaitForJoin();
 
   const gameData = useMemo(
     () =>
@@ -73,7 +73,7 @@ export function Web3MatchPage() {
   };
 
   const createMatch = (baseTime: number, incrementTime: number) => {
-    createMatchMutation.mutate({
+    gameMatchMutation.mutate({
       baseTimeSeconds: baseTime / 1000,
       incrementSeconds: incrementTime / 1000,
     });
@@ -83,7 +83,7 @@ export function Web3MatchPage() {
   return (
     <div>
       <BoardWithTime
-        isInMatching={createMatchMutation.isPending || !!watingMatch}
+        isInMatching={gameMatchMutation.isPending || !!watingMatch}
         gameData={gameData}
         sideBar={{
           createMatch,

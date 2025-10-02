@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-import { useCreateChessMatchMutation, useFindJoinedMatch, useWaitForJoin } from "@acme/chess-queries";
+import { useFindJoinedMatch, useIsWaitForJoin, useMatchMakingMutation } from "@acme/chess-queries";
 
 import { BoardWithTime } from "~/components/LiveMatch/BoardWithTime";
 import { MatchesList } from "~/components/solana/cards/MatchesList";
@@ -11,11 +11,11 @@ import { ProfilesList } from "~/components/solana/cards/ProfilesList";
 
 export function Web3MatchPage() {
   const router = useRouter();
-  const createMatchMutation = useCreateChessMatchMutation();
-  const { data: watingMatch } = useWaitForJoin();
+  const gameMatchMutation = useMatchMakingMutation();
+  const { data: watingMatch } = useIsWaitForJoin();
   const { data: liveMatch } = useFindJoinedMatch();
   const createMatch = (baseTime: number, incrementTime: number) => {
-    createMatchMutation.mutate({
+    gameMatchMutation.mutate({
       baseTimeSeconds: baseTime / 1000,
       incrementSeconds: incrementTime / 1000,
     });
@@ -29,7 +29,7 @@ export function Web3MatchPage() {
   return (
     <div>
       <BoardWithTime
-        isInMatching={createMatchMutation.isPending || !!watingMatch}
+        isInMatching={gameMatchMutation.isPending || !!watingMatch}
         sideBar={{ createMatch, matches, players }}
         layout={{ boardHeightOffset: 50 }}
       />

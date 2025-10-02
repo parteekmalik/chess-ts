@@ -119,7 +119,7 @@ export function useConnectedWalletProfileMatches() {
   });
 }
 
-export function useWaitForJoin() {
+export function useIsWaitForJoin() {
   const { account, client } = useWalletUi();
   return useQuery({
     queryKey: ["profile", "matches", "connected", "isWaiting"],
